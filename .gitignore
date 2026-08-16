@@ -1,0 +1,27 @@
+# Node & Frontend dependencies
+node_modules/
+dist/
+.vite/
+*.log
+
+# Python & Backend
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+*.sqlite3
+*.sqlite3-journal
+media/
+staticfiles/
+
+# Environment Variables
+.env
+.env.local
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

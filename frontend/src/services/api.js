@@ -142,7 +142,25 @@ export const dashboardApi = {
   getHeatmap: () => request('/dashboard/heatmap/'),
 };
 
+// 10. Authentication API
+export const authApi = {
+  login: (username, password) => request('/auth/token/', {
+    method: 'POST',
+    body: JSON.stringify({ username, password }),
+  }),
+  register: (userData) => request('/auth/register/', {
+    method: 'POST',
+    body: JSON.stringify(userData),
+  }),
+  refreshToken: (refresh) => request('/auth/token/refresh/', {
+    method: 'POST',
+    body: JSON.stringify({ refresh }),
+  }),
+  getMe: () => request('/auth/me/'),
+};
+
 export default {
+  auth: authApi,
   websites: websitesApi,
   projects: projectsApi,
   blogs: blogsApi,

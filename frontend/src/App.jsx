@@ -13,6 +13,8 @@ import SettingsView from './components/SettingsView';
 import LogoutModal from './components/LogoutModal';
 import LoginView from './components/LoginView';
 import SignupView from './components/SignupView';
+import { AuthProvider } from './context/AuthContext';
+import AuthModal from './components/AuthModal';
 
 export const WEBSITES = [
   { 
@@ -126,101 +128,102 @@ export default function App() {
   const selectedSite = WEBSITES.find(w => w.id === activeWebsite) || WEBSITES[0];
 
   return (
-    <div className="min-h-screen bg-black text-slate-100 flex flex-col selection:bg-blue-500/30 selection:text-blue-200 overflow-x-hidden">
-      {/* Container wrapper locking layout above 1920px */}
-      <div className="w-full max-w-[1920px] mx-auto min-h-screen flex flex-col relative">
-        {/* Fixed Navbar (Full-Width Header) */}
-        <Navbar 
-          onNavigate={handleNavigate} 
-          currentPage={currentPage}
-          activeWebsite={selectedSite}
-          onSelectWebsite={(siteId) => setActiveWebsite(siteId)}
-          isMobileSidebarOpen={isMobileSidebarOpen}
-          onToggleMobileSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
-        />
-
-        {/* Main Body Container */}
-        <div className="flex flex-1 pt-16">
-          {/* Sidebar */}
-          <Sidebar 
-            currentPage={currentPage} 
+    <AuthProvider>
+      <div className="min-h-screen bg-black text-slate-100 flex flex-col selection:bg-blue-500/30 selection:text-blue-200 overflow-x-hidden">
+        {/* Container wrapper locking layout above 1920px */}
+        <div className="w-full max-w-[1920px] mx-auto min-h-screen flex flex-col relative">
+          {/* Fixed Navbar (Full-Width Header) */}
+          <Navbar 
             onNavigate={handleNavigate} 
+            currentPage={currentPage}
             activeWebsite={selectedSite}
-            isOpen={isMobileSidebarOpen}
-            onClose={() => setIsMobileSidebarOpen(false)}
+            onSelectWebsite={(site) => setActiveWebsite(typeof site === 'object' ? site.id : site)}
+            isMobileSidebarOpen={isMobileSidebarOpen}
+            onToggleMobileSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
           />
 
-          {/* Main View Area (w-48 sidebar offset) */}
-          <main className="flex-1 ml-0 md:ml-48 p-3.5 sm:p-5 min-h-[calc(100vh-4rem)] w-full overflow-x-hidden">
+          {/* Main Body Container */}
+          <div className="flex flex-1 pt-16">
+            {/* Sidebar */}
+            <Sidebar 
+              currentPage={currentPage} 
+              onNavigate={handleNavigate} 
+              activeWebsite={selectedSite}
+              isOpen={isMobileSidebarOpen}
+              onClose={() => setIsMobileSidebarOpen(false)}
+            />
 
-
-
-            {currentPage === 'dashboard' && (
-              <DashboardView 
-                onNavigate={handleNavigate} 
-                activeWebsite={selectedSite}
-              />
-            )}
-            {currentPage === 'manage-experiences' && (
-              <ExperiencesView 
-                onNavigate={handleNavigate} 
-                activeWebsite={selectedSite} 
-              />
-            )}
-            {currentPage === 'manage-skills' && (
-              <SkillsView 
-                onNavigate={handleNavigate} 
-                activeWebsite={selectedSite} 
-              />
-            )}
-            {currentPage === 'manage-projects' && (
-              <ProjectsView 
-                onNavigate={handleNavigate} 
-                activeWebsite={selectedSite} 
-              />
-            )}
-            {currentPage === 'manage-blogs' && (
-              <BlogsView 
-                onNavigate={handleNavigate} 
-                activeWebsite={selectedSite} 
-              />
-            )}
-            {currentPage === 'manage-contacts' && (
-              <MessagesView 
-                onNavigate={handleNavigate} 
-                activeWebsite={selectedSite} 
-              />
-            )}
-            {currentPage === 'manage-portfolio' && (
-              <DetailsView 
-                onNavigate={handleNavigate} 
-                activeWebsite={selectedSite} 
-              />
-            )}
-            {currentPage === 'manage-faq' && (
-              <FaqsView 
-                onNavigate={handleNavigate} 
-                activeWebsite={selectedSite} 
-              />
-            )}
-            {currentPage === 'manage-settings' && (
-              <SettingsView 
-                onNavigate={handleNavigate} 
-                activeWebsite={selectedSite} 
-              />
-            )}
-          </main>
-
+            {/* Main View Area (w-48 sidebar offset) */}
+            <main className="flex-1 ml-0 md:ml-48 p-3.5 sm:p-5 min-h-[calc(100vh-4rem)] w-full overflow-x-hidden">
+              {currentPage === 'dashboard' && (
+                <DashboardView 
+                  onNavigate={handleNavigate} 
+                  activeWebsite={selectedSite}
+                />
+              )}
+              {currentPage === 'manage-experiences' && (
+                <ExperiencesView 
+                  onNavigate={handleNavigate} 
+                  activeWebsite={selectedSite} 
+                />
+              )}
+              {currentPage === 'manage-skills' && (
+                <SkillsView 
+                  onNavigate={handleNavigate} 
+                  activeWebsite={selectedSite} 
+                />
+              )}
+              {currentPage === 'manage-projects' && (
+                <ProjectsView 
+                  onNavigate={handleNavigate} 
+                  activeWebsite={selectedSite} 
+                />
+              )}
+              {currentPage === 'manage-blogs' && (
+                <BlogsView 
+                  onNavigate={handleNavigate} 
+                  activeWebsite={selectedSite} 
+                />
+              )}
+              {currentPage === 'manage-contacts' && (
+                <MessagesView 
+                  onNavigate={handleNavigate} 
+                  activeWebsite={selectedSite} 
+                />
+              )}
+              {currentPage === 'manage-portfolio' && (
+                <DetailsView 
+                  onNavigate={handleNavigate} 
+                  activeWebsite={selectedSite} 
+                />
+              )}
+              {currentPage === 'manage-faq' && (
+                <FaqsView 
+                  onNavigate={handleNavigate} 
+                  activeWebsite={selectedSite} 
+                />
+              )}
+              {currentPage === 'manage-settings' && (
+                <SettingsView 
+                  onNavigate={handleNavigate} 
+                  activeWebsite={selectedSite} 
+                />
+              )}
+            </main>
+          </div>
         </div>
-      </div>
 
-      {/* Logout Confirmation Modal */}
-      {showLogoutModal && (
-        <LogoutModal
-          onCancel={() => setShowLogoutModal(false)}
-          onConfirmLogout={handleConfirmLogout}
-        />
-      )}
-    </div>
+        {/* Global Authentication Modal */}
+        <AuthModal />
+
+        {/* Logout Confirmation Modal */}
+        {showLogoutModal && (
+          <LogoutModal
+            onCancel={() => setShowLogoutModal(false)}
+            onConfirmLogout={handleConfirmLogout}
+          />
+        )}
+      </div>
+    </AuthProvider>
   );
 }

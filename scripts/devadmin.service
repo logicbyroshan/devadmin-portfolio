@@ -1,0 +1,20 @@
+[Unit]
+Description=DevAdmin Django Gunicorn Application Daemon
+After=network.target mysql.service
+
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/var/www/devadmin/backend
+Environment="PATH=/var/www/devadmin/backend/venv/bin"
+ExecStart=/var/www/devadmin/backend/venv/bin/gunicorn \
+          --workers 3 \
+          --bind 127.0.0.1:8000 \
+          --access-logfile /var/log/devadmin_access.log \
+          --error-logfile /var/log/devadmin_error.log \
+          devadmin_backend.wsgi:application
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

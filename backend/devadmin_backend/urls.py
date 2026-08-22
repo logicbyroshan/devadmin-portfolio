@@ -12,6 +12,8 @@ from drf_spectacular.views import (
     SpectacularRedocView,
 )
 
+from apps.websites.views_auth import RegisterView, CurrentUserView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     
@@ -23,6 +25,8 @@ urlpatterns = [
     # JWT Authentication Endpoints
     path('api/auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/auth/register/', RegisterView.as_view(), name='auth_register'),
+    path('api/auth/me/', CurrentUserView.as_view(), name='auth_current_user'),
     
     # Multi-Site App Domain API Endpoints
     path('api/websites/', include('apps.websites.urls')),

@@ -16,6 +16,7 @@ import {
   Briefcase,
   Code
 } from 'lucide-react';
+import RichContentBuilder from './RichContentBuilder';
 
 export default function DetailsView({ onNavigate, activeWebsite }) {
   const [saved, setSaved] = useState(false);
@@ -65,14 +66,14 @@ export default function DetailsView({ onNavigate, activeWebsite }) {
 
         <div className="flex items-center gap-3">
           {saved && (
-            <div className="px-3.5 py-2 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-bold flex items-center gap-2 animate-in fade-in">
+            <div className="h-9 px-3.5 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-bold flex items-center gap-2 animate-in fade-in">
               <CheckCircle2 className="w-4 h-4" /> Profile Saved Successfully!
             </div>
           )}
 
           <button
             onClick={handleSave}
-            className="px-5 py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:brightness-110 text-white font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-blue-500/20 transition-all flex-shrink-0"
+            className="h-9 px-4 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:brightness-110 text-white font-bold text-sm flex items-center gap-2 shadow-lg shadow-blue-500/20 transition-all flex-shrink-0"
           >
             <Save className="w-4 h-4" />
             <span>Save Profile Details</span>
@@ -194,13 +195,13 @@ export default function DetailsView({ onNavigate, activeWebsite }) {
               </div>
             </div>
 
-            <div>
-              <label className="block text-neutral-300 font-bold text-xs mb-1.5">Biography Narrative</label>
-              <textarea
-                rows={4}
+            {/* ULTRA-RICH BIOGRAPHY & PORTFOLIO NARRATIVE BUILDER */}
+            <div className="pt-2">
+              <RichContentBuilder
                 value={details.bio}
-                onChange={e => setDetails({ ...details, bio: e.target.value })}
-                className="w-full p-3 rounded-lg bg-[#050609] border border-neutral-800 text-xs sm:text-sm text-neutral-200 focus:outline-none focus:border-blue-500 resize-none leading-relaxed"
+                onChange={val => setDetails({ ...details, bio: val })}
+                label="Biography Narrative & Portfolio Bio (Markdown, Architecture, Benchmarks)"
+                placeholder="Write your professional biography, engineering philosophy, system architecture stack, and career accomplishments..."
               />
             </div>
           </div>
@@ -266,7 +267,7 @@ export default function DetailsView({ onNavigate, activeWebsite }) {
           <div className="pt-4 border-t border-neutral-800 flex justify-end">
             <button
               type="submit"
-              className="px-6 py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:brightness-110 text-white font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-blue-500/20 transition-all"
+              className="h-9 px-5 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:brightness-110 text-white font-bold text-sm flex items-center gap-2 shadow-lg shadow-blue-500/20 transition-all"
             >
               <Save className="w-4 h-4" />
               <span>Save Profile Details</span>

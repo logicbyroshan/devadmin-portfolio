@@ -1,310 +1,589 @@
 import React, { useState } from 'react';
-import { FolderKanban, Plus, Edit2, Trash2, Globe, Github, Tag, Calendar, ExternalLink, Eye, EyeOff, X } from 'lucide-react';
+import { 
+  FolderKanban, 
+  Plus, 
+  Edit2, 
+  Trash2, 
+  Globe, 
+  Github, 
+  Calendar, 
+  Eye, 
+  EyeOff, 
+  Save, 
+  Tag, 
+  ChevronDown
+} from 'lucide-react';
+import RichContentBuilder from './RichContentBuilder';
 
-export default function ProjectsView() {
-  const [showModal, setShowModal] = useState(false);
+export default function ProjectsView({ onNavigate, activeWebsite }) {
+  const [viewMode, setViewMode] = useState('LIST'); // 'LIST' | 'EDITOR'
+  const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [editingId, setEditingId] = useState(null);
 
   const [projects, setProjects] = useState([
     {
       id: 1,
-      title: 'Awesome Project One',
+      title: 'Dev-Meet Video Conference Suite',
       status: 'LIVE',
       category: 'Web Application',
-      description: 'A brief overview of this fantastic project and what it achieves. It uses modern tech stacks.',
-      completed: '2023-10-15',
+      description: `## 🎥 High-Performance WebRTC Video Conferencing Suite
+
+Real-time WebRTC multi-peer conference room with low-latency media relays, selective forwarding units (SFU), and synchronized collaborative code editing.
+
+### 🏛️ WebRTC Peer & SFU Media Topology
+
+\`\`\`architecture:microservices
+title: WebRTC Mesh & Selective Forwarding Unit (SFU) Relay
+nodes:
+  - [Client Browser A] -> [Signaling Gateway (WebSocket / SSL)]
+  - [Signaling Gateway] -> [Mediasoup SFU Media Server]
+  - [Mediasoup SFU Server] -> [Opus Audio & VP9 Video Router]
+  - [Mediasoup SFU Server] -> [Client Browser B & C]
+\`\`\`
+
+### ⚡ Connection Latency & Audio Jitter Benchmarks
+
+\`\`\`chart:barchart
+title: Global Media Relay Latency (ms - Lower is Better)
+unit: ms
+data:
+  - Direct P2P Relay: 18
+  - Mediasoup SFU Regional Node: 24
+  - Legacy TURN Relay Server: 62
+\`\`\`
+
+### 📡 Real-time Room Signaling Endpoints
+
+| Method | Endpoint Path | Description | Protocol |
+| :--- | :--- | :--- | :--- |
+| \`POST\` | \`/api/v1/rooms/create\` | Initialize encrypted WebRTC room | HTTPS REST |
+| \`WSS\` | \`/ws/rooms/:id/connect\` | Media stream negotiation & SDP exchange | WebSockets |
+`,
+      completed: '2025-05-15',
       image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80',
-      demoUrl: 'https://example.com',
-      githubUrl: 'https://github.com'
+      demoUrl: 'https://dev-meet.example.com',
+      githubUrl: 'https://github.com/roshan-dev/dev-meet',
+      visible: true
     },
     {
       id: 2,
-      title: 'Mobile App Redesign',
+      title: 'Mitra Peer Pairing Matcher',
+      status: 'LIVE',
+      category: 'Community Platform',
+      description: `## 🤝 Intelligent Developer Mentorship & Pairing Platform
+
+Smart developer mentor pairing algorithms connecting junior developers with senior engineers for sprint coaching, code review sessions, and career guidance.
+
+### 🏛️ Algorithmic Matching Pipeline
+
+\`\`\`architecture:microservices
+title: Graph-Based Matchmaking Engine Flow
+nodes:
+  - [Mentor Profile Vectors] -> [Vector Embedding Engine]
+  - [Mentee Learning Goals] -> [Cosine Similarity Matcher]
+  - [Cosine Matcher] -> [Redis Pairing Queue]
+  - [Redis Pairing Queue] -> [Automated Calendar Invitation Relay]
+\`\`\`
+
+### 📈 Match Precision & Satisfaction Score
+
+\`\`\`chart:linegraph
+title: Session Completion Rate vs Pairing Cohorts
+unit: %
+points:
+  - Cohort 1 (Manual): 64%
+  - Cohort 2 (Rule-Based): 76%
+  - Cohort 3 (Vector Match): 94%
+\`\`\`
+`,
+      completed: '2025-06-01',
+      image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&auto=format&fit=crop&q=80',
+      demoUrl: 'https://dev-mitra.example.com',
+      githubUrl: 'https://github.com/roshan-dev/dev-mitra',
+      visible: true
+    },
+    {
+      id: 3,
+      title: 'Dev-Mate Collaborative IDE Sandbox',
       status: 'OFFLINE',
-      category: 'UI/UX Design',
-      description: 'Redesign of a popular mobile application focusing on user experience and modern UI trends.',
-      completed: '2024-01-20',
-      image: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=600&auto=format&fit=crop&q=80',
+      category: 'Developer Tools',
+      description: `## ⚡ In-Browser Cloud Compilation & Code Sandbox
+
+In-browser real-time cloud compilation sandbox supporting Node.js, Python, and Go micro-services with instantaneous live preview and container execution.
+
+### 🏛️ Sandboxed Container Lifecycle
+
+\`\`\`architecture:microservices
+title: Isolated Cloud Code Execution Sandbox
+nodes:
+  - [Monaco Code Editor] -> [WebSocket Language Server (LSP)]
+  - [LSP Server] -> [Firecracker MicroVM Manager]
+  - [Firecracker MicroVM] -> [Isolated Ephemeral Container]
+\`\`\`
+`,
+      completed: '2025-06-20',
+      image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&auto=format&fit=crop&q=80',
       demoUrl: '#',
-      githubUrl: '#'
+      githubUrl: 'https://github.com/roshan-dev/dev-mate',
+      visible: false
     }
   ]);
 
+  // Form state for unified separate Add/Edit page
   const [formData, setFormData] = useState({
     title: '',
     status: 'LIVE',
     category: 'Web Application',
     description: '',
-    completed: '',
-    image: '',
+    completed: new Date().toISOString().split('T')[0],
+    image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80',
     demoUrl: '',
-    githubUrl: ''
+    githubUrl: '',
+    visible: true
   });
 
-  const handleOpenAdd = () => {
+  const categories = ['ALL', ...Array.from(new Set(projects.map(p => p.category)))];
+
+  const filteredProjects = projects.filter(p => {
+    if (selectedCategory === 'ALL') return true;
+    return p.category === selectedCategory;
+  });
+
+  // Open separate Editor Page for Adding
+  const handleOpenAddPage = () => {
     setEditingId(null);
     setFormData({
       title: '',
       status: 'LIVE',
       category: 'Web Application',
-      description: '',
+      description: `## 🚀 Project Overview
+
+Describe the core problem this project solves and architectural decisions.
+
+### 🏛️ System Architecture Topology
+
+\`\`\`architecture:microservices
+title: System Topology & Ingress Flow
+nodes:
+  - [Web Frontend Client] -> [Ingress Load Balancer]
+  - [Ingress Load Balancer] -> [API Gateway Service]
+  - [API Gateway Service] -> [Relational Storage Cluster]
+\`\`\`
+
+### ⚡ Performance Benchmarks
+
+\`\`\`chart:barchart
+title: Throughput & Latency Benchmarks
+unit: req/s
+data:
+  - Optimized Pipeline: 110000
+  - Legacy Pipeline: 35000
+\`\`\`
+`,
       completed: new Date().toISOString().split('T')[0],
       image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80',
       demoUrl: '',
-      githubUrl: ''
+      githubUrl: '',
+      visible: true
     });
-    setShowModal(true);
+    setViewMode('EDITOR');
+    window.scrollTo(0, 0);
   };
 
-  const handleOpenEdit = (proj) => {
+  // Open separate Editor Page for Editing
+  const handleOpenEditPage = (proj) => {
     setEditingId(proj.id);
     setFormData({ ...proj });
-    setShowModal(true);
+    setViewMode('EDITOR');
+    window.scrollTo(0, 0);
   };
 
+  // Return to List View
+  const handleBackToList = () => {
+    setViewMode('LIST');
+    setEditingId(null);
+    window.scrollTo(0, 0);
+  };
+
+  // Save Form (Add or Edit)
+  const handleSaveForm = (e) => {
+    e?.preventDefault();
+    if (!formData.title.trim()) {
+      alert('Please enter a Project Title.');
+      return;
+    }
+
+    if (editingId) {
+      setProjects(projects.map(p => p.id === editingId ? { ...formData, id: editingId } : p));
+    } else {
+      const newEntry = {
+        ...formData,
+        id: Date.now()
+      };
+      setProjects([newEntry, ...projects]);
+    }
+
+    setViewMode('LIST');
+    setEditingId(null);
+    window.scrollTo(0, 0);
+  };
+
+  // Delete project
   const handleDelete = (id) => {
-    if (confirm('Delete project?')) {
+    if (confirm('Delete project portfolio item?')) {
       setProjects(projects.filter(p => p.id !== id));
     }
   };
 
-  const handleToggleStatus = (id) => {
-    setProjects(projects.map(p => p.id === id ? { ...p, status: p.status === 'LIVE' ? 'OFFLINE' : 'LIVE' } : p));
+  // Toggle visibility
+  const handleToggleVisible = (id) => {
+    setProjects(projects.map(p => p.id === id ? { ...p, visible: !p.visible } : p));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (editingId) {
-      setProjects(projects.map(p => p.id === editingId ? { ...formData, id: editingId } : p));
-    } else {
-      setProjects([...projects, { ...formData, id: Date.now() }]);
-    }
-    setShowModal(false);
-  };
+  // ==========================================
+  // VIEW 1: SEPARATE DEDICATED ADD / EDIT PAGE
+  // ==========================================
+  if (viewMode === 'EDITOR') {
+    const isEditing = editingId !== null;
+    return (
+      <div className="space-y-6 w-full max-w-full overflow-x-hidden font-sans animate-in fade-in duration-150">
+        {/* Top Header (Left-side Back button removed, Cancel on right) */}
+        <div className="p-4 sm:p-5 rounded-xl bg-[#07080d] border border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl">
+          <div className="flex items-center gap-3.5">
+            <div className="p-3 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/30">
+              <FolderKanban className="w-5 h-5" />
+            </div>
+            <div>
+              <h1 className="text-base sm:text-lg font-extrabold text-white flex items-center gap-2">
+                <span className="font-accent">{isEditing ? `Edit Project: ${formData.title}` : 'Add New Portfolio Project'}</span>
+              </h1>
+              <p className="text-xs text-neutral-400 mt-0.5">
+                {isEditing ? 'Update project repository URLs, live demo endpoints, and architectural documentation.' : 'Publish a new development project to your showcase.'}
+              </p>
+            </div>
+          </div>
 
-  return (
-    <div className="space-y-6">
-      {/* Top Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl glass-card border border-slate-800">
-        <div>
-          <h1 className="text-xl font-extrabold text-white flex items-center gap-2">
-            <FolderKanban className="w-5 h-5 text-cyan-400" />
-            <span>Manage Projects Portfolio</span>
-          </h1>
-          <p className="text-xs text-slate-400 mt-1">Showcase your best software projects, live preview links, and GitHub repositories.</p>
+          <div className="flex items-center gap-2.5">
+            <button
+              type="button"
+              onClick={handleBackToList}
+              className="px-4 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-300 text-xs font-semibold border border-neutral-800 transition-colors"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="button"
+              onClick={handleSaveForm}
+              className="px-5 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:brightness-110 text-white font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-blue-500/20 transition-all"
+            >
+              <Save className="w-4 h-4" />
+              <span>{isEditing ? 'Save Changes' : 'Save & Publish Project'}</span>
+            </button>
+          </div>
         </div>
-        <button
-          onClick={handleOpenAdd}
-          className="px-4 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs flex items-center gap-2 shadow-lg shadow-cyan-500/20 transition-all"
-        >
-          <Plus className="w-4 h-4" /> Add New Project
-        </button>
+
+        {/* Dedicated Separate Form Container with Rich Content Builder */}
+        <div className="p-6 sm:p-8 rounded-xl bg-[#07080d] border border-neutral-800 shadow-2xl space-y-6">
+          <form onSubmit={handleSaveForm} className="space-y-6">
+            {/* Title & Category */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2">
+                  Project Title <span className="text-blue-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  autoFocus
+                  value={formData.title}
+                  onChange={e => setFormData({ ...formData, title: e.target.value })}
+                  placeholder="e.g. Real-Time Distributed Collaboration Suite"
+                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 transition-colors font-accent font-bold"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2">
+                  Category Tag
+                </label>
+                <input
+                  type="text"
+                  value={formData.category}
+                  onChange={e => setFormData({ ...formData, category: e.target.value })}
+                  placeholder="e.g. Web Application, Cloud Architecture"
+                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 transition-colors"
+                />
+              </div>
+            </div>
+
+            {/* Status & Completion Date */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2">
+                  Deployment Status
+                </label>
+                <select
+                  value={formData.status}
+                  onChange={e => setFormData({ ...formData, status: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
+                >
+                  <option value="LIVE">LIVE (Public Online)</option>
+                  <option value="OFFLINE">OFFLINE (In Development / Archival)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2">
+                  Completion / Release Date
+                </label>
+                <input
+                  type="date"
+                  value={formData.completed}
+                  onChange={e => setFormData({ ...formData, completed: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
+                />
+              </div>
+            </div>
+
+            {/* Demo URL & GitHub Repository URL */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2">
+                  Live Demo URL
+                </label>
+                <input
+                  type="url"
+                  value={formData.demoUrl}
+                  onChange={e => setFormData({ ...formData, demoUrl: e.target.value })}
+                  placeholder="https://example.com"
+                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2">
+                  GitHub Repository URL
+                </label>
+                <input
+                  type="url"
+                  value={formData.githubUrl}
+                  onChange={e => setFormData({ ...formData, githubUrl: e.target.value })}
+                  placeholder="https://github.com/username/project-repo"
+                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 transition-colors"
+                />
+              </div>
+            </div>
+
+            {/* Showcase Image URL */}
+            <div>
+              <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2">
+                Cover Screenshot / Image URL
+              </label>
+              <input
+                type="text"
+                value={formData.image}
+                onChange={e => setFormData({ ...formData, image: e.target.value })}
+                placeholder="https://images.unsplash.com/photo-..."
+                className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 transition-colors font-mono text-xs"
+              />
+            </div>
+
+            {/* ULTRA-RICH CONTENT BUILDER (Architecture, Benchmarks, Video, Code) */}
+            <div className="pt-2">
+              <RichContentBuilder
+                value={formData.description}
+                onChange={val => setFormData({ ...formData, description: val })}
+                label="Project Technical Documentation & System Design"
+                placeholder="Detail key architectural decisions, microservice topology, benchmark throughput, and code patterns..."
+              />
+            </div>
+
+            {/* Visibility Toggle */}
+            <div className="p-4 rounded-lg bg-black/50 border border-neutral-800/80 flex items-center justify-between">
+              <div>
+                <div className="text-sm font-bold text-white">Live Portfolio Visibility</div>
+                <p className="text-xs text-neutral-400 mt-0.5">Show or hide this project from your public portfolio gallery.</p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, visible: !formData.visible })}
+                className={`px-3.5 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition-all ${
+                  formData.visible
+                    ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                    : 'bg-neutral-800 text-neutral-400 border border-neutral-700'
+                }`}
+              >
+                {formData.visible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                <span>{formData.visible ? 'Visible on Portfolio' : 'Hidden from Public'}</span>
+              </button>
+            </div>
+
+            {/* Form Actions Footer */}
+            <div className="flex items-center justify-end gap-3 pt-6 border-t border-neutral-800">
+              <button
+                type="button"
+                onClick={handleBackToList}
+                className="px-5 py-2.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-300 text-xs sm:text-sm font-semibold border border-neutral-800 transition-colors"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="submit"
+                className="px-6 py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:brightness-110 text-white font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-blue-500/20 transition-all"
+              >
+                <Save className="w-4 h-4" />
+                <span>{isEditing ? 'Save Changes' : 'Save & Publish Project'}</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  // ==========================================
+  // VIEW 2: PROJECTS 3-CARD GRID VIEW
+  // ==========================================
+  return (
+    <div className="space-y-5 w-full max-w-full overflow-x-hidden font-sans">
+      {/* Header Banner with Category Dropdown & Add Button */}
+      <div className="p-4 sm:p-5 rounded-xl bg-[#07080d] border border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl">
+        <div className="flex items-center gap-3.5">
+          <div className="p-3 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/30">
+            <FolderKanban className="w-5 h-5" />
+          </div>
+          <div>
+            <h1 className="text-base sm:text-lg font-extrabold text-white">Manage Projects Portfolio</h1>
+            <p className="text-xs text-neutral-400 mt-0.5">Showcase your best software projects, live preview links, and GitHub repositories.</p>
+          </div>
+        </div>
+
+        {/* Right Actions: Category Dropdown & Add Button */}
+        <div className="flex items-center gap-3 flex-wrap">
+          {/* Category Dropdown */}
+          <div className="relative">
+            <select
+              value={selectedCategory}
+              onChange={e => setSelectedCategory(e.target.value)}
+              className="px-3.5 py-2.5 rounded-lg bg-[#050609] hover:bg-neutral-900 border border-neutral-800 text-xs font-bold text-neutral-200 focus:outline-none focus:border-blue-500 transition-colors cursor-pointer appearance-none pr-8"
+            >
+              <option value="ALL">All Categories ({projects.length})</option>
+              {categories.filter(c => c !== 'ALL').map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+            <ChevronDown className="w-3.5 h-3.5 text-neutral-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
+
+          <button
+            onClick={handleOpenAddPage}
+            className="px-4 py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:brightness-110 text-white font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-blue-500/20 transition-all flex-shrink-0"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add New Project</span>
+          </button>
+        </div>
       </div>
 
-      {/* Projects Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {projects.map((proj) => (
-          <div key={proj.id} className="rounded-2xl glass-card glass-card-hover overflow-hidden border border-slate-800 flex flex-col justify-between">
+      {/* Projects 3-Card Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {filteredProjects.map((proj) => (
+          <div 
+            key={proj.id} 
+            className="rounded-xl bg-[#07080d] border border-neutral-800 hover:border-neutral-700 transition-all duration-200 overflow-hidden flex flex-col justify-between shadow-lg group hover:-translate-y-1"
+          >
             <div>
-              {/* Card Image */}
-              <div className="relative h-44 w-full bg-slate-900 overflow-hidden">
+              {/* Card Image Banner */}
+              <div className="relative h-44 w-full bg-[#030406] overflow-hidden border-b border-neutral-800">
                 <img
                   src={proj.image}
                   alt={proj.title}
-                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   onError={(e) => {
                     e.target.src = 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80';
                   }}
                 />
                 <div className="absolute top-3 right-3 flex items-center gap-2">
-                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold tracking-wider ${
+                  <span className={`px-2.5 py-0.5 rounded text-[10px] font-black uppercase tracking-wider ${
                     proj.status === 'LIVE'
                       ? 'bg-emerald-500/90 text-slate-950 shadow-md shadow-emerald-500/30'
-                      : 'bg-slate-900/90 text-slate-400 border border-slate-700'
+                      : 'bg-black/90 text-neutral-400 border border-neutral-700'
                   }`}>
                     {proj.status}
                   </span>
                 </div>
-              </div>
-
-              {/* Content */}
-              <div className="p-5 space-y-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-base font-bold text-white">{proj.title}</h3>
-                  <span className="text-[10px] font-semibold text-cyan-400 uppercase tracking-wider px-2 py-0.5 rounded-md bg-cyan-500/10 border border-cyan-500/20">
+                <div className="absolute bottom-3 left-3">
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-black/80 backdrop-blur-md text-blue-400 border border-blue-500/30">
                     {proj.category}
                   </span>
                 </div>
+              </div>
 
-                <p className="text-xs text-slate-300 leading-relaxed">{proj.description}</p>
+              {/* Content Details */}
+              <div className="p-5 space-y-3">
+                <h3 className="text-base font-extrabold text-white group-hover:text-blue-400 transition-colors line-clamp-1 font-accent">
+                  {proj.title}
+                </h3>
+                <p className="text-xs text-neutral-300 line-clamp-2 leading-relaxed font-normal">
+                  {proj.description.replace(/#|\*|`|\[|\]/g, '').substring(0, 120)}...
+                </p>
 
-                <div className="flex items-center justify-between text-[11px] text-slate-400 pt-3 border-t border-slate-800/80">
-                  <div className="flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5 text-cyan-400" />
-                    <span>Completed: {proj.completed}</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    {proj.demoUrl && proj.demoUrl !== '#' && (
-                      <a href={proj.demoUrl} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-cyan-400 transition-colors">
-                        <Globe className="w-4 h-4" />
-                      </a>
-                    )}
-                    {proj.githubUrl && proj.githubUrl !== '#' && (
-                      <a href={proj.githubUrl} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-cyan-400 transition-colors">
-                        <Github className="w-4 h-4" />
-                      </a>
-                    )}
-                  </div>
+                <div className="flex items-center gap-2 text-[11px] text-neutral-400 pt-2 border-t border-neutral-800">
+                  <Calendar className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" />
+                  <span>Completed: {proj.completed}</span>
                 </div>
               </div>
             </div>
 
-            {/* Bottom Actions */}
-            <div className="p-4 bg-slate-900/40 border-t border-slate-800/80 flex items-center justify-end gap-2">
+            {/* Card Action Buttons with Working Visibility Toggle */}
+            <div className="p-4 pt-0 flex items-center justify-between gap-2 border-t border-neutral-800/80 pt-3">
               <button
-                onClick={() => handleToggleStatus(proj.id)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all ${
-                  proj.status === 'LIVE'
-                    ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                    : 'bg-slate-800 text-slate-400 border border-slate-700'
+                type="button"
+                onClick={() => handleToggleVisible(proj.id)}
+                className={`px-2.5 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all truncate ${
+                  proj.visible
+                    ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                    : 'bg-neutral-800/60 text-neutral-400 border border-neutral-700'
                 }`}
+                title="Toggle Live Visibility"
               >
-                {proj.status === 'LIVE' ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
-                <span>{proj.status === 'LIVE' ? 'Online' : 'Offline'}</span>
+                {proj.visible ? <Eye className="w-3.5 h-3.5 flex-shrink-0" /> : <EyeOff className="w-3.5 h-3.5 flex-shrink-0" />}
+                <span className="truncate">{proj.visible ? 'Visible' : 'Hidden'}</span>
               </button>
-              <button
-                onClick={() => handleOpenEdit(proj)}
-                className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-medium flex items-center gap-1.5 border border-slate-700 transition-all"
-              >
-                <Edit2 className="w-3.5 h-3.5" /> Edit
-              </button>
-              <button
-                onClick={() => handleDelete(proj.id)}
-                className="px-3 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-medium flex items-center gap-1.5 border border-rose-500/20 transition-all"
-              >
-                <Trash2 className="w-3.5 h-3.5" /> Delete
-              </button>
+
+              <div className="flex items-center gap-1.5 flex-shrink-0">
+                {proj.demoUrl && proj.demoUrl !== '#' && (
+                  <a
+                    href={proj.demoUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="p-1.5 rounded-md bg-neutral-900 hover:bg-neutral-800 text-neutral-300 hover:text-white border border-neutral-800 transition-colors"
+                    title="Live Demo"
+                  >
+                    <Globe className="w-3.5 h-3.5" />
+                  </a>
+                )}
+                <button
+                  onClick={() => handleOpenEditPage(proj)}
+                  className="px-2.5 py-1.5 rounded-md bg-[#050609] hover:bg-neutral-800 text-neutral-300 hover:text-white text-xs font-semibold flex items-center gap-1.5 border border-neutral-800 transition-all"
+                >
+                  <Edit2 className="w-3.5 h-3.5" /> Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(proj.id)}
+                  className="p-1.5 rounded-md bg-rose-950/20 hover:bg-rose-950/40 text-rose-400 text-xs font-medium flex items-center gap-1.5 border border-rose-900/30 transition-all"
+                  title="Delete Project"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
             </div>
           </div>
         ))}
       </div>
-
-      {/* Modal */}
-      {showModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="w-full max-w-lg glass-card border border-slate-700 rounded-2xl p-6 space-y-4 animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-              <h3 className="text-base font-bold text-white">
-                {editingId ? 'Edit Project' : 'Add New Project'}
-              </h3>
-              <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-white">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-4 text-xs">
-              <div>
-                <label className="block text-slate-300 font-semibold mb-1">Project Title</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.title}
-                  onChange={e => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="e.g. Portfolio Dashboard"
-                  className="w-full px-3 py-2 rounded-xl glass-input"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Category</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.category}
-                    onChange={e => setFormData({ ...formData, category: e.target.value })}
-                    placeholder="e.g. Web Application"
-                    className="w-full px-3 py-2 rounded-xl glass-input"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Status</label>
-                  <select
-                    value={formData.status}
-                    onChange={e => setFormData({ ...formData, status: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl glass-input bg-slate-900"
-                  >
-                    <option value="LIVE">LIVE</option>
-                    <option value="OFFLINE">OFFLINE</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-slate-300 font-semibold mb-1">Thumbnail Image URL</label>
-                <input
-                  type="url"
-                  value={formData.image}
-                  onChange={e => setFormData({ ...formData, image: e.target.value })}
-                  placeholder="https://..."
-                  className="w-full px-3 py-2 rounded-xl glass-input"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Demo / Live URL</label>
-                  <input
-                    type="text"
-                    value={formData.demoUrl}
-                    onChange={e => setFormData({ ...formData, demoUrl: e.target.value })}
-                    placeholder="https://..."
-                    className="w-full px-3 py-2 rounded-xl glass-input"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-300 font-semibold mb-1">GitHub Repo URL</label>
-                  <input
-                    type="text"
-                    value={formData.githubUrl}
-                    onChange={e => setFormData({ ...formData, githubUrl: e.target.value })}
-                    placeholder="https://github.com/..."
-                    className="w-full px-3 py-2 rounded-xl glass-input"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-slate-300 font-semibold mb-1">Description</label>
-                <textarea
-                  rows="3"
-                  value={formData.description}
-                  onChange={e => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Project details and technical highlights..."
-                  className="w-full px-3 py-2 rounded-xl glass-input"
-                ></textarea>
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 font-medium hover:bg-slate-700"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 rounded-xl bg-cyan-500 text-slate-950 font-bold hover:bg-cyan-400"
-                >
-                  Save Project
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

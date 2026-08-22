@@ -1,256 +1,617 @@
 import React, { useState } from 'react';
-import { FileText, Plus, Edit2, Trash2, Search, Calendar, Eye, FileEdit, Clock, Check, X } from 'lucide-react';
+import { 
+  FileText, 
+  Plus, 
+  Edit2, 
+  Trash2, 
+  Calendar, 
+  Eye, 
+  EyeOff, 
+  Clock, 
+  Tag, 
+  Save, 
+  ChevronDown
+} from 'lucide-react';
+import RichContentBuilder from './RichContentBuilder';
 
-export default function BlogsView() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [showModal, setShowModal] = useState(false);
+export default function BlogsView({ onNavigate, activeWebsite }) {
+  const [viewMode, setViewMode] = useState('LIST'); // 'LIST' | 'EDITOR'
+  const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [editingId, setEditingId] = useState(null);
 
   const [blogs, setBlogs] = useState([
     {
       id: 1,
-      title: 'Building Modern Glassmorphism UIs with Tailwind CSS',
+      title: 'Building Modern Glassmorphism UIs with Tailwind CSS and React',
+      slug: 'glassmorphism-tailwind-react-2025',
       category: 'Design Systems',
       status: 'PUBLISHED',
       date: '2025-06-15',
-      views: 1420
+      readTime: '5 min read',
+      views: 1420,
+      summary: 'A comprehensive deep dive into creating deep obsidian glass interfaces with frosted backdrop blur, responsive borders, and unified color tokens.',
+      content: `## 🌟 Deep Obsidian Glassmorphism Architecture
+
+In this comprehensive guide, we construct highly responsive, glassmorphic dashboards using TailwindCSS utilities, frosted backdrop filters, and custom CSS design tokens.
+
+### 🏛️ UI Token & Rendering Pipeline
+
+\`\`\`architecture:microservices
+title: Glassmorphic Component Composition Pipeline
+nodes:
+  - [Design Tokens (CSS Variables)] -> [Tailwind Config Theme]
+  - [Tailwind Config Theme] -> [Obsidian Glass Card Primitive]
+  - [Obsidian Glass Card Primitive] -> [Interactive Chart & Form Widgets]
+\`\`\`
+
+### ⚡ Performance Benchmarks of CSS Blur vs SVG Filters
+
+\`\`\`chart:barchart
+title: GPU Compositing Frame Rate (FPS - 60 FPS Target)
+unit: FPS
+data:
+  - Backdrop Filter Blur (Hardware Accelerated): 60
+  - Pure SVG Filter Matrix: 44
+  - Canvas Repaint Layer: 38
+\`\`\`
+
+### 💻 Glassmorphic Card Implementation
+
+\`\`\`typescript:frontend/src/components/GlassCard.tsx
+import React from 'react';
+
+export function GlassCard({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div className={\`p-5 rounded-xl bg-[#07080d]/90 backdrop-blur-xl border border-neutral-800/90 shadow-2xl hover:border-neutral-700 transition-all \${className}\`}>
+      {children}
+    </div>
+  );
+}
+\`\`\`
+
+> [!TIP]
+> Always pair \`backdrop-blur-xl\` with an explicit subtle border (e.g. \`border-neutral-800/90\`) so cards maintain high visual contrast over dark backgrounds.
+`,
+      visible: true
     },
     {
       id: 2,
       title: 'State Management in 2025: From Zustand to Redux Toolkit',
+      slug: 'state-management-modern-react',
       category: 'React & Frontend',
       status: 'SCHEDULED',
       date: '2025-06-25',
-      views: 0
+      readTime: '8 min read',
+      views: 0,
+      summary: 'Comparing ergonomic micro-stores like Zustand with full-featured Redux Toolkit architectures for enterprise React multi-tenant apps.',
+      content: `## ⚖️ State Management in 2025: Architectural Comparison
+
+State management has evolved significantly over the past decade. While Zustand provides unmatched simplicity, RTK Query continues to dominate complex multi-tenant API caching layers.
+
+### 📊 Feature & Performance Comparison
+
+| Criteria | Zustand 4.5 | Redux Toolkit 2.x | Jotai 2.x |
+| :--- | :--- | :--- | :--- |
+| **Bundle Footprint** | \`1.2 kB\` | \`12.4 kB\` | \`2.8 kB\` |
+| **Boilerplate Ratio** | Minimal | Medium | Minimal |
+| **Built-in Cache Sync** | No (External) | Yes (RTK Query) | No |
+| **DevTools Support** | Redux DevTools | Redux DevTools | Custom Plugin |
+
+### ⚡ Memory Footprint Benchmark
+
+\`\`\`chart:barchart
+title: Memory Usage with 10,000 Reactive Atomic Stores (MB - Lower is Better)
+unit: MB
+data:
+  - Zustand Microstore: 4.2
+  - Jotai Atoms: 5.8
+  - Redux Slice Root: 11.4
+\`\`\`
+
+> [!NOTE]
+> For micro-frontends with independent lifecycle trees, Zustand provides the lowest cognitive overhead and zero provider wrappers.
+`,
+      visible: true
     },
     {
       id: 3,
-      title: 'Optimizing Node.js APIs for High Throughput Applications',
+      title: 'Optimizing Node.js APIs for High Throughput Microservices',
+      slug: 'optimizing-nodejs-apis-throughput',
       category: 'Backend Engineering',
       status: 'DRAFT',
       date: '2025-07-01',
-      views: 0
+      readTime: '12 min read',
+      views: 0,
+      summary: 'Practical caching techniques, connection pooling with Postgres, and cluster module configurations to maximize API throughput.',
+      content: `## 🚀 High-Throughput Node.js Microservice Optimization
+
+Scaling Node.js requires mastering event loop dynamics, libuv threadpools, and multi-core cluster utilization.
+
+### 🏛️ Microservice Deployment Topology
+
+\`\`\`architecture:microservices
+title: High-Throughput API Gateway & Cluster Deployment
+nodes:
+  - [Client Ingress] -> [Envoy Proxy / Load Balancer]
+  - [Envoy Proxy] -> [Node.js Cluster Workers (x8 Cores)]
+  - [Node.js Cluster Workers] -> [DragonflyDB Redis Cache]
+  - [Node.js Cluster Workers] -> [PostgreSQL PgBouncer Pool]
+\`\`\`
+
+### 📈 Latency Under Concurrent Traffic (p99)
+
+\`\`\`chart:linegraph
+title: p99 Latency vs Concurrent Connections (Lower is Better)
+unit: ms
+points:
+  - 500 Conns: 6ms
+  - 2,000 Conns: 12ms
+  - 5,000 Conns: 24ms
+  - 10,000 Conns: 39ms
+  - 25,000 Conns: 58ms
+\`\`\`
+`,
+      visible: false
     }
   ]);
 
+  // Form state for unified separate Add/Edit page
   const [formData, setFormData] = useState({
     title: '',
+    slug: '',
     category: 'React & Frontend',
-    status: 'DRAFT',
+    status: 'PUBLISHED',
     date: new Date().toISOString().split('T')[0],
-    views: 0
+    readTime: '5 min read',
+    views: 0,
+    summary: '',
+    content: '',
+    visible: true
   });
 
-  const filteredBlogs = blogs.filter(b => 
-    b.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    b.category.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const categories = ['ALL', ...Array.from(new Set(blogs.map(b => b.category)))];
 
-  const handleOpenAdd = () => {
+  const filteredBlogs = blogs.filter(b => {
+    if (selectedCategory === 'ALL') return true;
+    return b.category === selectedCategory;
+  });
+
+  // Open separate Editor Page for Adding
+  const handleOpenAddPage = () => {
     setEditingId(null);
     setFormData({
       title: '',
+      slug: '',
       category: 'React & Frontend',
-      status: 'DRAFT',
+      status: 'PUBLISHED',
       date: new Date().toISOString().split('T')[0],
-      views: 0
+      readTime: '5 min read',
+      views: 0,
+      summary: '',
+      content: `## 🚀 Introduction
+
+Write your comprehensive technical documentation here...
+
+### 🏛️ Architecture & System Flow
+
+\`\`\`architecture:microservices
+title: System Architecture Flow
+nodes:
+  - [Client Application] -> [API Gateway Layer]
+  - [API Gateway Layer] -> [Core Backend Microservice]
+  - [Core Backend Microservice] -> [Database Storage Pool]
+\`\`\`
+
+### ⚡ Performance Benchmarks
+
+\`\`\`chart:barchart
+title: Performance Benchmark Comparison
+unit: Req/s
+data:
+  - Optimized Version: 95000
+  - Baseline Version: 32000
+\`\`\`
+`,
+      visible: true
     });
-    setShowModal(true);
+    setViewMode('EDITOR');
+    window.scrollTo(0, 0);
   };
 
-  const handleOpenEdit = (blog) => {
+  // Open separate Editor Page for Editing
+  const handleOpenEditPage = (blog) => {
     setEditingId(blog.id);
     setFormData({ ...blog });
-    setShowModal(true);
+    setViewMode('EDITOR');
+    window.scrollTo(0, 0);
   };
 
+  // Return to List View
+  const handleBackToList = () => {
+    setViewMode('LIST');
+    setEditingId(null);
+    window.scrollTo(0, 0);
+  };
+
+  // Save Blog (Add or Edit)
+  const handleSaveForm = (e) => {
+    e?.preventDefault();
+    if (!formData.title.trim()) {
+      alert('Please enter an Article Title.');
+      return;
+    }
+
+    if (editingId) {
+      setBlogs(blogs.map(b => b.id === editingId ? { ...formData, id: editingId } : b));
+    } else {
+      const newEntry = {
+        ...formData,
+        id: Date.now()
+      };
+      setBlogs([newEntry, ...blogs]);
+    }
+
+    setViewMode('LIST');
+    setEditingId(null);
+    window.scrollTo(0, 0);
+  };
+
+  // Delete blog
   const handleDelete = (id) => {
-    if (confirm('Delete blog post entry?')) {
+    if (confirm('Delete this blog article?')) {
       setBlogs(blogs.filter(b => b.id !== id));
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (editingId) {
-      setBlogs(blogs.map(b => b.id === editingId ? { ...formData, id: editingId } : b));
-    } else {
-      setBlogs([...blogs, { ...formData, id: Date.now() }]);
-    }
-    setShowModal(false);
+  // Toggle visibility directly on card
+  const handleToggleVisible = (id) => {
+    setBlogs(blogs.map(b => b.id === id ? { ...b, visible: !b.visible } : b));
   };
 
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl glass-card border border-slate-800">
-        <div>
-          <h1 className="text-xl font-extrabold text-white flex items-center gap-2">
-            <FileText className="w-5 h-5 text-cyan-400" />
-            <span>Manage Blog Articles</span>
-          </h1>
-          <p className="text-xs text-slate-400 mt-1">Publish technical articles, track readership views, and schedule drafts.</p>
-        </div>
-        <button
-          onClick={handleOpenAdd}
-          className="px-4 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs flex items-center gap-2 shadow-lg shadow-cyan-500/20 transition-all"
-        >
-          <Plus className="w-4 h-4" /> Create Blog Post
-        </button>
-      </div>
+  const handleTitleChange = (val) => {
+    const generatedSlug = val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+    setFormData({
+      ...formData,
+      title: val,
+      slug: editingId ? formData.slug : generatedSlug
+    });
+  };
 
-      {/* Internal Search Bar for Articles */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="relative flex-1 max-w-md">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search articles by title or category..."
-            className="w-full pl-9 pr-4 py-2 rounded-xl glass-input text-xs"
-          />
-        </div>
-        <span className="text-xs text-slate-400 font-semibold">{filteredBlogs.length} articles found</span>
-      </div>
-
-      {/* Blog Table */}
-      <div className="rounded-2xl glass-card border border-slate-800 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-slate-300">
-            <thead className="bg-slate-900/80 text-slate-400 uppercase tracking-wider font-bold text-[10px] border-b border-slate-800">
-              <tr>
-                <th className="px-5 py-3">Article Title</th>
-                <th className="px-5 py-3">Category</th>
-                <th className="px-5 py-3">Status</th>
-                <th className="px-5 py-3">Publish Date</th>
-                <th className="px-5 py-3">Views</th>
-                <th className="px-5 py-3 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-800/60">
-              {filteredBlogs.map((blog) => (
-                <tr key={blog.id} className="hover:bg-slate-800/30 transition-colors">
-                  <td className="px-5 py-4 font-bold text-white max-w-xs">{blog.title}</td>
-                  <td className="px-5 py-4 text-cyan-400 font-medium">{blog.category}</td>
-                  <td className="px-5 py-4">
-                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase ${
-                      blog.status === 'PUBLISHED'
-                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                        : blog.status === 'SCHEDULED'
-                        ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
-                        : 'bg-slate-800 text-slate-400 border border-slate-700'
-                    }`}>
-                      {blog.status}
-                    </span>
-                  </td>
-                  <td className="px-5 py-4 text-slate-400">{blog.date}</td>
-                  <td className="px-5 py-4 font-semibold text-slate-200">{blog.views.toLocaleString()}</td>
-                  <td className="px-5 py-4 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <button
-                        onClick={() => handleOpenEdit(blog)}
-                        className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-slate-700 transition-all"
-                      >
-                        <Edit2 className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(blog.id)}
-                        className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 transition-all"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Modal */}
-      {showModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="w-full max-w-lg glass-card border border-slate-700 rounded-2xl p-6 space-y-4 animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-              <h3 className="text-base font-bold text-white">
-                {editingId ? 'Edit Blog Entry' : 'Create Blog Post'}
-              </h3>
-              <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-white">
-                <X className="w-5 h-5" />
-              </button>
+  // ==========================================
+  // VIEW 1: SEPARATE DEDICATED ADD / EDIT PAGE
+  // ==========================================
+  if (viewMode === 'EDITOR') {
+    const isEditing = editingId !== null;
+    return (
+      <div className="space-y-6 w-full max-w-full overflow-x-hidden font-sans animate-in fade-in duration-150">
+        {/* Top Header (Left-side Back button removed, Cancel on right) */}
+        <div className="p-4 sm:p-5 rounded-xl bg-[#07080d] border border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl">
+          <div className="flex items-center gap-3.5">
+            <div className="p-3 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/30">
+              <FileText className="w-5 h-5" />
             </div>
+            <div>
+              <h1 className="text-base sm:text-lg font-extrabold text-white flex items-center gap-2">
+                <span className="font-accent">{isEditing ? `Edit Article: ${formData.title}` : 'Create New Technical Article'}</span>
+              </h1>
+              <p className="text-xs text-neutral-400 mt-0.5">
+                {isEditing ? 'Update blog metadata, architecture diagrams, benchmark charts, and code.' : 'Compose and publish a rich technical post to your public portfolio blog.'}
+              </p>
+            </div>
+          </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4 text-xs">
+          <div className="flex items-center gap-2.5">
+            <button
+              type="button"
+              onClick={handleBackToList}
+              className="px-4 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-300 text-xs font-semibold border border-neutral-800 transition-colors"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="button"
+              onClick={handleSaveForm}
+              className="px-5 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:brightness-110 text-white font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-blue-500/20 transition-all"
+            >
+              <Save className="w-4 h-4" />
+              <span>{isEditing ? 'Save Changes' : 'Save & Publish Article'}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Dedicated Separate Form Container with Rich Content Builder */}
+        <div className="p-6 sm:p-8 rounded-xl bg-[#07080d] border border-neutral-800 shadow-2xl space-y-6">
+          <form onSubmit={handleSaveForm} className="space-y-6">
+            {/* Title & Slug */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Article Title</label>
+                <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2">
+                  Article Title <span className="text-blue-400">*</span>
+                </label>
                 <input
                   type="text"
                   required
+                  autoFocus
                   value={formData.title}
-                  onChange={e => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="e.g. Master TypeScript 5.0"
-                  className="w-full px-3 py-2 rounded-xl glass-input"
+                  onChange={e => handleTitleChange(e.target.value)}
+                  placeholder="e.g. Building Modern Glassmorphism UIs with Tailwind CSS"
+                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 transition-colors font-accent font-bold"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Category</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.category}
-                    onChange={e => setFormData({ ...formData, category: e.target.value })}
-                    placeholder="e.g. Web Development"
-                    className="w-full px-3 py-2 rounded-xl glass-input"
-                  />
-                </div>
+              <div>
+                <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2">
+                  URL Slug Identifier
+                </label>
+                <input
+                  type="text"
+                  value={formData.slug}
+                  onChange={e => setFormData({ ...formData, slug: e.target.value })}
+                  placeholder="e.g. building-modern-glassmorphism-uis"
+                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-neutral-300 placeholder-neutral-500 focus:outline-none focus:border-blue-500 transition-colors font-mono text-xs"
+                />
+              </div>
+            </div>
 
-                <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Status</label>
-                  <select
-                    value={formData.status}
-                    onChange={e => setFormData({ ...formData, status: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl glass-input bg-slate-900"
-                  >
-                    <option value="DRAFT">DRAFT</option>
-                    <option value="SCHEDULED">SCHEDULED</option>
-                    <option value="PUBLISHED">PUBLISHED</option>
-                  </select>
-                </div>
+            {/* Category & Status & Read Time & Date */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              <div>
+                <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2">
+                  Category Tag
+                </label>
+                <input
+                  type="text"
+                  value={formData.category}
+                  onChange={e => setFormData({ ...formData, category: e.target.value })}
+                  placeholder="e.g. React & Frontend"
+                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 transition-colors"
+                />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Publish Date</label>
+                <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2">
+                  Publication Status
+                </label>
+                <select
+                  value={formData.status}
+                  onChange={e => setFormData({ ...formData, status: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
+                >
+                  <option value="PUBLISHED">PUBLISHED</option>
+                  <option value="SCHEDULED">SCHEDULED</option>
+                  <option value="DRAFT">DRAFT</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2">
+                  Publish Date
+                </label>
                 <input
                   type="date"
                   value={formData.date}
                   onChange={e => setFormData({ ...formData, date: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl glass-input"
+                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 font-medium hover:bg-slate-700"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 rounded-xl bg-cyan-500 text-slate-950 font-bold hover:bg-cyan-400"
-                >
-                  Save Post
-                </button>
+              <div>
+                <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2">
+                  Estimated Read Time
+                </label>
+                <input
+                  type="text"
+                  value={formData.readTime}
+                  onChange={e => setFormData({ ...formData, readTime: e.target.value })}
+                  placeholder="e.g. 5 min read"
+                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 transition-colors"
+                />
               </div>
-            </form>
+            </div>
+
+            {/* Summary Excerpt */}
+            <div>
+              <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2">
+                Summary Excerpt (Meta Description & Card Preview)
+              </label>
+              <textarea
+                rows={2}
+                value={formData.summary}
+                onChange={e => setFormData({ ...formData, summary: e.target.value })}
+                placeholder="Write a concise overview of what readers will learn in this post..."
+                className="w-full p-3.5 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 resize-none leading-relaxed transition-colors"
+              />
+            </div>
+
+            {/* ULTRA-RICH CONTENT BUILDER (Diagrams, Code, Benchmark Charts, Video, Tables) */}
+            <div className="pt-2">
+              <RichContentBuilder
+                value={formData.content}
+                onChange={val => setFormData({ ...formData, content: val })}
+                label="Article Body Content & Architecture Documentation"
+                placeholder="Write markdown documentation, insert system design diagrams, benchmark charts, video walkthroughs, or code snippets..."
+              />
+            </div>
+
+            {/* Visibility Toggle */}
+            <div className="p-4 rounded-lg bg-black/50 border border-neutral-800/80 flex items-center justify-between">
+              <div>
+                <div className="text-sm font-bold text-white">Live Portfolio Visibility</div>
+                <p className="text-xs text-neutral-400 mt-0.5">Show or hide this article from your public blog index.</p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, visible: !formData.visible })}
+                className={`px-3.5 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition-all ${
+                  formData.visible
+                    ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                    : 'bg-neutral-800 text-neutral-400 border border-neutral-700'
+                }`}
+              >
+                {formData.visible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                <span>{formData.visible ? 'Visible on Portfolio' : 'Hidden from Public'}</span>
+              </button>
+            </div>
+
+            {/* Form Actions Footer */}
+            <div className="flex items-center justify-end gap-3 pt-6 border-t border-neutral-800">
+              <button
+                type="button"
+                onClick={handleBackToList}
+                className="px-5 py-2.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-300 text-xs sm:text-sm font-semibold border border-neutral-800 transition-colors"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="submit"
+                className="px-6 py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:brightness-110 text-white font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-blue-500/20 transition-all"
+              >
+                <Save className="w-4 h-4" />
+                <span>{isEditing ? 'Save Changes' : 'Save & Publish Article'}</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  // ==========================================
+  // VIEW 2: BLOGS 3-CARD GRID VIEW
+  // ==========================================
+  return (
+    <div className="space-y-5 w-full max-w-full overflow-x-hidden font-sans">
+      {/* Header Banner with Category Dropdown & Add Button */}
+      <div className="p-4 sm:p-5 rounded-xl bg-[#07080d] border border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl">
+        <div className="flex items-center gap-3.5">
+          <div className="p-3 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/30">
+            <FileText className="w-5 h-5" />
+          </div>
+          <div>
+            <h1 className="text-base sm:text-lg font-extrabold text-white">Manage Blog Articles</h1>
+            <p className="text-xs text-neutral-400 mt-0.5">Publish technical articles, system design docs, and manage schedules.</p>
           </div>
         </div>
-      )}
+
+        {/* Right Actions: Category Dropdown & Add Button */}
+        <div className="flex items-center gap-3 flex-wrap">
+          {/* Category Dropdown */}
+          <div className="relative">
+            <select
+              value={selectedCategory}
+              onChange={e => setSelectedCategory(e.target.value)}
+              className="px-3.5 py-2.5 rounded-lg bg-[#050609] hover:bg-neutral-900 border border-neutral-800 text-xs font-bold text-neutral-200 focus:outline-none focus:border-blue-500 transition-colors cursor-pointer appearance-none pr-8"
+            >
+              <option value="ALL">All Categories ({blogs.length})</option>
+              {categories.filter(c => c !== 'ALL').map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+            <ChevronDown className="w-3.5 h-3.5 text-neutral-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
+
+          <button
+            onClick={handleOpenAddPage}
+            className="px-4 py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:brightness-110 text-white font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-blue-500/20 transition-all flex-shrink-0"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Create Blog Post</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Blogs 3-Card Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {filteredBlogs.map(blog => (
+          <div key={blog.id} className="p-5 rounded-xl bg-[#07080d] border border-neutral-800 hover:border-neutral-700 transition-all duration-200 flex flex-col justify-between shadow-lg space-y-4 group">
+            <div className="space-y-3">
+              {/* Header: Category & Status */}
+              <div className="flex items-center justify-between gap-2">
+                <span className="px-2.5 py-0.5 rounded text-[10px] font-bold bg-blue-500/15 text-blue-400 border border-blue-500/30 flex items-center gap-1">
+                  <Tag className="w-3 h-3" />
+                  <span>{blog.category}</span>
+                </span>
+
+                <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wide border ${
+                  blog.status === 'PUBLISHED'
+                    ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                    : blog.status === 'SCHEDULED'
+                    ? 'bg-blue-500/15 text-blue-400 border border-blue-500/30'
+                    : 'bg-amber-500/15 text-amber-400 border-amber-500/30'
+                }`}>
+                  {blog.status}
+                </span>
+              </div>
+
+              {/* Title with Courgette font accent */}
+              <h3 className="text-sm sm:text-base font-extrabold text-white line-clamp-2 group-hover:text-blue-200 transition-colors leading-snug font-accent">
+                {blog.title}
+              </h3>
+
+              {/* Excerpt */}
+              <p className="text-xs text-neutral-300 line-clamp-2 leading-relaxed font-normal">
+                {blog.summary}
+              </p>
+
+              {/* Metadata Row */}
+              <div className="flex items-center justify-between text-[11px] text-neutral-400 pt-3 border-t border-neutral-800">
+                <div className="flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" />
+                  <span>{blog.date}</span>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-3 h-3 text-neutral-500" />
+                    <span>{blog.readTime}</span>
+                  </span>
+                  <span className="text-blue-400 font-bold">
+                    {blog.views > 0 ? `${blog.views.toLocaleString()} views` : 'Draft'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons with Working Visibility Toggle */}
+            <div className="flex items-center justify-between pt-3 border-t border-neutral-800/80 gap-2">
+              <button
+                type="button"
+                onClick={() => handleToggleVisible(blog.id)}
+                className={`px-2.5 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all truncate ${
+                  blog.visible
+                    ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                    : 'bg-neutral-800/60 text-neutral-400 border border-neutral-700'
+                }`}
+                title="Toggle Live Visibility"
+              >
+                {blog.visible ? <Eye className="w-3.5 h-3.5 flex-shrink-0" /> : <EyeOff className="w-3.5 h-3.5 flex-shrink-0" />}
+                <span className="truncate">{blog.visible ? 'Visible' : 'Hidden'}</span>
+              </button>
+
+              <div className="flex items-center gap-1.5 flex-shrink-0">
+                <button
+                  type="button"
+                  onClick={() => handleOpenEditPage(blog)}
+                  className="px-2.5 py-1.5 rounded-md bg-[#050609] hover:bg-neutral-800 text-neutral-300 hover:text-white text-xs font-semibold flex items-center gap-1.5 border border-neutral-800 transition-all"
+                >
+                  <Edit2 className="w-3.5 h-3.5" /> Edit
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDelete(blog.id)}
+                  className="p-1.5 rounded-md bg-rose-950/20 hover:bg-rose-950/40 text-rose-400 text-xs font-medium flex items-center gap-1.5 border border-rose-900/30 transition-all"
+                  title="Delete Blog"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

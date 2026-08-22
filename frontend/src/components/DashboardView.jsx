@@ -31,46 +31,66 @@ import {
 
 export default function DashboardView({ onNavigate, activeWebsite }) {
   const [messages] = useState([
-    { id: 1, name: 'John Doe', email: 'john@example.com', preview: `Inquiry regarding ${activeWebsite?.name || 'Dev-Meet'} platform features...`, tag: 'Inquiry', time: '2m ago', unread: true },
-    { id: 2, name: 'Renuka Dashbanda', email: 'renuka@design.co', preview: 'Great work on the UI update! Loved the glassmorphism theme...', tag: 'Feedback', time: '15m ago', unread: false },
-    { id: 3, name: 'Riya Sayam', email: 'riya@techcorp.io', preview: 'Can we schedule a short discovery call tomorrow for contract work?', tag: 'Hire', time: '1h ago', unread: true },
+    { id: 1, name: 'John Doe', email: 'john@example.com', preview: 'Inquiry regarding DevMeet platform features and scheduling...', tag: 'Inquiry', time: '2m ago', unread: true },
+    { id: 2, name: 'Renuka Dashbanda', email: 'renuka@design.co', preview: 'Great work on the UI update! Loved the dark glassmorphic design...', tag: 'Feedback', time: '15m ago', unread: false },
+    { id: 3, name: 'Riya Sayam', email: 'riya@techcorp.io', preview: 'Can we schedule a discovery call tomorrow for contract build work?', tag: 'Hire', time: '1h ago', unread: true },
     { id: 4, name: 'Jane Smith', email: 'jane@freelance.org', preview: 'Sent you an inquiry regarding full-stack architecture consultation.', tag: 'Consultation', time: '2d ago', unread: false },
   ]);
 
-  // Separate Blogs Activities
+  const [selectedMessageId, setSelectedMessageId] = useState(1);
+  const [replySubject, setReplySubject] = useState('');
+  const [replyText, setReplyText] = useState('');
+  const [sentToast, setSentToast] = useState(false);
+
+  const currentMsg = messages.find(m => m.id === selectedMessageId) || messages[0];
+
+  const handleSendReply = () => {
+    if (!replyText.trim()) {
+      alert('Please enter a reply message before sending.');
+      return;
+    }
+    setSentToast(true);
+    setTimeout(() => {
+      setSentToast(false);
+      setReplyText('');
+      alert(`Email reply sent successfully to ${currentMsg.email}!`);
+    }, 600);
+  };
+
+  // Separate Blogs Activities (showing exactly 3 items)
   const [blogsActivities] = useState([
-    { id: 1, title: `Published article for ${activeWebsite?.name || 'Dev-Meet'}: "Optimizing Node.js APIs"`, time: '4h ago', icon: FileText, color: activeWebsite?.accentText || 'text-blue-400', bg: activeWebsite?.accentBg || 'bg-blue-500/10' },
-    { id: 2, title: 'Scheduled draft "State Management in 2025" for June 25', time: '2 days ago', icon: CalendarDays, color: 'text-indigo-400', bg: 'bg-indigo-500/10' },
-    { id: 3, title: 'Saved new draft "Understanding React Server Components"', time: '3 days ago', icon: FileEdit, color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
-    { id: 4, title: 'Blog post reached 1,200 total reader views', time: '5 days ago', icon: BookOpen, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+    { id: 1, title: 'Published article: "Optimizing Node.js APIs for High Scale"', time: '4h ago', icon: FileText, color: 'text-blue-400', bg: 'bg-blue-500/10' },
+    { id: 2, title: 'Scheduled draft "State Management in 2025" for June 25', time: '2d ago', icon: CalendarDays, color: 'text-indigo-400', bg: 'bg-indigo-500/10' },
+    { id: 3, title: 'Saved new draft "Understanding React Server Components"', time: '3d ago', icon: FileEdit, color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
+    { id: 4, title: 'Article reached 1,420 total reader views', time: '5d ago', icon: BookOpen, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
   ]);
 
-  // Separate Project Activities
+  // Separate Project Activities (showing exactly 3 items)
   const [projectActivities] = useState([
-    { id: 1, title: `Updated live preview URL for ${activeWebsite?.name || 'Dev-Meet'}`, time: '2h ago', icon: Globe, color: activeWebsite?.accentText || 'text-blue-400', bg: activeWebsite?.accentBg || 'bg-blue-500/10' },
-    { id: 2, title: 'Completed milestone 3 of "Ecommerce Microservices"', time: '1 day ago', icon: CheckCircle, color: 'text-amber-400', bg: 'bg-amber-500/10' },
-    { id: 3, title: 'Deployed v2.0 production build to Vercel', time: '2 days ago', icon: FolderCheck, color: 'text-indigo-400', bg: 'bg-indigo-500/10' },
-    { id: 4, title: 'Added 5 screenshots to Mobile App portfolio card', time: '4 days ago', icon: FolderKanban, color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
+    { id: 1, title: 'Updated live preview production URL and API endpoints', time: '2h ago', icon: Globe, color: 'text-blue-400', bg: 'bg-blue-500/10' },
+    { id: 2, title: 'Completed milestone 3 of "Ecommerce Microservices"', time: '1d ago', icon: CheckCircle, color: 'text-amber-400', bg: 'bg-amber-500/10' },
+    { id: 3, title: 'Deployed v2.0 production build to Vercel edge', time: '2d ago', icon: FolderCheck, color: 'text-indigo-400', bg: 'bg-indigo-500/10' },
+    { id: 4, title: 'Added 5 screenshots to Mobile App portfolio card', time: '4d ago', icon: FolderKanban, color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
   ]);
 
   const [resumeName, setResumeName] = useState('my-resume-v4.pdf');
-  const [resumeDate, setResumeDate] = useState('3 days ago');
 
   const handleResumeUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
       setResumeName(file.name);
-      setResumeDate('Just now');
-      alert(`Resume uploaded successfully for ${activeWebsite?.name}: ${file.name}`);
+      alert(`Resume uploaded successfully: ${file.name}`);
     }
   };
 
-  // Full 12 Months Data (Row 1: Jan-Jun, Row 2: Jul-Dec)
-  const row1Months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-  const row2Months = ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  // Full 12 Months with Full Names
+  const fullMonths = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
   const dayLabels = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
-  const getDaysForMonth = (monthName, monthIndex) => {
+  const getDaysForMonth = (monthIndex) => {
     const daysCount = (monthIndex === 1) ? 28 : (monthIndex % 2 === 0 ? 31 : 30);
     return Array.from({ length: daysCount }, (_, d) => {
       const dayNum = d + 1;
@@ -81,9 +101,6 @@ export default function DashboardView({ onNavigate, activeWebsite }) {
   };
 
   const getHeatmapColorClass = (level) => {
-    if (activeWebsite?.heatmapColors && activeWebsite.heatmapColors[level]) {
-      return activeWebsite.heatmapColors[level];
-    }
     switch (level) {
       case 4: return 'bg-blue-400 shadow-sm shadow-blue-400/50';
       case 3: return 'bg-blue-500/80';
@@ -94,233 +111,342 @@ export default function DashboardView({ onNavigate, activeWebsite }) {
   };
 
   return (
-    <div className="space-y-5 w-full max-w-full overflow-x-hidden">
-      {/* Target Website Active Context Banner (Deep Charcoal Banner) */}
-      <div className="p-3.5 rounded-lg bg-[#07080d] border border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div className={`p-2.5 rounded-md ${activeWebsite?.badgeStyle}`}>
-            <Globe className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-base font-extrabold text-white">Managing Website: {activeWebsite?.name}</h2>
-              <span className={`text-[10px] font-black px-1.5 py-0.5 rounded border ${activeWebsite?.badgeStyle}`}>
-                {activeWebsite?.badge}
-              </span>
-            </div>
-            <p className="text-xs text-neutral-400 mt-0.5">{activeWebsite?.tag} — Shared database instance, site-specific theme & content isolated.</p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 text-xs font-bold text-neutral-300">
-          <span className={`w-2 h-2 rounded-full ${activeWebsite?.dotColor || 'bg-blue-400'} animate-pulse`}></span>
-          <span>Live Sync Operational</span>
-        </div>
-      </div>
-
-      {/* 1. TOP STAT BOXES (Deep Pitch Black Containers) */}
+    <div className="space-y-5 w-full max-w-full overflow-x-hidden font-sans">
+      {/* 1. TOP STAT BOXES (Color-Coded Cards with Right-Aligned Icons & Accent Numbers) */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
         {/* Total Live Blogs */}
         <div 
           onClick={() => onNavigate('manage-blogs')}
-          className="p-3.5 sm:p-4 rounded-lg glass-card glass-card-hover cursor-pointer border border-neutral-800/80 hover:border-neutral-700 transition-all flex items-center gap-3"
+          className="p-3.5 sm:p-4 rounded-xl cursor-pointer bg-gradient-to-br from-blue-950/50 via-[#070b16] to-[#04060c] border border-blue-500/30 hover:border-blue-400/80 shadow-lg shadow-blue-950/40 hover:shadow-blue-500/20 transition-all duration-200 flex items-center justify-between gap-3 group hover:-translate-y-0.5"
         >
-          <div className={`p-2.5 rounded-md ${activeWebsite?.accentBg} ${activeWebsite?.accentText} border ${activeWebsite?.accentBorder} flex-shrink-0`}>
-            <FileText className="w-5 h-5" />
-          </div>
           <div className="text-left min-w-0">
-            <div className="text-xl sm:text-2xl font-black text-white leading-none">15</div>
-            <div className="text-xs font-bold text-neutral-300 mt-1 truncate">Total Live Blogs</div>
+            <div className="text-xl sm:text-2xl font-bold text-white leading-none tracking-tight group-hover:text-blue-200 transition-colors font-accent">15</div>
+            <div className="text-xs font-medium text-neutral-300 mt-1.5 truncate">Total Live Blogs</div>
+            <div className="text-[10px] font-semibold text-blue-400/90 mt-0.5 flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
+              <span>Active Articles</span>
+            </div>
+          </div>
+          <div className="p-2.5 sm:p-3 rounded-lg bg-blue-500/15 text-blue-400 border border-blue-500/30 shadow-md shadow-blue-500/10 flex-shrink-0 group-hover:scale-110 group-hover:bg-blue-500/25 group-hover:border-blue-400 transition-all duration-200">
+            <FileText className="w-5 h-5" />
           </div>
         </div>
 
         {/* Total Experiences */}
         <div 
           onClick={() => onNavigate('manage-experiences')}
-          className="p-3.5 sm:p-4 rounded-lg glass-card glass-card-hover cursor-pointer border border-neutral-800/80 hover:border-neutral-700 transition-all flex items-center gap-3"
+          className="p-3.5 sm:p-4 rounded-xl cursor-pointer bg-gradient-to-br from-amber-950/50 via-[#120e06] to-[#04060c] border border-amber-500/30 hover:border-amber-400/80 shadow-lg shadow-amber-950/40 hover:shadow-amber-500/20 transition-all duration-200 flex items-center justify-between gap-3 group hover:-translate-y-0.5"
         >
-          <div className={`p-2.5 rounded-md ${activeWebsite?.accentBg} ${activeWebsite?.accentText} border ${activeWebsite?.accentBorder} flex-shrink-0`}>
-            <Briefcase className="w-5 h-5" />
-          </div>
           <div className="text-left min-w-0">
-            <div className="text-xl sm:text-2xl font-black text-white leading-none">6</div>
-            <div className="text-xs font-bold text-neutral-300 mt-1 truncate">Total Experiences</div>
+            <div className="text-xl sm:text-2xl font-bold text-white leading-none tracking-tight group-hover:text-amber-200 transition-colors font-accent">6</div>
+            <div className="text-xs font-medium text-neutral-300 mt-1.5 truncate">Total Experiences</div>
+            <div className="text-[10px] font-semibold text-amber-400/90 mt-0.5 flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+              <span>Career Milestones</span>
+            </div>
+          </div>
+          <div className="p-2.5 sm:p-3 rounded-lg bg-amber-500/15 text-amber-400 border border-amber-500/30 shadow-md shadow-amber-500/10 flex-shrink-0 group-hover:scale-110 group-hover:bg-amber-500/25 group-hover:border-amber-400 transition-all duration-200">
+            <Briefcase className="w-5 h-5" />
           </div>
         </div>
 
         {/* Total Projects */}
         <div 
           onClick={() => onNavigate('manage-projects')}
-          className="p-3.5 sm:p-4 rounded-lg glass-card glass-card-hover cursor-pointer border border-neutral-800/80 hover:border-neutral-700 transition-all flex items-center gap-3"
+          className="p-3.5 sm:p-4 rounded-xl cursor-pointer bg-gradient-to-br from-purple-950/50 via-[#10071c] to-[#04060c] border border-purple-500/30 hover:border-purple-400/80 shadow-lg shadow-purple-950/40 hover:shadow-purple-500/20 transition-all duration-200 flex items-center justify-between gap-3 group hover:-translate-y-0.5"
         >
-          <div className={`p-2.5 rounded-md ${activeWebsite?.accentBg} ${activeWebsite?.accentText} border ${activeWebsite?.accentBorder} flex-shrink-0`}>
-            <FolderKanban className="w-5 h-5" />
-          </div>
           <div className="text-left min-w-0">
-            <div className="text-xl sm:text-2xl font-black text-white leading-none">27</div>
-            <div className="text-xs font-bold text-neutral-300 mt-1 truncate">Total Projects</div>
+            <div className="text-xl sm:text-2xl font-bold text-white leading-none tracking-tight group-hover:text-purple-200 transition-colors font-accent">27</div>
+            <div className="text-xs font-medium text-neutral-300 mt-1.5 truncate">Total Projects</div>
+            <div className="text-[10px] font-semibold text-purple-400/90 mt-0.5 flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+              <span>15 Live Online</span>
+            </div>
+          </div>
+          <div className="p-2.5 sm:p-3 rounded-lg bg-purple-500/15 text-purple-400 border border-purple-500/30 shadow-md shadow-purple-500/10 flex-shrink-0 group-hover:scale-110 group-hover:bg-purple-500/25 group-hover:border-purple-400 transition-all duration-200">
+            <FolderKanban className="w-5 h-5" />
           </div>
         </div>
 
         {/* Total Skills */}
         <div 
           onClick={() => onNavigate('manage-skills')}
-          className="p-3.5 sm:p-4 rounded-lg glass-card glass-card-hover cursor-pointer border border-neutral-800/80 hover:border-neutral-700 transition-all flex items-center gap-3"
+          className="p-3.5 sm:p-4 rounded-xl cursor-pointer bg-gradient-to-br from-emerald-950/50 via-[#05140e] to-[#04060c] border border-emerald-500/30 hover:border-emerald-400/80 shadow-lg shadow-emerald-950/40 hover:shadow-emerald-500/20 transition-all duration-200 flex items-center justify-between gap-3 group hover:-translate-y-0.5"
         >
-          <div className={`p-2.5 rounded-md ${activeWebsite?.accentBg} ${activeWebsite?.accentText} border ${activeWebsite?.accentBorder} flex-shrink-0`}>
-            <Cpu className="w-5 h-5" />
-          </div>
           <div className="text-left min-w-0">
-            <div className="text-xl sm:text-2xl font-black text-white leading-none">32</div>
-            <div className="text-xs font-bold text-neutral-300 mt-1 truncate">Total Skills</div>
+            <div className="text-xl sm:text-2xl font-bold text-white leading-none tracking-tight group-hover:text-emerald-200 transition-colors font-accent">32</div>
+            <div className="text-xs font-medium text-neutral-300 mt-1.5 truncate">Total Skills</div>
+            <div className="text-[10px] font-semibold text-emerald-400/90 mt-0.5 flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              <span>Tech Stack Tags</span>
+            </div>
+          </div>
+          <div className="p-2.5 sm:p-3 rounded-lg bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 shadow-md shadow-emerald-500/10 flex-shrink-0 group-hover:scale-110 group-hover:bg-emerald-500/25 group-hover:border-emerald-400 transition-all duration-200">
+            <Cpu className="w-5 h-5" />
           </div>
         </div>
 
         {/* Received Messages */}
         <div 
           onClick={() => onNavigate('manage-contacts')}
-          className="p-3.5 sm:p-4 rounded-lg glass-card glass-card-hover cursor-pointer border border-neutral-800/80 hover:border-neutral-700 transition-all flex items-center gap-3 col-span-2 sm:col-span-1 lg:col-span-2 xl:col-span-1"
+          className="p-3.5 sm:p-4 rounded-xl cursor-pointer bg-gradient-to-br from-sky-950/50 via-[#07131e] to-[#04060c] border border-sky-500/30 hover:border-sky-400/80 shadow-lg shadow-sky-950/40 hover:shadow-sky-500/20 transition-all duration-200 flex items-center justify-between gap-3 col-span-2 sm:col-span-1 lg:col-span-2 xl:col-span-1 group hover:-translate-y-0.5"
         >
-          <div className={`p-2.5 rounded-md ${activeWebsite?.accentBg} ${activeWebsite?.accentText} border ${activeWebsite?.accentBorder} flex-shrink-0`}>
-            <Mail className="w-5 h-5" />
-          </div>
           <div className="text-left min-w-0">
-            <div className="text-xl sm:text-2xl font-black text-white leading-none">48</div>
-            <div className="text-xs font-bold text-neutral-300 mt-1 truncate">Received Messages</div>
+            <div className="text-xl sm:text-2xl font-bold text-white leading-none tracking-tight group-hover:text-sky-200 transition-colors font-accent">48</div>
+            <div className="text-xs font-medium text-neutral-300 mt-1.5 truncate">Received Messages</div>
+            <div className="text-[10px] font-semibold text-sky-400/90 mt-0.5 flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse"></span>
+              <span>2 Unread Inquiries</span>
+            </div>
+          </div>
+          <div className="p-2.5 sm:p-3 rounded-lg bg-sky-500/15 text-sky-400 border border-sky-500/30 shadow-md shadow-sky-500/10 flex-shrink-0 group-hover:scale-110 group-hover:bg-sky-500/25 group-hover:border-sky-400 transition-all duration-200">
+            <Mail className="w-5 h-5" />
           </div>
         </div>
       </div>
 
-      {/* 2. SIDE-BY-SIDE PIPELINES */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      {/* 2. PROJECTS SECTION: Matched Heights (h-[68px]), Colorful Vibrant Progress Bars */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
         {/* Projects Pipeline Card */}
-        <div className="p-4 sm:p-5 rounded-lg glass-card border border-neutral-800/80 space-y-4">
-          <div className="flex items-center justify-between border-b border-neutral-800 pb-3">
-            <h3 className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-neutral-200 flex items-center gap-2">
-              <FolderKanban className={`w-4 h-4 ${activeWebsite?.accentText}`} /> Projects Status Pipeline ({activeWebsite?.name})
-            </h3>
+        <div className="rounded-xl bg-[#07080d] border border-neutral-800 shadow-xl overflow-hidden flex flex-col justify-between h-full">
+          {/* Edge-to-Edge Special Header Bar */}
+          <div className="bg-gradient-to-r from-[#0c0f1d] via-[#090b14] to-[#05060a] px-4 py-3 border-b border-neutral-800 flex items-center justify-between flex-shrink-0">
+            <div className="flex items-center gap-2.5">
+              <div className="p-1.5 rounded-md bg-blue-500/10 text-blue-400 border border-blue-500/30">
+                <FolderKanban className="w-4 h-4" />
+              </div>
+              <h3 className="text-xs sm:text-sm font-bold text-white tracking-wide">
+                Projects Status Pipeline
+              </h3>
+            </div>
+
             <button 
               onClick={() => onNavigate('manage-projects')}
-              className={`text-xs sm:text-sm font-bold ${activeWebsite?.accentText} hover:underline flex items-center gap-1`}
+              className="text-xs font-semibold text-blue-400 hover:underline flex items-center gap-1 transition-colors"
             >
               <span>Manage All (27)</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
-          <div className="space-y-3">
-            {/* Completed */}
-            <div className="p-3 rounded-md bg-[#050609] border border-neutral-800/80 space-y-2">
-              <div className="flex items-center justify-between text-xs sm:text-sm font-bold">
-                <span className="text-neutral-200 flex items-center gap-2">
-                  <FolderCheck className={`w-4 h-4 ${activeWebsite?.accentText}`} /> Done Projects
+          {/* 3 Pipeline Items (Matched h-[68px] & Vibrant Multi-Color Progress Bars) */}
+          <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
+            {/* Completed: Cyan-Blue */}
+            <div className="h-[68px] p-3 rounded-lg bg-[#050609] border border-neutral-800/80 flex flex-col justify-center">
+              <div className="flex items-center justify-between text-xs sm:text-sm">
+                <span className="text-neutral-200 font-medium flex items-center gap-2">
+                  <FolderCheck className="w-4 h-4 text-cyan-400" /> Done Projects
                 </span>
-                <span className={`${activeWebsite?.accentText} font-extrabold`}>15 / 27</span>
+                <span className="font-bold text-neutral-100"><span className="text-cyan-400">15</span> / 27</span>
               </div>
-              <div className="w-full h-2 rounded-full bg-neutral-900 overflow-hidden">
-                <div className={`h-full bg-gradient-to-r ${activeWebsite?.gradient} rounded-full`} style={{ width: '55%' }}></div>
+              <div className="w-full h-2.5 rounded-sm bg-neutral-900 overflow-hidden mt-2.5 shrink-0 border border-neutral-800/80">
+                <div className="h-full bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-400 rounded-sm shadow-sm shadow-cyan-500/30" style={{ width: '55%' }}></div>
               </div>
             </div>
 
-            {/* In Progress */}
-            <div className="p-3 rounded-md bg-[#050609] border border-neutral-800/80 space-y-2">
-              <div className="flex items-center justify-between text-xs sm:text-sm font-bold">
-                <span className="text-neutral-200 flex items-center gap-2">
+            {/* In Progress: Amber-Orange */}
+            <div className="h-[68px] p-3 rounded-lg bg-[#050609] border border-neutral-800/80 flex flex-col justify-center">
+              <div className="flex items-center justify-between text-xs sm:text-sm">
+                <span className="text-neutral-200 font-medium flex items-center gap-2">
                   <Hourglass className="w-4 h-4 text-amber-400" /> In Progress (Active Sprint)
                 </span>
-                <span className="text-amber-400 font-extrabold">4 / 27</span>
+                <span className="font-bold text-neutral-100"><span className="text-amber-400">4</span> / 27</span>
               </div>
-              <div className="w-full h-2 rounded-full bg-neutral-900 overflow-hidden">
-                <div className="h-full bg-amber-500 rounded-full" style={{ width: '15%' }}></div>
+              <div className="w-full h-2.5 rounded-sm bg-neutral-900 overflow-hidden mt-2.5 shrink-0 border border-neutral-800/80">
+                <div className="h-full bg-gradient-to-r from-amber-400 via-orange-500 to-yellow-400 rounded-sm shadow-sm shadow-amber-500/30" style={{ width: '15%' }}></div>
               </div>
             </div>
 
-            {/* Planned */}
-            <div className="p-3 rounded-md bg-[#050609] border border-neutral-800/80 space-y-2">
-              <div className="flex items-center justify-between text-xs sm:text-sm font-bold">
-                <span className="text-neutral-200 flex items-center gap-2">
-                  <CalendarDays className={`w-4 h-4 ${activeWebsite?.accentText}`} /> Planned (Upcoming Roadmap)
+            {/* Planned: Purple-Violet-Fuchsia */}
+            <div className="h-[68px] p-3 rounded-lg bg-[#050609] border border-neutral-800/80 flex flex-col justify-center">
+              <div className="flex items-center justify-between text-xs sm:text-sm">
+                <span className="text-neutral-200 font-medium flex items-center gap-2">
+                  <CalendarDays className="w-4 h-4 text-purple-400" /> Planned (Upcoming Roadmap)
                 </span>
-                <span className={`${activeWebsite?.accentText} font-extrabold`}>8 / 27</span>
+                <span className="font-bold text-neutral-100"><span className="text-purple-400">8</span> / 27</span>
               </div>
-              <div className="w-full h-2 rounded-full bg-neutral-900 overflow-hidden">
-                <div className={`h-full bg-gradient-to-r ${activeWebsite?.gradient} rounded-full`} style={{ width: '30%' }}></div>
+              <div className="w-full h-2.5 rounded-sm bg-neutral-900 overflow-hidden mt-2.5 shrink-0 border border-neutral-800/80">
+                <div className="h-full bg-gradient-to-r from-purple-500 via-violet-500 to-fuchsia-400 rounded-sm shadow-sm shadow-purple-500/30" style={{ width: '30%' }}></div>
               </div>
             </div>
           </div>
         </div>
 
+        {/* Project Activity Card (Matched h-[68px] per item) */}
+        <div className="rounded-xl bg-[#07080d] border border-neutral-800 shadow-xl overflow-hidden flex flex-col justify-between h-full">
+          {/* Edge-to-Edge Special Header Bar */}
+          <div className="bg-gradient-to-r from-[#0c0f1d] via-[#090b14] to-[#05060a] px-4 py-3 border-b border-neutral-800 flex items-center justify-between flex-shrink-0">
+            <div className="flex items-center gap-2.5">
+              <div className="p-1.5 rounded-md bg-blue-500/10 text-blue-400 border border-blue-500/30">
+                <Activity className="w-4 h-4" />
+              </div>
+              <h3 className="text-xs sm:text-sm font-bold text-white tracking-wide">
+                Project Activity
+              </h3>
+            </div>
+
+            <button 
+              onClick={() => onNavigate('manage-projects')}
+              className="text-xs font-semibold text-blue-400 hover:underline flex items-center gap-1 transition-colors"
+            >
+              <span>All Projects</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          {/* Exactly 3 Activity Items (Matched h-[68px]) */}
+          <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
+            {projectActivities.slice(0, 3).map((act) => {
+              const Icon = act.icon;
+              return (
+                <div key={act.id} className="h-[68px] p-3 rounded-lg bg-[#050609] hover:bg-neutral-900/80 border border-neutral-800/80 flex items-center gap-3 transition-colors">
+                  <div className={`p-2 rounded-md ${act.bg} ${act.color} flex-shrink-0`}>
+                    <Icon className="w-4 h-4" />
+                  </div>
+                  <div className="text-xs sm:text-sm flex-1 min-w-0">
+                    <p className="font-medium text-neutral-200 line-clamp-1 leading-snug">{act.title}</p>
+                    <span className="text-[11px] text-neutral-500 mt-0.5 block font-normal">{act.time}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* 3. BLOGS SECTION: Matched Heights (h-[68px]), Colorful Vibrant Progress Bars */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
         {/* Blogs Pipeline Card */}
-        <div className="p-4 sm:p-5 rounded-lg glass-card border border-neutral-800/80 space-y-4">
-          <div className="flex items-center justify-between border-b border-neutral-800 pb-3">
-            <h3 className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-neutral-200 flex items-center gap-2">
-              <FileText className={`w-4 h-4 ${activeWebsite?.accentText}`} /> Blogs Pipeline Status ({activeWebsite?.name})
-            </h3>
+        <div className="rounded-xl bg-[#07080d] border border-neutral-800 shadow-xl overflow-hidden flex flex-col justify-between h-full">
+          {/* Edge-to-Edge Special Header Bar */}
+          <div className="bg-gradient-to-r from-[#0c0f1d] via-[#090b14] to-[#05060a] px-4 py-3 border-b border-neutral-800 flex items-center justify-between flex-shrink-0">
+            <div className="flex items-center gap-2.5">
+              <div className="p-1.5 rounded-md bg-blue-500/10 text-blue-400 border border-blue-500/30">
+                <FileText className="w-4 h-4" />
+              </div>
+              <h3 className="text-xs sm:text-sm font-bold text-white tracking-wide">
+                Blogs Pipeline Status
+              </h3>
+            </div>
+
             <button 
               onClick={() => onNavigate('manage-blogs')}
-              className={`text-xs sm:text-sm font-bold ${activeWebsite?.accentText} hover:underline flex items-center gap-1`}
+              className="text-xs font-semibold text-blue-400 hover:underline flex items-center gap-1 transition-colors"
             >
               <span>Manage All (22)</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
-          <div className="space-y-3">
-            {/* Drafts */}
-            <div className="p-3 rounded-md bg-[#050609] border border-neutral-800/80 space-y-2">
-              <div className="flex items-center justify-between text-xs sm:text-sm font-bold">
-                <span className="text-neutral-200 flex items-center gap-2">
+          {/* 3 Pipeline Items (Matched h-[68px] & Colorful Progress Bars) */}
+          <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
+            {/* Drafts: Indigo-Purple */}
+            <div className="h-[68px] p-3 rounded-lg bg-[#050609] border border-neutral-800/80 flex flex-col justify-center">
+              <div className="flex items-center justify-between text-xs sm:text-sm">
+                <span className="text-neutral-200 font-medium flex items-center gap-2">
                   <FileEdit className="w-4 h-4 text-indigo-400" /> Draft Articles
                 </span>
-                <span className="text-indigo-400 font-extrabold">7 Drafts</span>
+                <span className="font-bold text-indigo-400">7 Drafts</span>
               </div>
-              <div className="w-full h-2 rounded-full bg-neutral-900 overflow-hidden">
-                <div className="h-full bg-indigo-500 rounded-full" style={{ width: '32%' }}></div>
+              <div className="w-full h-2.5 rounded-sm bg-neutral-900 overflow-hidden mt-2.5 shrink-0 border border-neutral-800/80">
+                <div className="h-full bg-gradient-to-r from-indigo-500 via-blue-500 to-purple-400 rounded-sm shadow-sm shadow-indigo-500/30" style={{ width: '32%' }}></div>
               </div>
             </div>
 
-            {/* Scheduled */}
-            <div className="p-3 rounded-md bg-[#050609] border border-neutral-800/80 space-y-2">
-              <div className="flex items-center justify-between text-xs sm:text-sm font-bold">
-                <span className="text-neutral-200 flex items-center gap-2">
-                  <CalendarDays className={`w-4 h-4 ${activeWebsite?.accentText}`} /> Scheduled Publications
+            {/* Scheduled: Sky-Cyan */}
+            <div className="h-[68px] p-3 rounded-lg bg-[#050609] border border-neutral-800/80 flex flex-col justify-center">
+              <div className="flex items-center justify-between text-xs sm:text-sm">
+                <span className="text-neutral-200 font-medium flex items-center gap-2">
+                  <CalendarDays className="w-4 h-4 text-sky-400" /> Scheduled Publications
                 </span>
-                <span className={`${activeWebsite?.accentText} font-extrabold`}>3 Scheduled</span>
+                <span className="font-bold text-sky-400">3 Scheduled</span>
               </div>
-              <div className="w-full h-2 rounded-full bg-neutral-900 overflow-hidden">
-                <div className={`h-full bg-gradient-to-r ${activeWebsite?.gradient} rounded-full`} style={{ width: '14%' }}></div>
+              <div className="w-full h-2.5 rounded-sm bg-neutral-900 overflow-hidden mt-2.5 shrink-0 border border-neutral-800/80">
+                <div className="h-full bg-gradient-to-r from-sky-400 via-cyan-400 to-blue-500 rounded-sm shadow-sm shadow-sky-500/30" style={{ width: '14%' }}></div>
               </div>
             </div>
 
-            {/* Planned Topics */}
-            <div className="p-3 rounded-md bg-[#050609] border border-neutral-800/80 space-y-2">
-              <div className="flex items-center justify-between text-xs sm:text-sm font-bold">
-                <span className="text-neutral-200 flex items-center gap-2">
+            {/* Planned Topics: Emerald-Teal-Green */}
+            <div className="h-[68px] p-3 rounded-lg bg-[#050609] border border-neutral-800/80 flex flex-col justify-center">
+              <div className="flex items-center justify-between text-xs sm:text-sm">
+                <span className="text-neutral-200 font-medium flex items-center gap-2">
                   <TrendingUp className="w-4 h-4 text-emerald-400" /> Planned Topics
                 </span>
-                <span className="text-emerald-400 font-extrabold">12 Planned</span>
+                <span className="font-bold text-emerald-400">12 Planned</span>
               </div>
-              <div className="w-full h-2 rounded-full bg-neutral-900 overflow-hidden">
-                <div className="h-full bg-emerald-400 rounded-full" style={{ width: '54%' }}></div>
+              <div className="w-full h-2.5 rounded-sm bg-neutral-900 overflow-hidden mt-2.5 shrink-0 border border-neutral-800/80">
+                <div className="h-full bg-gradient-to-r from-emerald-400 via-teal-400 to-green-400 rounded-sm shadow-sm shadow-emerald-500/30" style={{ width: '54%' }}></div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* 3. Middle Section: Quick Actions & Resume */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        {/* Quick Actions */}
-        <div className="p-4 sm:p-5 rounded-lg glass-card space-y-4">
-          <h3 className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
-            <Plus className={`w-4 h-4 ${activeWebsite?.accentText}`} /> Quick Actions ({activeWebsite?.name})
-          </h3>
-          <div className="grid grid-cols-2 gap-2.5">
+        {/* Blogs Activity Card (Matched h-[68px] per item) */}
+        <div className="rounded-xl bg-[#07080d] border border-neutral-800 shadow-xl overflow-hidden flex flex-col justify-between h-full">
+          {/* Edge-to-Edge Special Header Bar */}
+          <div className="bg-gradient-to-r from-[#0c0f1d] via-[#090b14] to-[#05060a] px-4 py-3 border-b border-neutral-800 flex items-center justify-between flex-shrink-0">
+            <div className="flex items-center gap-2.5">
+              <div className="p-1.5 rounded-md bg-blue-500/10 text-blue-400 border border-blue-500/30">
+                <Activity className="w-4 h-4" />
+              </div>
+              <h3 className="text-xs sm:text-sm font-bold text-white tracking-wide">
+                Blogs Activity
+              </h3>
+            </div>
+
             <button 
               onClick={() => onNavigate('manage-blogs')}
-              className="p-3 rounded-md bg-[#050609] hover:bg-neutral-900/90 border border-neutral-800/80 text-left text-xs sm:text-sm font-semibold text-neutral-200 hover:text-white transition-all flex items-center gap-2.5 group"
+              className="text-xs font-semibold text-blue-400 hover:underline flex items-center gap-1 transition-colors"
             >
-              <span className={`p-1.5 rounded-md ${activeWebsite?.accentBg} ${activeWebsite?.accentText} group-hover:bg-gradient-to-r group-hover:${activeWebsite?.gradient} group-hover:text-white transition-colors`}>
+              <span>All Blogs</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          {/* Exactly 3 Activity Items (Matched h-[68px]) */}
+          <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
+            {blogsActivities.slice(0, 3).map((act) => {
+              const Icon = act.icon;
+              return (
+                <div key={act.id} className="h-[68px] p-3 rounded-lg bg-[#050609] hover:bg-neutral-900/80 border border-neutral-800/80 flex items-center gap-3 transition-colors">
+                  <div className={`p-2 rounded-md ${act.bg} ${act.color} flex-shrink-0`}>
+                    <Icon className="w-4 h-4" />
+                  </div>
+                  <div className="text-xs sm:text-sm flex-1 min-w-0">
+                    <p className="font-medium text-neutral-200 line-clamp-1 leading-snug">{act.title}</p>
+                    <span className="text-[11px] text-neutral-500 mt-0.5 block font-normal">{act.time}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* 4. Middle Section: Quick Actions & Resume (Full Height Upload Area) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
+        {/* Quick Actions */}
+        <div className="rounded-xl bg-[#07080d] border border-neutral-800 shadow-xl overflow-hidden flex flex-col justify-between h-full">
+          {/* Edge-to-Edge Header */}
+          <div className="bg-gradient-to-r from-[#0c0f1d] via-[#090b14] to-[#05060a] px-4 py-3 border-b border-neutral-800 flex items-center justify-between flex-shrink-0">
+            <div className="flex items-center gap-2.5">
+              <div className="p-1.5 rounded-md bg-blue-500/10 text-blue-400 border border-blue-500/30">
+                <Plus className="w-4 h-4" />
+              </div>
+              <h3 className="text-xs sm:text-sm font-bold text-white tracking-wide">
+                Quick Actions
+              </h3>
+            </div>
+
+            <span className="text-[11px] text-neutral-400 font-medium">Fast Create</span>
+          </div>
+
+          <div className="p-4 grid grid-cols-2 gap-2.5 flex-1 items-center">
+            <button 
+              onClick={() => onNavigate('manage-blogs')}
+              className="p-3 rounded-lg bg-[#050609] hover:bg-neutral-900 border border-neutral-800/80 text-left text-xs sm:text-sm font-semibold text-neutral-200 hover:text-white transition-all flex items-center gap-2.5 group"
+            >
+              <span className="p-1.5 rounded-md bg-blue-500/10 text-blue-400 group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-indigo-600 group-hover:text-white transition-colors">
                 <Plus className="w-4 h-4" />
               </span>
               <span>Add Blog</span>
@@ -328,9 +454,9 @@ export default function DashboardView({ onNavigate, activeWebsite }) {
 
             <button 
               onClick={() => onNavigate('manage-projects')}
-              className="p-3 rounded-md bg-[#050609] hover:bg-neutral-900/90 border border-neutral-800/80 text-left text-xs sm:text-sm font-semibold text-neutral-200 hover:text-white transition-all flex items-center gap-2.5 group"
+              className="p-3 rounded-lg bg-[#050609] hover:bg-neutral-900 border border-neutral-800/80 text-left text-xs sm:text-sm font-semibold text-neutral-200 hover:text-white transition-all flex items-center gap-2.5 group"
             >
-              <span className={`p-1.5 rounded-md ${activeWebsite?.accentBg} ${activeWebsite?.accentText} group-hover:bg-gradient-to-r group-hover:${activeWebsite?.gradient} group-hover:text-white transition-colors`}>
+              <span className="p-1.5 rounded-md bg-blue-500/10 text-blue-400 group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-indigo-600 group-hover:text-white transition-colors">
                 <Plus className="w-4 h-4" />
               </span>
               <span>Add Project</span>
@@ -338,9 +464,9 @@ export default function DashboardView({ onNavigate, activeWebsite }) {
 
             <button 
               onClick={() => onNavigate('manage-experiences')}
-              className="p-3 rounded-md bg-[#050609] hover:bg-neutral-900/90 border border-neutral-800/80 text-left text-xs sm:text-sm font-semibold text-neutral-200 hover:text-white transition-all flex items-center gap-2.5 group"
+              className="p-3 rounded-lg bg-[#050609] hover:bg-neutral-900 border border-neutral-800/80 text-left text-xs sm:text-sm font-semibold text-neutral-200 hover:text-white transition-all flex items-center gap-2.5 group"
             >
-              <span className={`p-1.5 rounded-md ${activeWebsite?.accentBg} ${activeWebsite?.accentText} group-hover:bg-gradient-to-r group-hover:${activeWebsite?.gradient} group-hover:text-white transition-colors`}>
+              <span className="p-1.5 rounded-md bg-blue-500/10 text-blue-400 group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-indigo-600 group-hover:text-white transition-colors">
                 <Plus className="w-4 h-4" />
               </span>
               <span>Add Experience</span>
@@ -348,9 +474,9 @@ export default function DashboardView({ onNavigate, activeWebsite }) {
 
             <button 
               onClick={() => onNavigate('manage-skills')}
-              className="p-3 rounded-md bg-[#050609] hover:bg-neutral-900/90 border border-neutral-800/80 text-left text-xs sm:text-sm font-semibold text-neutral-200 hover:text-white transition-all flex items-center gap-2.5 group"
+              className="p-3 rounded-lg bg-[#050609] hover:bg-neutral-900 border border-neutral-800/80 text-left text-xs sm:text-sm font-semibold text-neutral-200 hover:text-white transition-all flex items-center gap-2.5 group"
             >
-              <span className={`p-1.5 rounded-md ${activeWebsite?.accentBg} ${activeWebsite?.accentText} group-hover:bg-gradient-to-r group-hover:${activeWebsite?.gradient} group-hover:text-white transition-colors`}>
+              <span className="p-1.5 rounded-md bg-blue-500/10 text-blue-400 group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-indigo-600 group-hover:text-white transition-colors">
                 <Plus className="w-4 h-4" />
               </span>
               <span>Add Skill</span>
@@ -358,245 +484,264 @@ export default function DashboardView({ onNavigate, activeWebsite }) {
           </div>
         </div>
 
-        {/* Resume Management */}
-        <div className="p-4 sm:p-5 rounded-lg glass-card space-y-4">
-          <h3 className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
-            <FileUp className={`w-4 h-4 ${activeWebsite?.accentText}`} /> Resume & Documentation
-          </h3>
-          <div className="p-3.5 rounded-md bg-[#050609] border border-neutral-800/80 space-y-3">
-            <div>
-              <div className="text-xs text-neutral-400">Current Resume ({activeWebsite?.name}):</div>
-              <div className={`text-sm sm:text-base font-extrabold ${activeWebsite?.accentText} mt-0.5`}>{resumeName}</div>
-              <div className="text-xs text-neutral-500 mt-0.5">Last Updated: {resumeDate}</div>
+        {/* Resume & Documentation (Full Height Dropzone Area) */}
+        <div className="rounded-xl bg-[#07080d] border border-neutral-800 shadow-xl overflow-hidden flex flex-col justify-between h-full">
+          {/* Edge-to-Edge Header */}
+          <div className="bg-gradient-to-r from-[#0c0f1d] via-[#090b14] to-[#05060a] px-4 py-3 border-b border-neutral-800 flex items-center justify-between flex-shrink-0">
+            <div className="flex items-center gap-2.5">
+              <div className="p-1.5 rounded-md bg-blue-500/10 text-blue-400 border border-blue-500/30">
+                <FileUp className="w-4 h-4" />
+              </div>
+              <h3 className="text-xs sm:text-sm font-bold text-white tracking-wide">
+                Resume & Documentation
+              </h3>
             </div>
 
-            <label className={`w-full py-2.5 px-4 rounded-md bg-gradient-to-r ${activeWebsite?.gradient} text-white font-extrabold text-xs sm:text-sm cursor-pointer flex items-center justify-center gap-2 shadow-lg ${activeWebsite?.glow} hover:brightness-110 transition-all`}>
-              <Upload className="w-4 h-4" />
-              <span>Upload New Resume</span>
+            <span className="text-xs font-semibold text-blue-400 font-accent">{resumeName}</span>
+          </div>
+
+          {/* Full Height Clean Upload Area */}
+          <div className="p-4 flex-1 flex flex-col justify-center">
+            <label className="w-full h-full min-h-[140px] p-5 rounded-lg bg-[#050609] hover:bg-neutral-900/80 border border-dashed border-blue-500/40 text-neutral-200 cursor-pointer flex flex-col sm:flex-row items-center justify-between gap-4 transition-all group hover:border-solid hover:shadow-lg">
+              <div className="flex items-center gap-3.5 min-w-0">
+                <div className="p-3 rounded-lg bg-blue-500/10 text-blue-400 group-hover:scale-110 transition-transform flex-shrink-0">
+                  <Upload className="w-5 h-5" />
+                </div>
+                <div className="min-w-0 text-left">
+                  <div className="text-sm font-bold text-white truncate">Upload New Resume File</div>
+                  <p className="text-xs text-neutral-400 mt-1 truncate">PDF, DOC, DOCX up to 15MB • Direct Sync</p>
+                </div>
+              </div>
+
+              <div className="px-4 py-2 rounded-md bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-xs flex-shrink-0 shadow-md shadow-blue-500/20 group-hover:brightness-110 transition-all">
+                Browse File
+              </div>
               <input type="file" onChange={handleResumeUpload} className="hidden" accept=".pdf,.doc,.docx" />
             </label>
           </div>
         </div>
       </div>
 
-      {/* 4. REDESIGNED RECENT MESSAGES */}
-      <div className="p-4 sm:p-5 rounded-lg glass-card border border-neutral-800/80 space-y-4">
-        <div className="flex items-center justify-between border-b border-neutral-800 pb-3">
-          <div>
-            <h3 className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
-              <MessageSquare className={`w-4 h-4 ${activeWebsite?.accentText}`} /> Recent Messages & Inquiries ({activeWebsite?.name})
+      {/* 5. RECENT MESSAGES & QUICK EMAIL REPLY (Split 2-Column Design with Left-Aligned Previews & Taller Composer) */}
+      <div className="rounded-xl bg-[#07080d] border border-neutral-800 shadow-xl overflow-hidden flex flex-col">
+        {/* Edge-to-Edge Header */}
+        <div className="bg-gradient-to-r from-[#0c0f1d] via-[#090b14] to-[#05060a] px-4 py-3 border-b border-neutral-800 flex items-center justify-between flex-shrink-0">
+          <div className="flex items-center gap-2.5">
+            <div className="p-1.5 rounded-md bg-blue-500/10 text-blue-400 border border-blue-500/30">
+              <MessageSquare className="w-4 h-4" />
+            </div>
+            <h3 className="text-xs sm:text-sm font-bold text-white tracking-wide">
+              Recent Messages & Quick Email Reply
             </h3>
-            <p className="text-xs text-neutral-400 mt-0.5">Latest contact submissions from your public portfolio.</p>
           </div>
 
           <button 
             onClick={() => onNavigate('manage-contacts')}
-            className={`text-xs sm:text-sm font-bold ${activeWebsite?.accentText} hover:underline flex items-center gap-1.5`}
+            className="text-xs font-semibold text-blue-400 hover:underline flex items-center gap-1 transition-colors"
           >
-            <span>View All Inbox (48)</span>
+            <span>View Full Inbox (48)</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-          {messages.map((msg) => (
-            <div 
-              key={msg.id}
-              onClick={() => onNavigate('manage-contacts')}
-              className="p-3.5 rounded-md bg-[#050609] hover:bg-neutral-900/80 border border-neutral-800/80 cursor-pointer transition-all duration-200 space-y-2 group"
-            >
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div className={`w-8 h-8 rounded-md bg-gradient-to-br ${activeWebsite?.gradient} text-white font-black text-xs sm:text-sm flex items-center justify-center flex-shrink-0 shadow-sm`}>
-                    {msg.name.charAt(0)}
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h4 className={`text-xs sm:text-sm font-bold text-neutral-100 truncate group-hover:${activeWebsite?.accentText} transition-colors`}>{msg.name}</h4>
-                      {msg.unread && (
-                        <span className={`w-2 h-2 rounded-full ${activeWebsite?.dotColor} animate-pulse flex-shrink-0`}></span>
-                      )}
+        {/* 2-Column Split: Message List on Left, Email Reply Composer on Right */}
+        <div className="p-4 grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+          {/* Left Side: Incoming Messages Feed (Left Aligned Previews) */}
+          <div className="lg:col-span-5 space-y-2.5">
+            <div className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider flex items-center justify-between px-1">
+              <span>Incoming Inquiries</span>
+              <span className="text-[10px] text-blue-400 font-semibold">{messages.filter(m => m.unread).length} Unread</span>
+            </div>
+
+            <div className="space-y-2">
+              {messages.map((msg) => {
+                const isSelected = msg.id === selectedMessageId;
+                return (
+                  <div 
+                    key={msg.id}
+                    onClick={() => {
+                      setSelectedMessageId(msg.id);
+                      setReplySubject(`Re: ${msg.tag} inquiry from ${msg.name}`);
+                    }}
+                    className={`p-3 rounded-lg border cursor-pointer transition-all duration-200 space-y-2 ${
+                      isSelected 
+                        ? 'bg-[#0d1222] border-blue-500/60 shadow-md shadow-blue-500/10' 
+                        : 'bg-[#050609] hover:bg-neutral-900/80 border-neutral-800/80'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div className={`w-7 h-7 rounded-md ${isSelected ? 'bg-blue-600 text-white' : 'bg-neutral-800 text-neutral-300'} font-bold text-xs flex items-center justify-center flex-shrink-0 font-accent`}>
+                          {msg.name.charAt(0)}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <h4 className="text-xs font-bold text-neutral-100 truncate font-accent">{msg.name}</h4>
+                            {msg.unread && (
+                              <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse flex-shrink-0"></span>
+                            )}
+                          </div>
+                          <p className="text-[10px] text-neutral-400 truncate">{msg.email}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                        <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-500/15 text-blue-400 border border-blue-500/30">
+                          {msg.tag}
+                        </span>
+                        <span className="text-[10px] text-neutral-500">{msg.time}</span>
+                      </div>
                     </div>
-                    <p className="text-xs text-neutral-400 truncate">{msg.email}</p>
+
+                    {/* Left Aligned Clean Message Content */}
+                    <p className="text-xs text-neutral-300 line-clamp-2 leading-relaxed font-normal">
+                      {msg.preview}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Right Side: Quick Email Reply Composer (Taller Height & Polished Typography) */}
+          <div className="lg:col-span-7 rounded-lg bg-[#050609] border border-neutral-800/90 p-4 flex flex-col justify-between space-y-3.5">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between pb-2 border-b border-neutral-800/80">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="p-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/30">
+                    <Mail className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="text-xs min-w-0">
+                    <span className="text-neutral-400 font-medium">Replying via Email to: </span>
+                    <span className="font-bold text-white font-accent">{currentMsg?.name}</span>
+                    <span className="text-neutral-400 text-[11px] ml-1">({currentMsg?.email})</span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${activeWebsite?.badgeStyle}`}>
-                    {msg.tag}
-                  </span>
-                  <span className="text-xs text-neutral-500">{msg.time}</span>
-                </div>
+                <span className="text-[10px] text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20 font-semibold flex items-center gap-1">
+                  <CheckCircle className="w-3 h-3" /> Direct SMTP Relay
+                </span>
               </div>
 
-              <p className={`text-xs sm:text-sm text-neutral-300 line-clamp-1 pl-10 border-l-2 ${activeWebsite?.accentBorder} font-medium`}>
-                {msg.preview}
-              </p>
+              {/* Subject line input */}
+              <div className="space-y-2.5">
+                <div className="flex items-center gap-2 bg-black/60 border border-neutral-800/80 rounded-md px-3 py-2 text-xs">
+                  <span className="text-neutral-400 font-bold text-[11px] uppercase tracking-wider">Subject:</span>
+                  <input 
+                    type="text"
+                    value={replySubject || `Re: ${currentMsg?.tag || 'Inquiry'} response from Roshan Kumar`}
+                    onChange={(e) => setReplySubject(e.target.value)}
+                    className="bg-transparent border-none outline-none text-neutral-100 text-xs w-full font-medium"
+                  />
+                </div>
+
+                {/* Reply message body (Taller min-h-[140px]) */}
+                <textarea
+                  rows={5}
+                  value={replyText}
+                  onChange={(e) => setReplyText(e.target.value)}
+                  placeholder={`Hi ${currentMsg?.name || 'there'},\n\nThank you for reaching out! I'd be happy to discuss your inquiry...`}
+                  className="w-full min-h-[140px] p-3 rounded-md bg-black/60 border border-neutral-800/80 text-xs sm:text-sm text-neutral-100 placeholder-neutral-500 focus:outline-none focus:border-blue-500/60 transition-colors resize-none leading-relaxed font-normal"
+                />
+              </div>
             </div>
-          ))}
+
+            {/* Quick Canned Suggestions & Send Button */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-2.5 border-t border-neutral-800/80">
+              <div className="flex flex-wrap items-center gap-1.5">
+                <button 
+                  type="button"
+                  onClick={() => setReplyText(`Hi ${currentMsg?.name}, thanks for reaching out! I am currently available for new contracts and projects.`)}
+                  className="text-[11px] font-medium px-2.5 py-1 rounded bg-neutral-900 hover:bg-neutral-800 text-neutral-200 border border-neutral-800 transition-colors"
+                >
+                  Available for work
+                </button>
+                <button 
+                  type="button"
+                  onClick={() => setReplyText(`Hi ${currentMsg?.name}, let's schedule a 15-minute discovery call this week to discuss your requirements.`)}
+                  className="text-[11px] font-medium px-2.5 py-1 rounded bg-neutral-900 hover:bg-neutral-800 text-neutral-200 border border-neutral-800 transition-colors"
+                >
+                  Schedule Call
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleSendReply}
+                className="px-4 py-2 rounded-md bg-gradient-to-r from-blue-600 to-indigo-600 hover:brightness-110 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-blue-500/20 transition-all flex-shrink-0"
+              >
+                <Send className="w-3.5 h-3.5" />
+                <span>Send Email Reply</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* 5. 12-MONTH ACTIVITY HEATMAP: DYNAMIC THEMED HEATMAP GRID */}
-      <div className={`p-4 sm:p-5 rounded-lg glass-card border border-neutral-800/90 space-y-5`}>
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-neutral-800">
-          <div>
-            <h3 className="text-sm sm:text-base xl:text-lg font-extrabold text-white flex items-center gap-2">
-              <Activity className={`w-5 h-5 ${activeWebsite?.accentText}`} /> Monthly Daily Activity ({activeWebsite?.name})
+      {/* 6. 12-MONTH ACTIVITY HEATMAP (With Edge-to-Edge Gradient Header & Footer) */}
+      <div className="rounded-xl bg-[#07080d] border border-neutral-800 shadow-xl overflow-hidden flex flex-col">
+        {/* Edge-to-Edge Header with Matched Title Size */}
+        <div className="bg-gradient-to-r from-[#0c0f1d] via-[#090b14] to-[#05060a] px-4 py-3 border-b border-neutral-800 flex items-center justify-between flex-shrink-0">
+          <div className="flex items-center gap-2.5">
+            <div className="p-1.5 rounded-md bg-blue-500/10 text-blue-400 border border-blue-500/30">
+              <Activity className="w-4 h-4" />
+            </div>
+            <h3 className="text-xs sm:text-sm font-bold text-white tracking-wide">
+              Monthly Daily Activity
             </h3>
-            <p className="text-xs sm:text-sm text-neutral-400 mt-0.5">Annual activity heatmap displaying 7 days per week in color-coordinated fluid grid boxes.</p>
           </div>
 
-          <div className="flex items-center gap-2 text-xs sm:text-sm">
-            <span className={`px-3 py-1 rounded-md ${activeWebsite?.badgeStyle} font-extrabold`}>
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-0.5 rounded text-xs font-bold bg-blue-500/15 text-blue-400 border border-blue-500/30 font-accent">
               528 Total Activities in 2025
             </span>
           </div>
         </div>
 
-        {/* 2 ROWS OF 6 MONTHS */}
-        <div className="space-y-5 pt-1 pb-1">
-          {/* Row 1: Jan - Jun */}
-          <div className="space-y-2.5">
-            <div className={`text-xs sm:text-sm font-extrabold ${activeWebsite?.accentText} tracking-wider`}>FIRST HALF (JANUARY – JUNE 2025)</div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6 gap-3">
-              {row1Months.map((m, idx) => (
-                <div key={m} className="p-2.5 rounded-md bg-[#050609] border border-neutral-800/80 space-y-2">
-                  <div className="text-xs font-extrabold text-neutral-200 text-center uppercase tracking-wide">{m}</div>
-                  
-                  {/* 7 Days of the Week Column Headers */}
-                  <div className="grid grid-cols-7 gap-1 text-center font-bold text-[9px] text-neutral-500">
-                    {dayLabels.map((dayLabel, dIdx) => (
-                      <span key={dIdx}>{dayLabel}</span>
-                    ))}
-                  </div>
-
-                  {/* 7-Column Days Grid (Aspect Square Fluid Resizing) */}
-                  <div className="grid grid-cols-7 gap-1">
-                    {getDaysForMonth(m, idx).map((d) => (
-                      <div
-                        key={d.day}
-                        title={`${m} Day ${d.day}: ${d.count} activities`}
-                        className={`aspect-square w-full rounded-sm transition-all duration-200 hover:scale-125 cursor-pointer ${getHeatmapColorClass(d.level)}`}
-                      ></div>
-                    ))}
-                  </div>
+        {/* ALL 12 MONTHS GRID */}
+        <div className="p-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3.5">
+            {fullMonths.map((monthName, mIdx) => (
+              <div key={monthName} className="p-3 rounded-lg bg-[#050609] border border-neutral-800/80 space-y-2.5 hover:border-neutral-700 transition-colors">
+                {/* Full Name of Month with accent font */}
+                <div className="text-xs font-bold text-neutral-100 text-center tracking-wide font-accent">{monthName}</div>
+                
+                {/* 7 Days of the Week Column Headers */}
+                <div className="grid grid-cols-7 gap-1 text-center font-bold text-[9px] text-neutral-500">
+                  {dayLabels.map((dayLabel) => (
+                    <span key={dayLabel}>{dayLabel}</span>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
 
-          {/* Row 2: Jul - Dec */}
-          <div className="space-y-2.5 pt-3 border-t border-neutral-800/80">
-            <div className={`text-xs sm:text-sm font-extrabold ${activeWebsite?.accentText} tracking-wider`}>SECOND HALF (JULY – DECEMBER 2025)</div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6 gap-3">
-              {row2Months.map((m, idx) => (
-                <div key={m} className="p-2.5 rounded-md bg-[#050609] border border-neutral-800/80 space-y-2">
-                  <div className="text-xs font-extrabold text-neutral-200 text-center uppercase tracking-wide">{m}</div>
-                  
-                  {/* 7 Days of the Week Column Headers */}
-                  <div className="grid grid-cols-7 gap-1 text-center font-bold text-[9px] text-neutral-500">
-                    {dayLabels.map((dayLabel, dIdx) => (
-                      <span key={dIdx}>{dayLabel}</span>
-                    ))}
-                  </div>
-
-                  {/* 7-Column Days Grid (Aspect Square Fluid Resizing) */}
-                  <div className="grid grid-cols-7 gap-1">
-                    {getDaysForMonth(m, idx + 6).map((d) => (
-                      <div
-                        key={d.day}
-                        title={`${m} Day ${d.day}: ${d.count} activities`}
-                        className={`aspect-square w-full rounded-sm transition-all duration-200 hover:scale-125 cursor-pointer ${getHeatmapColorClass(d.level)}`}
-                      ></div>
-                    ))}
-                  </div>
+                {/* 7-Column Days Grid */}
+                <div className="grid grid-cols-7 gap-1">
+                  {getDaysForMonth(mIdx).map((d) => (
+                    <div
+                      key={d.day}
+                      title={`${monthName} Day ${d.day}: ${d.count} activities`}
+                      className={`aspect-square w-full rounded-sm transition-all duration-200 hover:scale-125 cursor-pointer ${getHeatmapColorClass(d.level)}`}
+                    ></div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Heatmap Intensity Legend */}
-        <div className="flex items-center justify-between text-xs sm:text-sm text-neutral-400 pt-2 border-t border-neutral-800/80">
-          <span className="font-semibold">Daily Box Activity Legend</span>
-          <div className="flex items-center gap-1.5 text-xs">
-            <span>Less</span>
+        {/* Edge-to-Edge Footer Bar (Same Styling as Header) */}
+        <div className="bg-gradient-to-r from-[#0c0f1d] via-[#090b14] to-[#05060a] px-4 py-3 border-t border-neutral-800 flex items-center justify-between flex-shrink-0">
+          <span className="text-xs font-semibold text-neutral-300 flex items-center gap-2">
+            <Activity className="w-3.5 h-3.5 text-blue-400" />
+            <span>Daily Contribution Legend</span>
+          </span>
+          <div className="flex items-center gap-2 text-xs">
+            <span className="text-neutral-400 font-medium">Less</span>
             <div className="w-3.5 h-3.5 rounded-sm bg-[#030406] border border-neutral-900"></div>
             <div className={`w-3.5 h-3.5 rounded-sm ${getHeatmapColorClass(1)}`}></div>
             <div className={`w-3.5 h-3.5 rounded-sm ${getHeatmapColorClass(2)}`}></div>
             <div className={`w-3.5 h-3.5 rounded-sm ${getHeatmapColorClass(3)}`}></div>
             <div className={`w-3.5 h-3.5 rounded-sm ${getHeatmapColorClass(4)}`}></div>
-            <span className={`${activeWebsite?.accentText} font-bold`}>More</span>
-          </div>
-        </div>
-      </div>
-
-      {/* 6. Separate Blogs Activity Card & Separate Project Activity Card */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        {/* Separate Blogs Activity Card */}
-        <div className="p-4 sm:p-5 rounded-lg glass-card border border-neutral-800 space-y-4">
-          <div className="flex items-center justify-between border-b border-neutral-800 pb-3">
-            <h3 className="text-sm sm:text-base font-extrabold text-white flex items-center gap-2">
-              <FileText className={`w-4 h-4 ${activeWebsite?.accentText}`} /> Blogs Activity
-            </h3>
-            <button 
-              onClick={() => onNavigate('manage-blogs')}
-              className={`text-xs sm:text-sm font-bold ${activeWebsite?.accentText} hover:underline flex items-center gap-1`}
-            >
-              <span>Manage Blogs</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          <div className="space-y-2.5 max-h-56 overflow-y-auto pr-1">
-            {blogsActivities.map((act) => {
-              const Icon = act.icon;
-              return (
-                <div key={act.id} className="p-3 rounded-md bg-[#050609] hover:bg-neutral-900/80 border border-neutral-800/80 flex items-start gap-3 transition-colors">
-                  <div className={`p-2 rounded-md ${act.bg} ${act.color} mt-0.5 flex-shrink-0`}>
-                    <Icon className="w-4 h-4" />
-                  </div>
-                  <div className="text-xs sm:text-sm flex-1 min-w-0">
-                    <p className="font-semibold text-neutral-200 line-clamp-1">{act.title}</p>
-                    <span className="text-xs text-neutral-500 mt-0.5 block">{act.time}</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Separate Project Activity Card */}
-        <div className="p-4 sm:p-5 rounded-lg glass-card border border-neutral-800 space-y-4">
-          <div className="flex items-center justify-between border-b border-neutral-800 pb-3">
-            <h3 className="text-sm sm:text-base font-extrabold text-white flex items-center gap-2">
-              <FolderKanban className={`w-4 h-4 ${activeWebsite?.accentText}`} /> Project Activity
-            </h3>
-            <button 
-              onClick={() => onNavigate('manage-projects')}
-              className={`text-xs sm:text-sm font-bold ${activeWebsite?.accentText} hover:underline flex items-center gap-1`}
-            >
-              <span>Manage Projects</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          <div className="space-y-2.5 max-h-56 overflow-y-auto pr-1">
-            {projectActivities.map((act) => {
-              const Icon = act.icon;
-              return (
-                <div key={act.id} className="p-3 rounded-md bg-[#050609] hover:bg-neutral-900/80 border border-neutral-800/80 flex items-start gap-3 transition-colors">
-                  <div className={`p-2 rounded-md ${act.bg} ${act.color} mt-0.5 flex-shrink-0`}>
-                    <Icon className="w-4 h-4" />
-                  </div>
-                  <div className="text-xs sm:text-sm flex-1 min-w-0">
-                    <p className="font-semibold text-neutral-200 line-clamp-1">{act.title}</p>
-                    <span className="text-xs text-neutral-500 mt-0.5 block">{act.time}</span>
-                  </div>
-                </div>
-              );
-            })}
+            <span className="text-blue-400 font-bold">More</span>
           </div>
         </div>
       </div>

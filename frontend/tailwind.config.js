@@ -19,8 +19,14 @@ export default {
         xs: '2px',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        sans: ['Inter', 'Space Grotesk', 'system-ui', '-apple-system', 'sans-serif'],
+        inter: ['Inter', 'sans-serif'],
+        courgette: ['Courgette', 'cursive', 'sans-serif'],
+        accent: ['Courgette', 'cursive', 'sans-serif'],
       },
+
+
+
       boxShadow: {
         'glass-glow': '0 0 25px -5px rgba(0, 210, 255, 0.15)',
         'glass-card': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',

@@ -1,305 +1,459 @@
 import React, { useState } from 'react';
-import { Briefcase, Plus, Edit2, Trash2, Eye, EyeOff, Calendar, Building, Tag, Check, X } from 'lucide-react';
+import { 
+  Briefcase, 
+  Plus, 
+  Edit2, 
+  Trash2, 
+  Eye, 
+  EyeOff, 
+  Calendar, 
+  Tag, 
+  Save, 
+  ChevronDown
+} from 'lucide-react';
 
-export default function ExperiencesView() {
-  const [filter, setFilter] = useState('ALL');
-  const [showModal, setShowModal] = useState(false);
+export default function ExperiencesView({ onNavigate, activeWebsite }) {
+  const [viewMode, setViewMode] = useState('LIST'); // 'LIST' | 'EDITOR'
+  const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [editingId, setEditingId] = useState(null);
 
   const [experiences, setExperiences] = useState([
     {
       id: 1,
-      role: 'Software Engineer',
-      company: 'Tech Solutions Inc.',
+      role: 'Lead Platform Architect',
+      company: 'DevAdmin Cloud Labs',
       status: 'CURRENT',
-      description: 'Developed and maintained web applications using modern JavaScript frameworks and backend technologies.',
-      category: 'Full-Stack Development',
-      joined: '2022-05-01',
+      description: 'Architecting multi-tenant React applications and unified REST APIs across developer collaboration platforms.',
+      category: 'Full-Stack Engineering',
+      joined: '2023-01-15',
       left: 'Present',
       visible: true
     },
     {
       id: 2,
-      role: 'Intern',
-      company: 'Web Wizards Inc.',
+      role: 'Senior Frontend Developer',
+      company: 'Tech Mitras Global',
       status: 'PAST',
-      description: 'Assisted senior developers with frontend tasks and bug fixing. Learned about agile methodologies.',
-      category: 'Frontend Development',
+      description: 'Engineered reusable UI component systems with TailwindCSS, WebSocket live chat integrations, and high-performance state stores.',
+      category: 'Frontend Architecture',
       joined: '2021-06-01',
-      left: '2021-08-31',
+      left: '2022-12-31',
+      visible: true
+    },
+    {
+      id: 3,
+      role: 'Full Stack Engineer Intern',
+      company: 'Open Matrix Solutions',
+      status: 'PAST',
+      description: 'Assisted senior developers with Python/Django REST API endpoints, PostgreSQL database migrations, and CI/CD pipelines.',
+      category: 'Backend & DevOps',
+      joined: '2020-08-01',
+      left: '2021-05-31',
       visible: false
     }
   ]);
 
+  // Unified separate Add/Edit form state
   const [formData, setFormData] = useState({
     role: '',
     company: '',
     status: 'CURRENT',
     description: '',
-    category: '',
-    joined: '',
+    category: 'Full-Stack Engineering',
+    joined: new Date().toISOString().split('T')[0],
     left: 'Present',
     visible: true
   });
 
+  // Extract unique categories for the dropdown
+  const categories = ['ALL', ...Array.from(new Set(experiences.map(e => e.category)))];
+
   const filteredExperiences = experiences.filter(exp => {
-    if (filter === 'CURRENT') return exp.status === 'CURRENT';
-    if (filter === 'PAST') return exp.status === 'PAST';
-    return true;
+    if (selectedCategory === 'ALL') return true;
+    return exp.category === selectedCategory;
   });
 
-  const handleOpenAdd = () => {
+  // Navigate to separate Editor Page for Adding
+  const handleOpenAddPage = () => {
     setEditingId(null);
     setFormData({
       role: '',
       company: '',
       status: 'CURRENT',
       description: '',
-      category: '',
-      joined: '',
+      category: 'Full-Stack Engineering',
+      joined: new Date().toISOString().split('T')[0],
       left: 'Present',
       visible: true
     });
-    setShowModal(true);
+    setViewMode('EDITOR');
+    window.scrollTo(0, 0);
   };
 
-  const handleOpenEdit = (exp) => {
+  // Navigate to separate Editor Page for Editing
+  const handleOpenEditPage = (exp) => {
     setEditingId(exp.id);
     setFormData({ ...exp });
-    setShowModal(true);
+    setViewMode('EDITOR');
+    window.scrollTo(0, 0);
   };
 
+  // Return to List Page
+  const handleBackToList = () => {
+    setViewMode('LIST');
+    setEditingId(null);
+    window.scrollTo(0, 0);
+  };
+
+  // Save Form (Add or Edit)
+  const handleSaveForm = (e) => {
+    e?.preventDefault();
+    if (!formData.role.trim() || !formData.company.trim()) {
+      alert('Please enter both Role Title and Company Name.');
+      return;
+    }
+
+    if (editingId) {
+      setExperiences(experiences.map(e => e.id === editingId ? { ...formData, id: editingId } : e));
+    } else {
+      const newEntry = {
+        ...formData,
+        id: Date.now()
+      };
+      setExperiences([newEntry, ...experiences]);
+    }
+
+    setViewMode('LIST');
+    setEditingId(null);
+    window.scrollTo(0, 0);
+  };
+
+  // Delete experience
   const handleDelete = (id) => {
-    if (confirm('Are you sure you want to delete this experience?')) {
+    if (confirm('Delete this experience entry?')) {
       setExperiences(experiences.filter(e => e.id !== id));
     }
   };
 
+  // Toggle visibility directly on card
   const handleToggleVisible = (id) => {
     setExperiences(experiences.map(e => e.id === id ? { ...e, visible: !e.visible } : e));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (editingId) {
-      setExperiences(experiences.map(e => e.id === editingId ? { ...formData, id: editingId } : e));
-    } else {
-      setExperiences([...experiences, { ...formData, id: Date.now() }]);
-    }
-    setShowModal(false);
-  };
-
-  return (
-    <div className="space-y-6">
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl glass-card border border-slate-800">
-        <div>
-          <h1 className="text-xl font-extrabold text-white flex items-center gap-2">
-            <Briefcase className="w-5 h-5 text-cyan-400" />
-            <span>Manage Experiences</span>
-          </h1>
-          <p className="text-xs text-slate-400 mt-1">Add, update, or reorganize work experience records for your portfolio.</p>
-        </div>
-        <button
-          onClick={handleOpenAdd}
-          className="px-4 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs flex items-center gap-2 shadow-lg shadow-cyan-500/20 transition-all"
-        >
-          <Plus className="w-4 h-4" /> Add New Experience
-        </button>
-      </div>
-
-      {/* Filter Tabs */}
-      <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
-        {['ALL', 'CURRENT', 'PAST'].map(tab => (
-          <button
-            key={tab}
-            onClick={() => setFilter(tab)}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-              filter === tab
-                ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
-            }`}
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
-
-      {/* Experience Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        {filteredExperiences.map(exp => (
-          <div key={exp.id} className="p-5 rounded-2xl glass-card glass-card-hover space-y-4 relative flex flex-col justify-between">
-            <div>
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <h3 className="text-base font-bold text-white">{exp.role} <span className="text-cyan-400">@ {exp.company}</span></h3>
-                  <div className="flex items-center gap-2 text-xs text-slate-400 mt-1">
-                    <Tag className="w-3.5 h-3.5 text-cyan-400" />
-                    <span>{exp.category}</span>
-                  </div>
-                </div>
-                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider ${
-                  exp.status === 'CURRENT'
-                    ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
-                    : 'bg-slate-800 text-slate-400 border border-slate-700'
-                }`}>
-                  {exp.status}
-                </span>
-              </div>
-
-              <p className="text-xs text-slate-300 mt-3 leading-relaxed">{exp.description}</p>
-
-              <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-4 pt-3 border-t border-slate-800">
-                <Calendar className="w-3.5 h-3.5 text-cyan-400" />
-                <span>Joined: {exp.joined} - {exp.left}</span>
-              </div>
+  // ==========================================
+  // VIEW 1: SEPARATE DEDICATED ADD / EDIT PAGE
+  // ==========================================
+  if (viewMode === 'EDITOR') {
+    const isEditing = editingId !== null;
+    return (
+      <div className="space-y-6 w-full max-w-full overflow-x-hidden font-sans animate-in fade-in duration-150">
+        {/* Top Header */}
+        <div className="p-4 sm:p-5 rounded-xl bg-[#07080d] border border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl">
+          <div className="flex items-center gap-3.5">
+            <div className="p-3 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/30">
+              <Briefcase className="w-5 h-5" />
             </div>
-
-            {/* Action Buttons */}
-            <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-800/60">
-              <button
-                onClick={() => handleToggleVisible(exp.id)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all ${
-                  exp.visible
-                    ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                    : 'bg-slate-800 text-slate-400 border border-slate-700'
-                }`}
-              >
-                {exp.visible ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
-                <span>{exp.visible ? 'Visible' : 'Hidden'}</span>
-              </button>
-              <button
-                onClick={() => handleOpenEdit(exp)}
-                className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-medium flex items-center gap-1.5 border border-slate-700 transition-all"
-              >
-                <Edit2 className="w-3.5 h-3.5" /> Edit
-              </button>
-              <button
-                onClick={() => handleDelete(exp.id)}
-                className="px-3 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-medium flex items-center gap-1.5 border border-rose-500/20 transition-all"
-              >
-                <Trash2 className="w-3.5 h-3.5" /> Delete
-              </button>
+            <div>
+              <h1 className="text-base sm:text-lg font-extrabold text-white flex items-center gap-2">
+                <span className="font-accent">{isEditing ? `Edit Experience: ${formData.role}` : 'Add New Experience Record'}</span>
+              </h1>
+              <p className="text-xs text-neutral-400 mt-0.5">
+                {isEditing ? 'Modify experience details, tenure dates, and visibility settings.' : 'Fill in the details below to add a new career milestone.'}
+              </p>
             </div>
           </div>
-        ))}
-      </div>
 
-      {/* Modal */}
-      {showModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="w-full max-w-lg glass-card border border-slate-700 rounded-2xl p-6 space-y-4 animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-              <h3 className="text-base font-bold text-white">
-                {editingId ? 'Edit Experience' : 'Add New Experience'}
-              </h3>
-              <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-white">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+          <div className="flex items-center gap-2.5">
+            <button
+              type="button"
+              onClick={handleBackToList}
+              className="px-4 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-300 text-xs font-semibold border border-neutral-800 transition-colors"
+            >
+              Cancel
+            </button>
 
-            <form onSubmit={handleSubmit} className="space-y-4 text-xs">
+
+            <button
+              type="button"
+              onClick={handleSaveForm}
+              className="px-5 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:brightness-110 text-white font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-blue-500/20 transition-all"
+            >
+              <Save className="w-4 h-4" />
+              <span>{isEditing ? 'Save Changes' : 'Save & Publish Experience'}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Dedicated Form Card */}
+        <div className="p-6 sm:p-8 rounded-xl bg-[#07080d] border border-neutral-800 shadow-2xl space-y-6">
+          <form onSubmit={handleSaveForm} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Role Title</label>
+                <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2">
+                  Role Title <span className="text-blue-400">*</span>
+                </label>
                 <input
                   type="text"
                   required
+                  autoFocus
                   value={formData.role}
                   onChange={e => setFormData({ ...formData, role: e.target.value })}
-                  placeholder="e.g. Senior Frontend Engineer"
-                  className="w-full px-3 py-2 rounded-xl glass-input"
+                  placeholder="e.g. Lead Platform Architect"
+                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 transition-colors font-accent"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Company</label>
+                <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2">
+                  Company / Organization <span className="text-blue-400">*</span>
+                </label>
                 <input
                   type="text"
                   required
                   value={formData.company}
                   onChange={e => setFormData({ ...formData, company: e.target.value })}
-                  placeholder="e.g. Acme Corp"
-                  className="w-full px-3 py-2 rounded-xl glass-input"
+                  placeholder="e.g. DevAdmin Cloud Labs"
+                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 transition-colors font-accent text-blue-400"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2">
+                  Domain / Category
+                </label>
+                <input
+                  type="text"
+                  value={formData.category}
+                  onChange={e => setFormData({ ...formData, category: e.target.value })}
+                  placeholder="e.g. Full-Stack Engineering, Frontend Architecture"
+                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 transition-colors"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Status</label>
-                  <select
-                    value={formData.status}
-                    onChange={e => setFormData({ ...formData, status: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl glass-input bg-slate-900"
-                  >
-                    <option value="CURRENT">CURRENT</option>
-                    <option value="PAST">PAST</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Category</label>
-                  <input
-                    type="text"
-                    value={formData.category}
-                    onChange={e => setFormData({ ...formData, category: e.target.value })}
-                    placeholder="e.g. Web Development"
-                    className="w-full px-3 py-2 rounded-xl glass-input"
-                  />
-                </div>
+              <div>
+                <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2">
+                  Employment Status
+                </label>
+                <select
+                  value={formData.status}
+                  onChange={e => setFormData({ 
+                    ...formData, 
+                    status: e.target.value, 
+                    left: e.target.value === 'CURRENT' ? 'Present' : (formData.left === 'Present' ? '' : formData.left) 
+                  })}
+                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
+                >
+                  <option value="CURRENT">CURRENT (Active Position)</option>
+                  <option value="PAST">PAST (Former Position)</option>
+                </select>
               </div>
+            </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Joined Date</label>
-                  <input
-                    type="date"
-                    value={formData.joined}
-                    onChange={e => setFormData({ ...formData, joined: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl glass-input"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-300 font-semibold mb-1">Left Date</label>
-                  <input
-                    type="text"
-                    value={formData.left}
-                    onChange={e => setFormData({ ...formData, left: e.target.value })}
-                    placeholder="e.g. Present or 2023-12"
-                    className="w-full px-3 py-2 rounded-xl glass-input"
-                  />
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2">
+                  Start / Joined Date
+                </label>
+                <input
+                  type="date"
+                  value={formData.joined}
+                  onChange={e => setFormData({ ...formData, joined: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
+                />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Description</label>
-                <textarea
-                  rows="3"
-                  value={formData.description}
-                  onChange={e => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Describe your responsibilities and achievements..."
-                  className="w-full px-3 py-2 rounded-xl glass-input"
-                ></textarea>
+                <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2">
+                  End Date / Current Status
+                </label>
+                <input
+                  type="text"
+                  value={formData.left}
+                  onChange={e => setFormData({ ...formData, left: e.target.value })}
+                  placeholder="e.g. Present or 2024-12-31"
+                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 transition-colors"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2">
+                Role Description & Key Responsibilities
+              </label>
+              <textarea
+                rows={5}
+                value={formData.description}
+                onChange={e => setFormData({ ...formData, description: e.target.value })}
+                placeholder="Detail your responsibilities, architecture decisions, and tech stack utilized..."
+                className="w-full p-4 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 resize-none leading-relaxed transition-colors"
+              />
+            </div>
+
+            {/* Visibility Toggle */}
+            <div className="p-4 rounded-lg bg-black/50 border border-neutral-800/80 flex items-center justify-between">
+              <div>
+                <div className="text-sm font-bold text-white">Portfolio Visibility</div>
+                <p className="text-xs text-neutral-400 mt-0.5">Control whether this experience record appears publicly on your live portfolio.</p>
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 font-medium hover:bg-slate-700"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 rounded-xl bg-cyan-500 text-slate-950 font-bold hover:bg-cyan-400"
-                >
-                  Save Experience
-                </button>
-              </div>
-            </form>
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, visible: !formData.visible })}
+                className={`px-3.5 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition-all ${
+                  formData.visible
+                    ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                    : 'bg-neutral-800 text-neutral-400 border border-neutral-700'
+                }`}
+              >
+                {formData.visible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                <span>{formData.visible ? 'Visible on Portfolio' : 'Hidden from Public'}</span>
+              </button>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-6 border-t border-neutral-800">
+              <button
+                type="button"
+                onClick={handleBackToList}
+                className="px-5 py-2.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-300 text-xs sm:text-sm font-semibold border border-neutral-800 transition-colors"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="submit"
+                className="px-6 py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:brightness-110 text-white font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-blue-500/20 transition-all"
+              >
+                <Save className="w-4 h-4" />
+                <span>{isEditing ? 'Save Changes' : 'Save & Publish Experience'}</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  // ==========================================
+  // VIEW 2: EXPERIENCES 3-CARD GRID VIEW
+  // ==========================================
+  return (
+    <div className="space-y-5 w-full max-w-full overflow-x-hidden font-sans">
+      {/* Header Banner with Category Dropdown & Add Button */}
+      <div className="p-4 sm:p-5 rounded-xl bg-[#07080d] border border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl">
+        <div className="flex items-center gap-3.5">
+          <div className="p-3 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/30">
+            <Briefcase className="w-5 h-5" />
+          </div>
+          <div>
+            <h1 className="text-base sm:text-lg font-extrabold text-white">Manage Experiences</h1>
+            <p className="text-xs text-neutral-400 mt-0.5">Manage career milestones and work experience records for your portfolio.</p>
           </div>
         </div>
-      )}
+
+        {/* Right Actions: Category Dropdown & Add Button */}
+        <div className="flex items-center gap-3 flex-wrap">
+          {/* Category Dropdown */}
+          <div className="relative">
+            <select
+              value={selectedCategory}
+              onChange={e => setSelectedCategory(e.target.value)}
+              className="px-3.5 py-2.5 rounded-lg bg-[#050609] hover:bg-neutral-900 border border-neutral-800 text-xs font-bold text-neutral-200 focus:outline-none focus:border-blue-500 transition-colors cursor-pointer appearance-none pr-8"
+            >
+              <option value="ALL">All Categories ({experiences.length})</option>
+              {categories.filter(c => c !== 'ALL').map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+            <ChevronDown className="w-3.5 h-3.5 text-neutral-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
+
+          <button
+            onClick={handleOpenAddPage}
+            className="px-4 py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:brightness-110 text-white font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-blue-500/20 transition-all flex-shrink-0"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add New Experience</span>
+          </button>
+        </div>
+      </div>
+
+      {/* 3-Card Format Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {filteredExperiences.map(exp => (
+          <div key={exp.id} className="p-5 rounded-xl bg-[#07080d] border border-neutral-800 hover:border-neutral-700 transition-all duration-200 flex flex-col justify-between shadow-lg space-y-4 group">
+            <div className="space-y-3">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <h3 className="text-sm sm:text-base font-extrabold text-white line-clamp-1 font-accent">
+                    {exp.role}
+                  </h3>
+                  <div className="text-xs font-bold text-blue-400 truncate mt-0.5 font-accent">
+                    @ {exp.company}
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[11px] text-neutral-400 mt-1.5">
+                    <Tag className="w-3 h-3 text-blue-400 flex-shrink-0" />
+                    <span className="truncate">{exp.category}</span>
+                  </div>
+                </div>
+
+                <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider flex-shrink-0 ${
+                  exp.status === 'CURRENT'
+                    ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                    : 'bg-neutral-800 text-neutral-400 border border-neutral-700'
+                }`}>
+                  {exp.status}
+                </span>
+              </div>
+
+              <p className="text-xs text-neutral-300 line-clamp-3 leading-relaxed font-normal">
+                {exp.description}
+              </p>
+
+              <div className="flex items-center gap-1.5 text-[11px] text-neutral-400 pt-3 border-t border-neutral-800">
+                <Calendar className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" />
+                <span className="truncate">Tenure: {exp.joined} — {exp.left}</span>
+              </div>
+            </div>
+
+            {/* Action Buttons with Working Visibility Toggle */}
+            <div className="flex items-center justify-between pt-3 border-t border-neutral-800/80 gap-2">
+              <button
+                type="button"
+                onClick={() => handleToggleVisible(exp.id)}
+                className={`px-2.5 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all truncate ${
+                  exp.visible
+                    ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                    : 'bg-neutral-800/60 text-neutral-400 border border-neutral-700'
+                }`}
+                title="Toggle Live Visibility"
+              >
+                {exp.visible ? <Eye className="w-3.5 h-3.5 flex-shrink-0" /> : <EyeOff className="w-3.5 h-3.5 flex-shrink-0" />}
+                <span className="truncate">{exp.visible ? 'Visible' : 'Hidden'}</span>
+              </button>
+
+              <div className="flex items-center gap-1.5 flex-shrink-0">
+                <button
+                  type="button"
+                  onClick={() => handleOpenEditPage(exp)}
+                  className="px-2.5 py-1.5 rounded-md bg-[#050609] hover:bg-neutral-800 text-neutral-300 hover:text-white text-xs font-semibold flex items-center gap-1.5 border border-neutral-800 transition-all"
+                >
+                  <Edit2 className="w-3.5 h-3.5" /> Edit
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDelete(exp.id)}
+                  className="p-1.5 rounded-md bg-rose-950/20 hover:bg-rose-950/40 text-rose-400 text-xs font-medium flex items-center gap-1.5 border border-rose-900/30 transition-all"
+                  title="Delete Experience"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

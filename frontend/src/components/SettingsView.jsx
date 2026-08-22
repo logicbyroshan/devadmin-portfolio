@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { Settings, Shield, UserPlus, Save, Lock, Trash2, Edit2, CheckCircle2, AlertCircle, ToggleLeft, ToggleRight, X } from 'lucide-react';
 
-export default function SettingsView() {
-  const [siteTitle, setSiteTitle] = useState("Roshan's Portfolio");
-  const [seoDescription, setSeoDescription] = useState("Welcome to my personal portfolio showcasing my skills and projects.");
-  const [seoKeywords, setSeoKeywords] = useState("portfolio, web developer, roshan, projects");
+export default function SettingsView({ onNavigate, activeWebsite }) {
+  const [siteTitle, setSiteTitle] = useState(`${activeWebsite?.name || 'Dev-Meet'} Admin Workspace`);
+  const [seoDescription, setSeoDescription] = useState(`Official administrative control center for ${activeWebsite?.name || 'Dev-Meet'} developer platform.`);
+  const [seoKeywords, setSeoKeywords] = useState(`developer, portfolio, admin, ${activeWebsite?.id || 'dev-meet'}, react, fullstack`);
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [savedSettings, setSavedSettings] = useState(false);
 
   const [users, setUsers] = useState([
-    { id: 1, name: 'Roshan Kumar (You)', email: 'your.email@example.com', role: 'Super User', status: 'Active' },
-    { id: 2, name: 'Jane Doe', email: 'jane.doe@example.com', role: 'Normal User', status: 'Temporary' },
+    { id: 1, name: 'Roshan Kumar (You)', email: 'roshan.dev@example.com', role: 'Super User', status: 'Active' },
+    { id: 2, name: 'Jane Doe', email: 'jane.doe@example.com', role: 'Normal User', status: 'Active' },
     { id: 3, name: 'Mark Smith', email: 'mark.smith@example.com', role: 'Normal User', status: 'Inactive' }
   ]);
 
@@ -51,85 +51,93 @@ export default function SettingsView() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl glass-card border border-slate-800">
-        <div>
-          <h1 className="text-xl font-extrabold text-white flex items-center gap-2">
-            <Settings className="w-5 h-5 text-cyan-400" />
-            <span>Website Settings & User Access</span>
-          </h1>
-          <p className="text-xs text-slate-400 mt-1">Manage global website configuration, administrative role access, and account security.</p>
+    <div className="space-y-5 w-full max-w-full overflow-x-hidden">
+      {/* Header Banner */}
+      <div className="p-4 sm:p-5 rounded-xl bg-[#07080d] border border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <div className={`p-3 rounded-lg ${activeWebsite?.accentBg || 'bg-blue-500/10'} ${activeWebsite?.accentText || 'text-blue-400'} border ${activeWebsite?.accentBorder || 'border-blue-500/30'}`}>
+            <Settings className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-base sm:text-lg font-extrabold text-white">Website Settings & Access Control</h1>
+              <span className={`text-[10px] font-black px-1.5 py-0.5 rounded border ${activeWebsite?.badgeStyle}`}>
+                {activeWebsite?.badge}
+              </span>
+            </div>
+            <p className="text-xs text-neutral-400 mt-0.5">Manage global website configuration, administrative roles, and account security for {activeWebsite?.name}.</p>
+          </div>
         </div>
       </div>
 
       {/* Section 1: General Site Settings */}
-      <div className="p-6 rounded-2xl glass-card border border-slate-800 space-y-4">
-        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-          <h3 className="text-sm font-bold text-white flex items-center gap-2">
-            <Settings className="w-4 h-4 text-cyan-400" /> General Site Settings
+      <div className="p-5 sm:p-6 rounded-xl bg-[#07080d] border border-neutral-800 space-y-4 shadow-xl">
+        <div className="flex items-center justify-between pb-3 border-b border-neutral-800">
+          <h3 className="text-sm font-extrabold text-white flex items-center gap-2">
+            <Settings className={`w-4 h-4 ${activeWebsite?.accentText || 'text-blue-400'}`} />
+            <span>General Site Settings ({activeWebsite?.name})</span>
           </h3>
           {savedSettings && (
-            <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
+            <span className="text-xs text-emerald-400 font-extrabold flex items-center gap-1">
               <CheckCircle2 className="w-4 h-4" /> Settings Saved!
             </span>
           )}
         </div>
 
-        <form onSubmit={handleSaveGeneral} className="space-y-4 text-xs">
+        <form onSubmit={handleSaveGeneral} className="space-y-4 text-xs sm:text-sm">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-slate-300 font-semibold mb-1">Website Title</label>
+              <label className="block text-neutral-300 font-semibold mb-1">Website Title</label>
               <input
                 type="text"
                 required
                 value={siteTitle}
                 onChange={e => setSiteTitle(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl glass-input"
+                className="w-full px-3.5 py-2.5 rounded-lg glass-input bg-[#050609] border-neutral-800"
               />
             </div>
 
             <div>
-              <label className="block text-slate-300 font-semibold mb-1">Maintenance Mode</label>
+              <label className="block text-neutral-300 font-semibold mb-1">Maintenance Mode</label>
               <button
                 type="button"
                 onClick={() => setMaintenanceMode(!maintenanceMode)}
-                className={`w-full px-3.5 py-2 rounded-xl flex items-center justify-between font-bold transition-all border ${
+                className={`w-full px-3.5 py-2 rounded-lg flex items-center justify-between font-bold transition-all border ${
                   maintenanceMode
-                    ? 'bg-rose-500/20 text-rose-300 border-rose-500/30'
-                    : 'bg-slate-900 text-slate-400 border-slate-800'
+                    ? 'bg-rose-950/20 text-rose-300 border-rose-900/40'
+                    : 'bg-[#050609] text-neutral-400 border-neutral-800 hover:text-white'
                 }`}
               >
-                <span>{maintenanceMode ? 'ENABLED (Site Hidden)' : 'DISABLED (Live)'}</span>
-                {maintenanceMode ? <ToggleRight className="w-6 h-6 text-rose-400" /> : <ToggleLeft className="w-6 h-6 text-slate-500" />}
+                <span>{maintenanceMode ? 'ENABLED (Site Hidden)' : 'DISABLED (Live Operational)'}</span>
+                {maintenanceMode ? <ToggleRight className="w-6 h-6 text-rose-400" /> : <ToggleLeft className="w-6 h-6 text-neutral-500" />}
               </button>
             </div>
           </div>
 
           <div>
-            <label className="block text-slate-300 font-semibold mb-1">Default SEO Meta Description</label>
+            <label className="block text-neutral-300 font-semibold mb-1">Default SEO Meta Description</label>
             <textarea
               rows="2"
               value={seoDescription}
               onChange={e => setSeoDescription(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl glass-input"
+              className="w-full px-3.5 py-2.5 rounded-lg glass-input bg-[#050609] border-neutral-800"
             ></textarea>
           </div>
 
           <div>
-            <label className="block text-slate-300 font-semibold mb-1">Default SEO Meta Keywords (comma-separated)</label>
+            <label className="block text-neutral-300 font-semibold mb-1">Default SEO Meta Keywords</label>
             <input
               type="text"
               value={seoKeywords}
               onChange={e => setSeoKeywords(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl glass-input"
+              className="w-full px-3.5 py-2.5 rounded-lg glass-input bg-[#050609] border-neutral-800"
             />
           </div>
 
           <div className="flex justify-end pt-2">
             <button
               type="submit"
-              className="px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs flex items-center gap-2 shadow-lg shadow-cyan-500/20 transition-all"
+              className={`px-5 py-2.5 rounded-lg bg-gradient-to-r ${activeWebsite?.gradient || 'from-blue-600 to-indigo-600'} text-white font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-lg ${activeWebsite?.glow || 'shadow-blue-500/20'} hover:brightness-110 transition-all`}
             >
               <Save className="w-4 h-4" /> Save General Settings
             </button>
@@ -138,22 +146,23 @@ export default function SettingsView() {
       </div>
 
       {/* Section 2: User Management */}
-      <div className="p-6 rounded-2xl glass-card border border-slate-800 space-y-4">
-        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-          <h3 className="text-sm font-bold text-white flex items-center gap-2">
-            <Shield className="w-4 h-4 text-cyan-400" /> User Management
+      <div className="p-5 sm:p-6 rounded-xl bg-[#07080d] border border-neutral-800 space-y-4 shadow-xl">
+        <div className="flex items-center justify-between pb-3 border-b border-neutral-800">
+          <h3 className="text-sm font-extrabold text-white flex items-center gap-2">
+            <Shield className={`w-4 h-4 ${activeWebsite?.accentText || 'text-blue-400'}`} />
+            <span>Authorized Admin Users</span>
           </h3>
           <button
             onClick={() => setShowAddUserModal(true)}
-            className="px-3 py-1.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 transition-all shadow-md shadow-cyan-500/10"
+            className={`px-3 py-1.5 rounded-lg bg-gradient-to-r ${activeWebsite?.gradient || 'from-blue-600 to-indigo-600'} text-white font-extrabold text-xs flex items-center gap-1.5 transition-all shadow-md ${activeWebsite?.glow || 'shadow-blue-500/20'} hover:brightness-110`}
           >
             <UserPlus className="w-3.5 h-3.5" /> Add New User
           </button>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-slate-300">
-            <thead className="bg-slate-900/80 text-slate-400 uppercase tracking-wider font-bold text-[10px] border-b border-slate-800">
+          <table className="w-full text-left text-xs sm:text-sm text-neutral-300">
+            <thead className="bg-[#050609] text-neutral-400 uppercase tracking-wider font-extrabold text-[10px] border-b border-neutral-800">
               <tr>
                 <th className="px-4 py-3">Name</th>
                 <th className="px-4 py-3">Email</th>
@@ -162,24 +171,25 @@ export default function SettingsView() {
                 <th className="px-4 py-3 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60">
+            <tbody className="divide-y divide-neutral-800/60 bg-[#07080d]/60">
               {users.map((u) => (
-                <tr key={u.id} className="hover:bg-slate-800/30 transition-colors">
-                  <td className="px-4 py-3 font-bold text-white">{u.name}</td>
-                  <td className="px-4 py-3 text-slate-400">{u.email}</td>
-                  <td className="px-4 py-3 font-semibold text-cyan-400">{u.role}</td>
-                  <td className="px-4 py-3">
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                      u.status === 'Active' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-800 text-slate-400'
+                <tr key={u.id} className="hover:bg-neutral-900/60 transition-colors">
+                  <td className="px-4 py-3.5 font-bold text-white">{u.name}</td>
+                  <td className="px-4 py-3.5 text-neutral-400">{u.email}</td>
+                  <td className={`px-4 py-3.5 font-semibold ${activeWebsite?.accentText || 'text-blue-400'}`}>{u.role}</td>
+                  <td className="px-4 py-3.5">
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
+                      u.status === 'Active' ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' : 'bg-neutral-800 text-neutral-400 border-neutral-700'
                     }`}>
                       {u.status}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-4 py-3.5 text-right">
                     {u.id !== 1 && (
                       <button
                         onClick={() => handleDeleteUser(u.id)}
-                        className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 transition-all"
+                        className="p-1.5 rounded-md bg-rose-950/20 hover:bg-rose-950/40 text-rose-400 border border-rose-900/30 transition-all"
+                        title="Remove User"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -193,60 +203,61 @@ export default function SettingsView() {
       </div>
 
       {/* Section 3: Password Security */}
-      <div className="p-6 rounded-2xl glass-card border border-slate-800 space-y-4">
-        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-          <h3 className="text-sm font-bold text-white flex items-center gap-2">
-            <Lock className="w-4 h-4 text-cyan-400" /> Account Security & Password
+      <div className="p-5 sm:p-6 rounded-xl bg-[#07080d] border border-neutral-800 space-y-4 shadow-xl">
+        <div className="flex items-center justify-between pb-3 border-b border-neutral-800">
+          <h3 className="text-sm font-extrabold text-white flex items-center gap-2">
+            <Lock className={`w-4 h-4 ${activeWebsite?.accentText || 'text-blue-400'}`} />
+            <span>Account Security & Password</span>
           </h3>
           {passFeedback?.success && (
-            <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
+            <span className="text-xs text-emerald-400 font-extrabold flex items-center gap-1">
               <CheckCircle2 className="w-4 h-4" /> {passFeedback.success}
             </span>
           )}
           {passFeedback?.error && (
-            <span className="text-xs text-rose-400 font-bold flex items-center gap-1">
+            <span className="text-xs text-rose-400 font-extrabold flex items-center gap-1">
               <AlertCircle className="w-4 h-4" /> {passFeedback.error}
             </span>
           )}
         </div>
 
-        <form onSubmit={handlePasswordSubmit} className="space-y-4 text-xs max-w-md">
+        <form onSubmit={handlePasswordSubmit} className="space-y-4 text-xs sm:text-sm max-w-md">
           <div>
-            <label className="block text-slate-300 font-semibold mb-1">Current Password</label>
+            <label className="block text-neutral-300 font-semibold mb-1">Current Password</label>
             <input
               type="password"
               required
               value={passwords.current}
               onChange={e => setPasswords({ ...passwords, current: e.target.value })}
-              className="w-full px-3.5 py-2.5 rounded-xl glass-input"
+              className="w-full px-3.5 py-2.5 rounded-lg glass-input bg-[#050609] border-neutral-800"
             />
           </div>
 
           <div>
-            <label className="block text-slate-300 font-semibold mb-1">New Password</label>
+            <label className="block text-neutral-300 font-semibold mb-1">New Password</label>
             <input
               type="password"
               required
               value={passwords.new}
               onChange={e => setPasswords({ ...passwords, new: e.target.value })}
-              className="w-full px-3.5 py-2.5 rounded-xl glass-input"
+              className="w-full px-3.5 py-2.5 rounded-lg glass-input bg-[#050609] border-neutral-800"
             />
           </div>
 
           <div>
-            <label className="block text-slate-300 font-semibold mb-1">Confirm New Password</label>
+            <label className="block text-neutral-300 font-semibold mb-1">Confirm New Password</label>
             <input
               type="password"
               required
               value={passwords.confirm}
               onChange={e => setPasswords({ ...passwords, confirm: e.target.value })}
-              className="w-full px-3.5 py-2.5 rounded-xl glass-input"
+              className="w-full px-3.5 py-2.5 rounded-lg glass-input bg-[#050609] border-neutral-800"
             />
           </div>
 
           <button
             type="submit"
-            className="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-slate-700 font-bold text-xs flex items-center gap-2 transition-all"
+            className="px-5 py-2.5 rounded-lg bg-[#050609] hover:bg-neutral-800 text-neutral-200 hover:text-white border border-neutral-800 font-extrabold text-xs sm:text-sm flex items-center gap-2 transition-all shadow-md"
           >
             <Lock className="w-3.5 h-3.5" /> Update Password
           </button>
@@ -255,65 +266,66 @@ export default function SettingsView() {
 
       {/* Add User Modal */}
       {showAddUserModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="w-full max-w-md glass-card border border-slate-700 rounded-2xl p-6 space-y-4 animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <UserPlus className="w-4 h-4 text-cyan-400" /> Add Admin User
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="w-full max-w-md bg-[#07080d] border border-neutral-800 rounded-xl p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150 shadow-2xl">
+            <div className="flex items-center justify-between pb-3 border-b border-neutral-800">
+              <h3 className="text-base font-extrabold text-white flex items-center gap-2">
+                <UserPlus className={`w-4 h-4 ${activeWebsite?.accentText || 'text-blue-400'}`} />
+                <span>Add Admin User</span>
               </h3>
-              <button onClick={() => setShowAddUserModal(false)} className="text-slate-400 hover:text-white">
+              <button onClick={() => setShowAddUserModal(false)} className="text-neutral-400 hover:text-white transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleAddUserSubmit} className="space-y-4 text-xs">
+            <form onSubmit={handleAddUserSubmit} className="space-y-4 text-xs sm:text-sm">
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Full Name</label>
+                <label className="block text-neutral-300 font-semibold mb-1">Full Name</label>
                 <input
                   type="text"
                   required
                   value={newUser.name}
                   onChange={e => setNewUser({ ...newUser, name: e.target.value })}
                   placeholder="e.g. Alex Morgan"
-                  className="w-full px-3 py-2 rounded-xl glass-input"
+                  className="w-full px-3.5 py-2.5 rounded-lg glass-input bg-[#050609] border-neutral-800"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Email Address</label>
+                <label className="block text-neutral-300 font-semibold mb-1">Email Address</label>
                 <input
                   type="email"
                   required
                   value={newUser.email}
                   onChange={e => setNewUser({ ...newUser, email: e.target.value })}
                   placeholder="alex@example.com"
-                  className="w-full px-3 py-2 rounded-xl glass-input"
+                  className="w-full px-3.5 py-2.5 rounded-lg glass-input bg-[#050609] border-neutral-800"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Role</label>
+                <label className="block text-neutral-300 font-semibold mb-1">Role</label>
                 <select
                   value={newUser.role}
                   onChange={e => setNewUser({ ...newUser, role: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl glass-input bg-slate-900"
+                  className="w-full px-3.5 py-2.5 rounded-lg glass-input bg-[#050609] border-neutral-800"
                 >
                   <option value="Normal User">Normal User</option>
                   <option value="Super User">Super User</option>
                 </select>
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-neutral-800">
                 <button
                   type="button"
                   onClick={() => setShowAddUserModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 font-medium hover:bg-slate-700"
+                  className="px-4 py-2.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-300 font-semibold text-xs sm:text-sm border border-neutral-800 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-cyan-500 text-slate-950 font-bold hover:bg-cyan-400"
+                  className={`px-5 py-2.5 rounded-lg bg-gradient-to-r ${activeWebsite?.gradient || 'from-blue-600 to-indigo-600'} text-white font-extrabold text-xs sm:text-sm shadow-md ${activeWebsite?.glow || 'shadow-blue-500/20'} hover:brightness-110 transition-all`}
                 >
                   Create User
                 </button>

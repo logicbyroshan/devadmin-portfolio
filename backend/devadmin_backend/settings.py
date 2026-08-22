@@ -66,7 +66,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'devadmin_backend.wsgi'
+WSGI_APPLICATION = 'devadmin_backend.wsgi.application'
 
 # MySQL Database Configuration with fallback to SQLite for local zero-config setup
 USE_MYSQL = os.environ.get('USE_MYSQL', 'False').lower() == 'true'

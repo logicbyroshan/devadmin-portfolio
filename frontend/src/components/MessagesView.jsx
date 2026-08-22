@@ -1,19 +1,43 @@
 import React, { useState } from 'react';
-import { Mail, Star, Trash2, Reply, CheckCircle2, Clock, Filter, Send, X } from 'lucide-react';
+import { 
+  Mail, 
+  Star, 
+  Trash2, 
+  Reply, 
+  CheckCircle2, 
+  Clock, 
+  Filter, 
+  Send, 
+  X, 
+  Search, 
+  Check, 
+  ArrowRight,
+  MessageSquare,
+  Sparkles,
+  Inbox,
+  User,
+  ExternalLink,
+  ShieldCheck
+} from 'lucide-react';
 
-export default function MessagesView() {
+export default function MessagesView({ onNavigate, activeWebsite }) {
   const [filter, setFilter] = useState('ALL');
-  const [replyMessage, setReplyMessage] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedId, setSelectedId] = useState(1);
+  const [replySubject, setReplySubject] = useState('');
   const [replyText, setReplyText] = useState('');
+  const [isSentToast, setIsSentToast] = useState(false);
 
   const [messages, setMessages] = useState([
     {
       id: 1,
       sender: 'John Doe',
       email: 'john.doe@example.com',
-      subject: 'Inquiry regarding React Frontend Contract',
-      body: 'Hi Roshan, I came across your impressive web developer portfolio and wanted to ask if you are available for a contract React frontend build next month?',
+      tag: 'Inquiry',
+      subject: 'Inquiry regarding DevMeet Platform Features & Architecture',
+      body: 'Hi Roshan,\n\nI came across your impressive developer portal DevMeet and wanted to ask if you are available for a contract full-stack build next month? We are building a high-performance developer workspace and would love your expertise on the frontend architecture and real-time backend synchronization.\n\nLooking forward to hearing from you!',
       time: '2m ago',
+      date: 'June 20, 2025 • 02:45 PM',
       read: false,
       starred: true
     },
@@ -21,9 +45,11 @@ export default function MessagesView() {
       id: 2,
       sender: 'Renuka Dashbanda',
       email: 'renuka.d@company.io',
-      subject: 'Feedback on Glassmorphism UI Template',
-      body: 'Great work on the modern dev dashboard! The dark theme glass styling looks extremely slick. Let us know when the open source repo is ready.',
+      tag: 'Feedback',
+      subject: 'Feedback on Modern Pitch-Black Glassmorphic Dashboard UI',
+      body: 'Hello Roshan,\n\nGreat work on the multi-site platform management architecture! The pitch-black glass styling and responsive typography look extremely slick and polished. Let us know when the open source repository is ready for public review.\n\nBest regards,\nRenuka',
       time: '15m ago',
+      date: 'June 20, 2025 • 02:30 PM',
       read: true,
       starred: false
     },
@@ -31,191 +57,362 @@ export default function MessagesView() {
       id: 3,
       sender: 'Riya Sayam',
       email: 'riya@techcorp.com',
-      subject: 'Full Stack Engineer Position',
-      body: 'Hello Roshan! We would love to discuss an open Senior Engineer role at our team. Please let me know your availability for a 15-minute introductory call.',
+      tag: 'Hire',
+      subject: 'Senior Full Stack Engineer Contract Role Inquiry',
+      body: 'Hello Roshan!\n\nWe would love to discuss an open Senior Engineer position at our engineering team. We were particularly impressed by your microservices and React performance optimization work. Please let me know your availability for a 15-minute discovery call this week.\n\nCheers,\nRiya',
       time: '1h ago',
+      date: 'June 20, 2025 • 01:45 PM',
       read: false,
       starred: true
+    },
+    {
+      id: 4,
+      sender: 'Jane Smith',
+      email: 'jane@freelance.org',
+      tag: 'Consultation',
+      subject: 'Full-Stack Architecture Consultation for Fintech App',
+      body: 'Hi Roshan,\n\nI am reaching out regarding technical architecture consultation for an upcoming fintech application with PostgreSQL and Django REST backends. Are you open to hourly advisory sessions?',
+      time: '2d ago',
+      date: 'June 18, 2025 • 11:15 AM',
+      read: true,
+      starred: false
     }
   ]);
 
   const filteredMessages = messages.filter(m => {
+    const matchesSearch = 
+      m.sender.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      m.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      m.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      m.body.toLowerCase().includes(searchQuery.toLowerCase());
+
+    if (!matchesSearch) return false;
     if (filter === 'UNREAD') return !m.read;
     if (filter === 'STARRED') return m.starred;
+    if (filter === 'INQUIRY') return m.tag === 'Inquiry';
+    if (filter === 'FEEDBACK') return m.tag === 'Feedback';
+    if (filter === 'HIRE') return m.tag === 'Hire';
     return true;
   });
 
-  const toggleStar = (id) => {
+  const selectedMessage = messages.find(m => m.id === selectedId) || filteredMessages[0] || messages[0];
+
+  const toggleStar = (id, e) => {
+    e?.stopPropagation();
     setMessages(messages.map(m => m.id === id ? { ...m, starred: !m.starred } : m));
   };
 
-  const markRead = (id) => {
-    setMessages(messages.map(m => m.id === id ? { ...m, read: true } : m));
+  const toggleReadStatus = (id) => {
+    setMessages(messages.map(m => m.id === id ? { ...m, read: !m.read } : m));
   };
 
   const handleDelete = (id) => {
-    setMessages(messages.filter(m => m.id !== id));
+    if (confirm('Delete this message conversation?')) {
+      const remaining = messages.filter(m => m.id !== id);
+      setMessages(remaining);
+      if (selectedId === id && remaining.length > 0) {
+        setSelectedId(remaining[0].id);
+      }
+    }
   };
 
   const handleSendReply = (e) => {
-    e.preventDefault();
-    alert(`Reply sent to ${replyMessage.email}!`);
-    setReplyMessage(null);
+    e?.preventDefault();
+    if (!replyText.trim()) {
+      alert('Please enter an email reply message.');
+      return;
+    }
+    setIsSentToast(true);
     setReplyText('');
+    setReplySubject('');
+    setTimeout(() => {
+      setIsSentToast(false);
+    }, 3500);
   };
 
   return (
-    <div className="space-y-6">
-      {/* Top Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl glass-card border border-slate-800">
-        <div>
-          <h1 className="text-xl font-extrabold text-white flex items-center gap-2">
-            <Mail className="w-5 h-5 text-cyan-400" />
-            <span>Contact Messages & Inquiries</span>
-          </h1>
-          <p className="text-xs text-slate-400 mt-1">Review inquiries submitted via your portfolio contact form and send instant replies.</p>
+    <div className="space-y-5 w-full max-w-full overflow-x-hidden font-sans">
+      {/* Header Banner */}
+      <div className="p-4 sm:p-5 rounded-xl bg-[#07080d] border border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl">
+        <div className="flex items-center gap-3.5">
+          <div className="p-3 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/30">
+            <Mail className="w-5 h-5" />
+          </div>
+          <div>
+            <h1 className="text-base sm:text-lg font-extrabold text-white">Contact Inquiries & Direct Email Console</h1>
+            <p className="text-xs text-neutral-400 mt-0.5">Manage incoming contact submissions and reply directly via authenticated SMTP relay.</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 text-xs font-semibold text-neutral-300">
+          <span className="px-3 py-1.5 rounded-md bg-blue-500/15 text-blue-400 border border-blue-500/30 font-bold flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
+            <span>{messages.filter(m => !m.read).length} Unread Inquiries</span>
+          </span>
         </div>
       </div>
 
-      {/* Filter Bar */}
-      <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
-        {['ALL', 'UNREAD', 'STARRED'].map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setFilter(tab)}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-              filter === tab
-                ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
-            }`}
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
+      {/* 2-Column Split: Message Inbox Feed (Left) & Full Conversation & Reply Console (Right) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch min-h-[640px]">
+        {/* LEFT COLUMN: Messages Feed & Search */}
+        <div className="lg:col-span-5 rounded-xl bg-[#07080d] border border-neutral-800 shadow-xl overflow-hidden flex flex-col justify-between">
+          {/* Top Filter & Search Bar */}
+          <div className="p-3.5 border-b border-neutral-800 space-y-2.5 bg-[#050609]">
+            <div className="relative">
+              <Search className="w-4 h-4 text-neutral-500 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                placeholder="Search messages by sender, email or text..."
+                className="w-full pl-9 pr-3 py-2 rounded-lg bg-black/80 border border-neutral-800 text-xs text-neutral-200 placeholder-neutral-500 focus:outline-none focus:border-blue-500/60"
+              />
+            </div>
 
-      {/* Messages Feed */}
-      <div className="space-y-3">
-        {filteredMessages.map((msg) => (
-          <div
-            key={msg.id}
-            onClick={() => markRead(msg.id)}
-            className={`p-5 rounded-2xl glass-card transition-all duration-200 border space-y-3 ${
-              msg.read ? 'border-slate-800/80 bg-slate-900/40' : 'border-cyan-500/30 bg-cyan-950/10'
-            }`}
-          >
-            {/* Sender Row */}
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 text-slate-950 font-black text-base flex items-center justify-center shadow-md">
-                  {msg.sender.charAt(0)}
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-sm font-bold text-white">{msg.sender}</h3>
-                    {!msg.read && (
-                      <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-                    )}
-                  </div>
-                  <p className="text-xs text-slate-400">{msg.email}</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-                  {msg.time}
-                </span>
+            {/* Quick Filter Pills */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-[11px] font-semibold text-neutral-400">
+              {[
+                { id: 'ALL', label: `All (${messages.length})` },
+                { id: 'UNREAD', label: `Unread (${messages.filter(m => !m.read).length})` },
+                { id: 'STARRED', label: `Starred (${messages.filter(m => m.starred).length})` },
+                { id: 'INQUIRY', label: 'Inquiries' },
+                { id: 'FEEDBACK', label: 'Feedback' },
+                { id: 'HIRE', label: 'Hire' }
+              ].map(tab => (
                 <button
-                  onClick={(e) => { e.stopPropagation(); toggleStar(msg.id); }}
-                  className={`p-1.5 rounded-lg transition-colors ${
-                    msg.starred ? 'text-amber-400 bg-amber-400/10' : 'text-slate-500 hover:text-slate-300'
+                  key={tab.id}
+                  onClick={() => setFilter(tab.id)}
+                  className={`px-2.5 py-1 rounded-md whitespace-nowrap transition-all ${
+                    filter === tab.id
+                      ? 'bg-blue-500/20 text-blue-400 border border-blue-500/40 font-bold'
+                      : 'hover:bg-neutral-800 hover:text-white bg-neutral-900/60 border border-neutral-800/80'
                   }`}
                 >
-                  <Star className="w-4 h-4 fill-current" />
+                  {tab.label}
                 </button>
-              </div>
-            </div>
-
-            {/* Subject & Body */}
-            <div>
-              <h4 className="text-xs font-bold text-cyan-400 mb-1">{msg.subject}</h4>
-              <p className="text-xs text-slate-300 leading-relaxed">{msg.body}</p>
-            </div>
-
-            {/* Footer actions */}
-            <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-800/60">
-              <button
-                onClick={() => setReplyMessage(msg)}
-                className="px-3 py-1.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-bold flex items-center gap-1.5 transition-all shadow-md shadow-cyan-500/10"
-              >
-                <Reply className="w-3.5 h-3.5" /> Reply
-              </button>
-              <button
-                onClick={() => handleDelete(msg.id)}
-                className="px-3 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-medium flex items-center gap-1.5 border border-rose-500/20 transition-all"
-              >
-                <Trash2 className="w-3.5 h-3.5" /> Delete
-              </button>
+              ))}
             </div>
           </div>
-        ))}
-      </div>
 
-      {/* Reply Modal */}
-      {replyMessage && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="w-full max-w-lg glass-card border border-slate-700 rounded-2xl p-6 space-y-4 animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <Reply className="w-4 h-4 text-cyan-400" /> Reply to {replyMessage.sender}
-              </h3>
-              <button onClick={() => setReplyMessage(null)} className="text-slate-400 hover:text-white">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleSendReply} className="space-y-4 text-xs">
-              <div>
-                <label className="block text-slate-400 font-semibold mb-1">To Email</label>
-                <input
-                  type="text"
-                  disabled
-                  value={replyMessage.email}
-                  className="w-full px-3 py-2 rounded-xl glass-input opacity-70 cursor-not-allowed"
-                />
+          {/* Scrollable Message Items List */}
+          <div className="p-3 space-y-2 flex-1 overflow-y-auto max-h-[580px]">
+            {filteredMessages.length === 0 ? (
+              <div className="p-8 text-center text-neutral-500 text-xs">
+                No messages match the current filter.
               </div>
+            ) : (
+              filteredMessages.map((msg) => {
+                const isSelected = msg.id === selectedMessage?.id;
+                return (
+                  <div
+                    key={msg.id}
+                    onClick={() => {
+                      setSelectedId(msg.id);
+                      setReplySubject(`Re: ${msg.subject}`);
+                      if (!msg.read) {
+                        setMessages(messages.map(m => m.id === msg.id ? { ...m, read: true } : m));
+                      }
+                    }}
+                    className={`p-3.5 rounded-lg border cursor-pointer transition-all duration-200 space-y-2 ${
+                      isSelected
+                        ? 'bg-[#0d1222] border-blue-500/80 shadow-lg shadow-blue-500/15'
+                        : 'bg-[#050609] hover:bg-neutral-900/80 border-neutral-800/80'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className={`w-8 h-8 rounded-lg ${isSelected ? 'bg-gradient-to-br from-blue-600 to-indigo-600 text-white' : 'bg-neutral-800 text-neutral-300'} font-bold text-xs flex items-center justify-center flex-shrink-0 font-accent shadow-sm`}>
+                          {msg.sender.charAt(0)}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <h4 className="text-xs sm:text-sm font-bold text-white truncate font-accent">{msg.sender}</h4>
+                            {!msg.read && (
+                              <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse flex-shrink-0"></span>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-neutral-400 truncate">{msg.email}</p>
+                        </div>
+                      </div>
 
-              <div>
-                <label className="block text-slate-300 font-semibold mb-1">Message Content</label>
-                <textarea
-                  rows="4"
-                  required
-                  value={replyText}
-                  onChange={(e) => setReplyText(e.target.value)}
-                  placeholder="Type your response here..."
-                  className="w-full px-3 py-2 rounded-xl glass-input"
-                ></textarea>
-              </div>
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/15 text-blue-400 border border-blue-500/30">
+                          {msg.tag}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={(e) => toggleStar(msg.id, e)}
+                          className={`p-1 rounded transition-colors ${
+                            msg.starred ? 'text-amber-400' : 'text-neutral-600 hover:text-neutral-400'
+                          }`}
+                        >
+                          <Star className={`w-3.5 h-3.5 ${msg.starred ? 'fill-current' : ''}`} />
+                        </button>
+                      </div>
+                    </div>
 
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
-                <button
-                  type="button"
-                  onClick={() => setReplyMessage(null)}
-                  className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 font-medium hover:bg-slate-700"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 rounded-xl bg-cyan-500 text-slate-950 font-bold hover:bg-cyan-400 flex items-center gap-1.5"
-                >
-                  <Send className="w-3.5 h-3.5" /> Send Reply
-                </button>
-              </div>
-            </form>
+                    <div className="text-xs font-semibold text-neutral-200 line-clamp-1">
+                      {msg.subject}
+                    </div>
+
+                    <p className="text-xs text-neutral-400 line-clamp-2 leading-relaxed font-normal">
+                      {msg.body}
+                    </p>
+
+                    <div className="flex items-center justify-between text-[10px] text-neutral-500 pt-1 border-t border-neutral-800/60">
+                      <span>{msg.date}</span>
+                      <span>{msg.time}</span>
+                    </div>
+                  </div>
+                );
+              })
+            )}
           </div>
         </div>
-      )}
+
+        {/* RIGHT COLUMN: Full Conversation Reader & Quick Email Reply Composer */}
+        <div className="lg:col-span-7 rounded-xl bg-[#07080d] border border-neutral-800 shadow-xl overflow-hidden flex flex-col justify-between">
+          {selectedMessage ? (
+            <div className="flex-1 flex flex-col justify-between">
+              {/* Message Header */}
+              <div className="bg-gradient-to-r from-[#0c0f1d] via-[#090b14] to-[#05060a] p-4 border-b border-neutral-800 flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-black text-base flex items-center justify-center flex-shrink-0 shadow-md font-accent">
+                    {selectedMessage.sender.charAt(0)}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-sm sm:text-base font-extrabold text-white truncate font-accent">{selectedMessage.sender}</h2>
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/15 text-blue-400 border border-blue-500/30">
+                        {selectedMessage.tag}
+                      </span>
+                    </div>
+                    <p className="text-xs text-neutral-400">{selectedMessage.email} • <span className="text-neutral-500">{selectedMessage.date}</span></p>
+                  </div>
+                </div>
+
+                {/* Header Actions */}
+                <div className="flex items-center gap-1.5 flex-shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => toggleReadStatus(selectedMessage.id)}
+                    className="px-2.5 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-xs font-semibold text-neutral-300 transition-colors"
+                  >
+                    {selectedMessage.read ? 'Mark Unread' : 'Mark Read'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(selectedMessage.id)}
+                    className="p-1.5 rounded-lg bg-rose-950/20 hover:bg-rose-950/40 text-rose-400 border border-rose-900/30 text-xs transition-colors"
+                    title="Delete Message"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Message Content View Card */}
+              <div className="p-5 space-y-3.5 border-b border-neutral-800 bg-[#050609]/60">
+                <div className="text-sm sm:text-base font-bold text-neutral-100">
+                  {selectedMessage.subject}
+                </div>
+
+                <div className="p-4 rounded-xl bg-black/60 border border-neutral-800/80 text-xs sm:text-sm text-neutral-200 leading-relaxed whitespace-pre-line font-normal">
+                  {selectedMessage.body}
+                </div>
+              </div>
+
+              {/* Direct Email Reply Composer */}
+              <div className="p-4 sm:p-5 space-y-3.5 bg-[#07080d]">
+                {/* Sent Success Toast Banner */}
+                {isSentToast && (
+                  <div className="flex items-center gap-2.5 p-3 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-bold animate-in fade-in duration-200">
+                    <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                    <span>Email reply dispatched to <span className="font-mono">{selectedMessage?.email}</span> via SMTP relay!</span>
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/30">
+                      <Mail className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-xs font-bold text-white">
+                      Quick Email Reply to {selectedMessage.sender}
+                    </span>
+                  </div>
+
+                  <span className="text-[10px] text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20 font-semibold flex items-center gap-1">
+                    <ShieldCheck className="w-3.5 h-3.5 text-blue-400" /> Direct SMTP Relay Connected
+                  </span>
+                </div>
+
+
+                {/* Subject Input */}
+                <div className="flex items-center gap-2 bg-black/80 border border-neutral-800 rounded-lg px-3 py-2 text-xs">
+                  <span className="text-neutral-400 font-bold text-[11px] uppercase tracking-wider">Subject:</span>
+                  <input
+                    type="text"
+                    value={replySubject || `Re: ${selectedMessage.subject}`}
+                    onChange={e => setReplySubject(e.target.value)}
+                    className="bg-transparent border-none outline-none text-neutral-100 text-xs w-full font-medium"
+                  />
+                </div>
+
+                {/* Textarea */}
+                <textarea
+                  rows={4}
+                  value={replyText}
+                  onChange={e => setReplyText(e.target.value)}
+                  placeholder={`Hi ${selectedMessage.sender},\n\nThank you for reaching out! I would be delighted to assist you with...`}
+                  className="w-full p-3 rounded-lg bg-black/80 border border-neutral-800 text-xs sm:text-sm text-neutral-100 placeholder-neutral-500 focus:outline-none focus:border-blue-500/80 transition-colors resize-none leading-relaxed font-normal"
+                />
+
+                {/* Canned suggestions + Send Button */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setReplyText(`Hi ${selectedMessage.sender}, thank you for reaching out! I am currently available for new contract work and architecture consultation.`)}
+                      className="text-[11px] font-medium px-2.5 py-1 rounded-md bg-neutral-900 hover:bg-neutral-800 text-neutral-200 border border-neutral-800 transition-colors"
+                    >
+                      Available for work
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setReplyText(`Hi ${selectedMessage.sender}, let's schedule a 15-minute discovery call this week to discuss details.`)}
+                      className="text-[11px] font-medium px-2.5 py-1 rounded-md bg-neutral-900 hover:bg-neutral-800 text-neutral-200 border border-neutral-800 transition-colors"
+                    >
+                      Schedule Call
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setReplyText(`Hi ${selectedMessage.sender}, thank you for the wonderful feedback! Really appreciate you taking the time to share.`)}
+                      className="text-[11px] font-medium px-2.5 py-1 rounded-md bg-neutral-900 hover:bg-neutral-800 text-neutral-200 border border-neutral-800 transition-colors"
+                    >
+                      Thanks for feedback
+                    </button>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleSendReply}
+                    className="px-5 py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:brightness-110 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 transition-all flex-shrink-0"
+                  >
+                    <Send className="w-4 h-4" />
+                    <span>Send Email Reply</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="p-12 text-center text-neutral-500 text-sm flex flex-col items-center justify-center space-y-2">
+              <Inbox className="w-10 h-10 text-neutral-600" />
+              <p>Select a message from the left to read and reply.</p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

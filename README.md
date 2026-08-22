@@ -25,10 +25,10 @@ Dev-Admin/
 +-- frontend/
 ¦   +-- src/
 ¦   ¦   +-- App.jsx                  # Root: auth state, WEBSITES config
-¦   ¦   +-- index.css                # Design system: tokens, buttons, badges, inputs
+¦   ¦   +-- index.css                # Design system: tokens, buttons, badges, inputs (16px base)
 ¦   ¦   +-- components/
 ¦   ¦       +-- Navbar.jsx           # Top navbar: site switcher, notifications, profile
-¦   ¦       +-- Sidebar.jsx          # Left sidebar (w-40): page navigation
+¦   ¦       +-- Sidebar.jsx          # Left sidebar (w-48): page navigation
 ¦   ¦       +-- DashboardView.jsx    # Stats, heatmap, quick actions, recent messages
 ¦   ¦       +-- ExperiencesView.jsx  # Career milestones CRUD (3-card + editor page)
 ¦   ¦       +-- SkillsView.jsx       # Tech stack with proficiency bars
@@ -58,6 +58,10 @@ Dev-Admin/
 
 All components follow a **unified design token system** in index.css.
 
+### Typography Standards
+- **Base font size**: 16px (browser standard) — ensuring Tailwind text sizes (	ext-xs=12px, 	ext-sm=14px, 	ext-base=16px) scale comfortably and legibly.
+- **Accents**: Courgette cursive font (ont-accent) for titles, numbers, and branded labels.
+
 ### Button Heights — 36px (h-9) Across ALL buttons
 
 | Button Type | Classes Used |
@@ -70,11 +74,11 @@ All components follow a **unified design token system** in index.css.
 
 ### Badge Padding Standard
 
-All badges: px-2.5 py-1 rounded-md text-xs font-bold (NOT text-[10px] or py-0.5)
+All badges: px-2.5 py-1 rounded-md text-xs font-bold (no tiny cramped badges)
 
 ### Dropdown Height Standard
 
-All category filter selects: h-9 pl-3.5 pr-8 rounded-lg (same 36px as Add button)
+All category filter selects: h-9 pl-3.5 pr-8 rounded-lg (matching adjacent Add buttons)
 
 ---
 
@@ -124,9 +128,9 @@ python manage.py runserver   # http://localhost:8000
 
 ## Design Standards
 
-- Sidebar width: w-40 (160px), main content offset: md:ml-40
+- Sidebar width: w-48 (192px), main content offset: md:ml-48
 - Navbar height: h-16 (64px), main content top padding: pt-16
-- Base font: 14px (Inter/Space Grotesk)
+- Base font: 16px (Inter/Space Grotesk)
 - Card bg: bg-[#07080d], page header bg: bg-[#07080d]
 - Active sidebar: bg-blue-500/15 text-blue-400 border border-blue-500/30
 - All button heights: h-9 (36px) — consistent everywhere
@@ -135,18 +139,18 @@ python manage.py runserver   # http://localhost:8000
 
 ---
 
-## Bug Fixes Applied
+## Bug Fixes & Improvements Applied
 
-| # | File | Bug | Status |
+| # | File | Change | Status |
 |---|---|---|---|
-| 1 | SkillsView.jsx | handleToggleVisible used undefined e instead of s — ReferenceError crash | Fixed |
-| 2 | Navbar.jsx | Dropdowns never closed on outside click — no click handler | Fixed |
-| 3 | MessagesView.jsx | isSentToast state was tracked but never rendered to user | Fixed |
-| 4 | All card views | Button heights inconsistent: py-1.5 / py-2 / py-2.5 mixed | Fixed — all h-9 |
-| 5 | All card views | Badges: text-[10px] py-0.5 too small and inconsistent | Fixed — text-xs py-1 |
-| 6 | All page headers | Category dropdowns shorter than Add buttons | Fixed — all h-9 |
-| 7 | All editors | Left-side back button duplicated Cancel button | Removed |
-| 8 | Multiple files | Unused imports added unnecessary bundle weight | Cleaned |
+| 1 | index.css | 16px base font size for crisp, proportionate typography across whole app | Completed |
+| 2 | Sidebar.jsx & App.jsx | Widened sidebar to w-48 (192px) and offset md:ml-48 for spacious navigation | Completed |
+| 3 | SkillsView.jsx | handleToggleVisible crash fix (e -> s) | Fixed |
+| 4 | Navbar.jsx | Auto-close dropdowns on outside click with useRef + useEffect | Fixed |
+| 5 | MessagesView.jsx | Upgraded tags, dates, and SMTP relay badge; clean auto-dismiss toast | Fixed |
+| 6 | DashboardView.jsx | Upgraded stat numbers, sub-labels, and inbox feed to readable proportional text | Fixed |
+| 7 | All card views | Unified button heights to h-9 (36px) and badges to text-xs with px-2.5 py-1 | Fixed |
+| 8 | All editors | Clean single-cancel-button layout, removed redundant Back buttons | Completed |
 
 ---
 

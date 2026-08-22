@@ -255,11 +255,11 @@ caption: Complete technical walkthrough of the platform management interface, re
           elements.push(
             <div key={blockId} className="my-6 p-5 rounded-xl bg-[#070913] border border-blue-500/30 shadow-xl space-y-4">
               <div className="flex items-center justify-between pb-3 border-b border-neutral-800">
-                <div className="flex items-center gap-2 text-xs font-extrabold text-blue-400 font-accent">
+                <div className="flex items-center gap-2 text-xs sm:text-sm font-extrabold text-blue-400 font-accent">
                   <GitFork className="w-4 h-4" />
                   <span>{title}</span>
                 </div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/40">
+                <span className="text-xs font-bold px-2.5 py-1 rounded-md bg-blue-500/20 text-blue-300 border border-blue-500/40">
                   SYSTEM DESIGN FLOW
                 </span>
               </div>
@@ -307,11 +307,11 @@ caption: Complete technical walkthrough of the platform management interface, re
           elements.push(
             <div key={blockId} className="my-6 p-5 rounded-xl bg-[#070913] border border-neutral-800 shadow-xl space-y-4">
               <div className="flex items-center justify-between pb-3 border-b border-neutral-800">
-                <div className="flex items-center gap-2 text-xs font-extrabold text-white font-accent">
+                <div className="flex items-center gap-2 text-xs sm:text-sm font-extrabold text-white font-accent">
                   <BarChart3 className="w-4 h-4 text-blue-400" />
                   <span>{title}</span>
                 </div>
-                <span className="text-[10px] text-neutral-400 font-semibold">Unit: {unit}</span>
+                <span className="text-xs text-neutral-400 font-semibold">Unit: {unit}</span>
               </div>
 
               <div className="space-y-3 pt-1">
@@ -319,7 +319,7 @@ caption: Complete technical walkthrough of the platform management interface, re
                   const percent = Math.round((d.value / maxValue) * 100);
                   return (
                     <div key={dIdx} className="space-y-1">
-                      <div className="flex items-center justify-between text-xs font-bold">
+                      <div className="flex items-center justify-between text-xs sm:text-sm font-bold">
                         <span className="text-neutral-200">{d.label}</span>
                         <span className="text-blue-400 font-mono">{d.value.toLocaleString()} {unit}</span>
                       </div>
@@ -351,11 +351,11 @@ caption: Complete technical walkthrough of the platform management interface, re
           elements.push(
             <div key={blockId} className="my-6 p-5 rounded-xl bg-[#070913] border border-neutral-800 shadow-xl space-y-4">
               <div className="flex items-center justify-between pb-3 border-b border-neutral-800">
-                <div className="flex items-center gap-2 text-xs font-extrabold text-white font-accent">
+                <div className="flex items-center gap-2 text-xs sm:text-sm font-extrabold text-white font-accent">
                   <Activity className="w-4 h-4 text-emerald-400" />
                   <span>{title}</span>
                 </div>
-                <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30 font-bold">
+                <span className="text-xs text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/30 font-bold">
                   LATENCY METRIC
                 </span>
               </div>
@@ -363,7 +363,7 @@ caption: Complete technical walkthrough of the platform management interface, re
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 pt-1">
                 {points.map((pt, pIdx) => (
                   <div key={pIdx} className="p-3 rounded-lg bg-black/60 border border-neutral-800 text-center space-y-1 hover:border-emerald-500/40 transition-colors">
-                    <div className="text-[11px] text-neutral-400 font-semibold">{pt.label}</div>
+                    <div className="text-xs text-neutral-400 font-semibold">{pt.label}</div>
                     <div className="text-base font-extrabold text-emerald-400 font-mono">{pt.value}</div>
                   </div>
                 ))}
@@ -385,11 +385,11 @@ caption: Complete technical walkthrough of the platform management interface, re
           elements.push(
             <div key={blockId} className="my-6 rounded-xl overflow-hidden bg-[#070913] border border-neutral-800 shadow-xl space-y-3">
               <div className="p-3.5 border-b border-neutral-800 flex items-center justify-between">
-                <div className="flex items-center gap-2 text-xs font-extrabold text-white font-accent">
+                <div className="flex items-center gap-2 text-xs sm:text-sm font-extrabold text-white font-accent">
                   <Play className="w-4 h-4 text-blue-400" />
                   <span>{title}</span>
                 </div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-neutral-800 text-neutral-300">
+                <span className="text-xs font-bold px-2.5 py-1 rounded-md bg-neutral-800 text-neutral-300">
                   VIDEO DEMO
                 </span>
               </div>
@@ -503,7 +503,7 @@ caption: Complete technical walkthrough of the platform management interface, re
           elements.push(
             <div key={`table-${elements.length}`} className="my-5 rounded-xl border border-neutral-800 overflow-x-auto shadow-xl bg-[#07080d]">
               <table className="w-full text-left text-xs text-neutral-300">
-                <thead className="bg-[#0b0e1b] text-neutral-300 uppercase tracking-wider font-extrabold text-[10px] border-b border-neutral-800">
+                <thead className="bg-[#0b0e1b] text-neutral-300 uppercase tracking-wider font-extrabold text-xs border-b border-neutral-800">
                   <tr>
                     {headerRow.map((h, hIdx) => (
                       <th key={hIdx} className="px-4 py-3 font-accent text-white">{h}</th>
@@ -729,8 +729,8 @@ caption: Complete technical walkthrough of the platform management interface, re
         {activeTab === 'split' && (
           <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-neutral-800 min-h-[480px]">
             <div className="p-3 bg-black/80 flex flex-col justify-between">
-              <div className="text-[10px] uppercase font-bold text-neutral-500 mb-1 flex items-center gap-1">
-                <Edit3 className="w-3 h-3 text-blue-400" />
+              <div className="text-xs uppercase font-bold text-neutral-400 mb-1.5 flex items-center gap-1.5">
+                <Edit3 className="w-3.5 h-3.5 text-blue-400" />
                 <span>Markdown & Widget Source</span>
               </div>
               <textarea
@@ -739,13 +739,13 @@ caption: Complete technical walkthrough of the platform management interface, re
                 value={value}
                 onChange={e => onChange(e.target.value)}
                 placeholder={placeholder}
-                className="w-full flex-1 p-2 bg-transparent text-xs text-neutral-200 placeholder-neutral-600 font-mono focus:outline-none resize-none leading-relaxed"
+                className="w-full flex-1 p-2 bg-transparent text-xs sm:text-sm text-neutral-200 placeholder-neutral-600 font-mono focus:outline-none resize-none leading-relaxed"
               />
             </div>
 
             <div className="p-5 bg-[#07080d]/80 overflow-y-auto max-h-[550px]">
-              <div className="text-[10px] uppercase font-bold text-neutral-500 mb-3 flex items-center gap-1 pb-1.5 border-b border-neutral-800/80">
-                <Eye className="w-3 h-3 text-emerald-400" />
+              <div className="text-xs uppercase font-bold text-neutral-400 mb-3 flex items-center gap-1.5 pb-1.5 border-b border-neutral-800/80">
+                <Eye className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Live Interactive Preview</span>
               </div>
               <div className="prose prose-invert max-w-none">

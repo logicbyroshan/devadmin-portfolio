@@ -61,7 +61,7 @@ export default function SettingsView({ onNavigate, activeWebsite }) {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-base sm:text-lg font-extrabold text-white">Website Settings & Access Control</h1>
-              <span className={`text-[10px] font-black px-1.5 py-0.5 rounded border ${activeWebsite?.badgeStyle}`}>
+              <span className={`text-xs font-bold px-2.5 py-1 rounded-md border ${activeWebsite?.badgeStyle}`}>
                 {activeWebsite?.badge}
               </span>
             </div>
@@ -162,7 +162,7 @@ export default function SettingsView({ onNavigate, activeWebsite }) {
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs sm:text-sm text-neutral-300">
-            <thead className="bg-[#050609] text-neutral-400 uppercase tracking-wider font-extrabold text-[10px] border-b border-neutral-800">
+            <thead className="bg-[#050609] text-neutral-400 uppercase tracking-wider font-extrabold text-xs border-b border-neutral-800">
               <tr>
                 <th className="px-4 py-3">Name</th>
                 <th className="px-4 py-3">Email</th>
@@ -178,7 +178,7 @@ export default function SettingsView({ onNavigate, activeWebsite }) {
                   <td className="px-4 py-3.5 text-neutral-400">{u.email}</td>
                   <td className={`px-4 py-3.5 font-semibold ${activeWebsite?.accentText || 'text-blue-400'}`}>{u.role}</td>
                   <td className="px-4 py-3.5">
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
+                    <span className={`px-2.5 py-1 rounded-md text-xs font-bold border ${
                       u.status === 'Active' ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' : 'bg-neutral-800 text-neutral-400 border-neutral-700'
                     }`}>
                       {u.status}

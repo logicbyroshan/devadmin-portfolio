@@ -235,8 +235,8 @@ export default function MessagesView({ onNavigate, activeWebsite }) {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-1.5 flex-shrink-0">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/15 text-blue-400 border border-blue-500/30">
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <span className="px-2.5 py-1 rounded-md text-xs font-bold bg-blue-500/15 text-blue-400 border border-blue-500/30">
                           {msg.tag}
                         </span>
                         <button
@@ -246,12 +246,12 @@ export default function MessagesView({ onNavigate, activeWebsite }) {
                             msg.starred ? 'text-amber-400' : 'text-neutral-600 hover:text-neutral-400'
                           }`}
                         >
-                          <Star className={`w-3.5 h-3.5 ${msg.starred ? 'fill-current' : ''}`} />
+                          <Star className={`w-4 h-4 ${msg.starred ? 'fill-current' : ''}`} />
                         </button>
                       </div>
                     </div>
 
-                    <div className="text-xs font-semibold text-neutral-200 line-clamp-1">
+                    <div className="text-sm font-semibold text-neutral-200 line-clamp-1">
                       {msg.subject}
                     </div>
 
@@ -259,7 +259,7 @@ export default function MessagesView({ onNavigate, activeWebsite }) {
                       {msg.body}
                     </p>
 
-                    <div className="flex items-center justify-between text-[10px] text-neutral-500 pt-1 border-t border-neutral-800/60">
+                    <div className="flex items-center justify-between text-xs text-neutral-500 pt-1.5 border-t border-neutral-800/60">
                       <span>{msg.date}</span>
                       <span>{msg.time}</span>
                     </div>
@@ -282,12 +282,12 @@ export default function MessagesView({ onNavigate, activeWebsite }) {
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <h2 className="text-sm sm:text-base font-extrabold text-white truncate font-accent">{selectedMessage.sender}</h2>
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/15 text-blue-400 border border-blue-500/30">
+                      <h2 className="text-base font-extrabold text-white truncate font-accent">{selectedMessage.sender}</h2>
+                      <span className="px-2.5 py-1 rounded-md text-xs font-bold bg-blue-500/15 text-blue-400 border border-blue-500/30">
                         {selectedMessage.tag}
                       </span>
                     </div>
-                    <p className="text-xs text-neutral-400">{selectedMessage.email} • <span className="text-neutral-500">{selectedMessage.date}</span></p>
+                    <p className="text-xs text-neutral-400 mt-0.5">{selectedMessage.email} • <span className="text-neutral-500">{selectedMessage.date}</span></p>
                   </div>
                 </div>
 
@@ -342,7 +342,7 @@ export default function MessagesView({ onNavigate, activeWebsite }) {
                     </span>
                   </div>
 
-                  <span className="text-[10px] text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20 font-semibold flex items-center gap-1">
+                  <span className="text-xs text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-md border border-blue-500/20 font-semibold flex items-center gap-1.5">
                     <ShieldCheck className="w-3.5 h-3.5 text-blue-400" /> Direct SMTP Relay Connected
                   </span>
                 </div>

@@ -150,8 +150,8 @@ export default function App() {
             onClose={() => setIsMobileSidebarOpen(false)}
           />
 
-          {/* Main View Area (w-40 sidebar offset) */}
-          <main className="flex-1 ml-0 md:ml-40 p-3.5 sm:p-5 min-h-[calc(100vh-4rem)] w-full overflow-x-hidden">
+          {/* Main View Area (w-48 sidebar offset) */}
+          <main className="flex-1 ml-0 md:ml-48 p-3.5 sm:p-5 min-h-[calc(100vh-4rem)] w-full overflow-x-hidden">
 
 
 

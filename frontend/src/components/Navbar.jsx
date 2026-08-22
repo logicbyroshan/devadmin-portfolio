@@ -78,18 +78,18 @@ export default function Navbar({
               setShowNotifications(false);
               setShowProfileMenu(false);
             }}
-            className="text-xs font-bold px-2.5 py-1 rounded-md border flex items-center gap-1.5 transition-all bg-blue-500/15 text-blue-400 border-blue-500/30 hover:brightness-125"
+            className="text-xs font-bold px-3 py-1.5 rounded-lg border flex items-center gap-2 transition-all bg-blue-500/15 text-blue-400 border-blue-500/30 hover:brightness-125 shadow-sm"
             title="Switch Target Website"
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
-            <span>{activeWebsite?.name || 'DevMeet'}</span>
-            <ChevronDown className="w-3 h-3 text-blue-400" />
+            <span className="w-2 h-2 rounded-full bg-blue-400"></span>
+            <span className="font-bold">{activeWebsite?.name || 'DevMeet'}</span>
+            <ChevronDown className="w-3.5 h-3.5 text-blue-400" />
           </button>
 
           {/* Website Switcher Dropdown Menu */}
           {showWebsiteMenu && (
             <div className="absolute left-0 top-11 w-64 rounded-xl bg-[#07080c] border border-neutral-800 shadow-2xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
-              <div className="px-2.5 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-neutral-400 border-b border-neutral-800 mb-1.5 flex items-center gap-1.5">
+              <div className="px-3 py-1.5 text-xs font-extrabold uppercase tracking-wider text-neutral-400 border-b border-neutral-800 mb-1.5 flex items-center gap-2">
                 <Globe className="w-3.5 h-3.5 text-blue-400" /> Select Target Website
               </div>
 
@@ -103,9 +103,9 @@ export default function Navbar({
                         if (onSelectWebsite) onSelectWebsite(site.id);
                         setShowWebsiteMenu(false);
                       }}
-                      className={`w-full text-left p-2 rounded-lg text-xs font-semibold flex items-center justify-between transition-all ${
+                      className={`w-full text-left p-2.5 rounded-lg text-sm font-semibold flex items-center justify-between transition-all ${
                         isSelected
-                          ? 'bg-blue-500/15 text-blue-400 border border-blue-500/30'
+                          ? 'bg-blue-500/15 text-blue-400 border border-blue-500/30 font-bold'
                           : 'text-neutral-300 hover:bg-neutral-900 hover:text-white'
                       }`}
                     >
@@ -113,7 +113,7 @@ export default function Navbar({
                         <div className="font-bold text-white flex items-center gap-1.5">
                           <span>{site.name}</span>
                         </div>
-                        <span className="text-[10px] text-neutral-400 block mt-0.5">{site.tag}</span>
+                        <span className="text-xs text-neutral-400 block mt-0.5">{site.tag}</span>
                       </div>
                       {isSelected && <Check className="w-4 h-4 text-blue-400 flex-shrink-0 ml-1" />}
                     </button>
@@ -130,7 +130,7 @@ export default function Navbar({
       {/* Right: Uniform Height Widgets */}
       <div className="flex items-center gap-2.5 sm:gap-3">
         {/* Date Widget */}
-        <div className="hidden sm:flex h-9 items-center gap-2 px-3 rounded-lg bg-[#07080c] border border-neutral-800 text-xs font-semibold text-neutral-200">
+        <div className="hidden sm:flex h-9 items-center gap-2 px-3.5 rounded-lg bg-[#07080c] border border-neutral-800 text-xs font-semibold text-neutral-200">
           <Calendar className="w-3.5 h-3.5 text-blue-400" />
           <span className="font-accent">20th June 2025</span>
         </div>
@@ -148,7 +148,7 @@ export default function Navbar({
           >
             <Bell className="w-4 h-4" />
             {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-400 text-[10px] font-bold text-slate-950 animate-pulse">
+              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-400 text-xs font-bold text-slate-950 animate-pulse">
                 {unreadCount}
               </span>
             )}
@@ -163,9 +163,9 @@ export default function Navbar({
                 {unreadCount > 0 && (
                   <button 
                     onClick={markAllRead}
-                    className="text-[11px] text-blue-400 hover:underline flex items-center gap-1"
+                    className="text-xs text-blue-400 hover:underline flex items-center gap-1 font-semibold"
                   >
-                    <Check className="w-3 h-3" /> Mark all read
+                    <Check className="w-3.5 h-3.5" /> Mark all read
                   </button>
                 )}
               </div>
@@ -178,7 +178,7 @@ export default function Navbar({
                     }`}
                   >
                     <p className="line-clamp-2">{n.text}</p>
-                    <span className="text-[10px] text-neutral-500 mt-1 block">{n.time}</span>
+                    <span className="text-[11px] text-neutral-500 mt-1 block">{n.time}</span>
                   </div>
                 ))}
               </div>
@@ -194,7 +194,7 @@ export default function Navbar({
               setShowWebsiteMenu(false);
               setShowNotifications(false);
             }}
-            className="h-9 flex items-center gap-2 p-1.5 pr-2.5 rounded-lg bg-[#07080c] border border-neutral-800 hover:border-neutral-700 transition-all duration-200"
+            className="h-9 flex items-center gap-2.5 px-2.5 rounded-lg bg-[#07080d] border border-neutral-800 hover:border-neutral-700 transition-all duration-200"
           >
             <img
               src="/logo.png"
@@ -210,18 +210,16 @@ export default function Navbar({
             <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
           </button>
 
-
-
           {showProfileMenu && (
-            <div className="absolute right-0 mt-3 w-48 rounded-xl bg-[#07080c] border border-neutral-800 shadow-2xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
+            <div className="absolute right-0 mt-3 w-52 rounded-xl bg-[#07080c] border border-neutral-800 shadow-2xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
               <button
                 onClick={() => {
                   onNavigate('manage-portfolio');
                   setShowProfileMenu(false);
                 }}
-                className={`w-full text-left px-3 py-2 text-xs rounded-lg text-neutral-300 hover:bg-neutral-900 hover:${activeWebsite?.accentText} flex items-center gap-2`}
+                className="w-full text-left px-3 py-2 text-sm rounded-lg text-neutral-300 hover:bg-neutral-900 hover:text-blue-400 flex items-center gap-2.5 font-medium transition-colors"
               >
-                <User className={`w-3.5 h-3.5 ${activeWebsite?.accentText}`} />
+                <User className="w-4 h-4 text-blue-400" />
                 <span>Edit Profile Details</span>
               </button>
               <button
@@ -229,9 +227,9 @@ export default function Navbar({
                   onNavigate('manage-settings');
                   setShowProfileMenu(false);
                 }}
-                className={`w-full text-left px-3 py-2 text-xs rounded-lg text-neutral-300 hover:bg-neutral-900 hover:${activeWebsite?.accentText} flex items-center gap-2`}
+                className="w-full text-left px-3 py-2 text-sm rounded-lg text-neutral-300 hover:bg-neutral-900 hover:text-blue-400 flex items-center gap-2.5 font-medium transition-colors"
               >
-                <Sparkles className={`w-3.5 h-3.5 ${activeWebsite?.accentText}`} />
+                <Sparkles className="w-4 h-4 text-blue-400" />
                 <span>Website Settings</span>
               </button>
             </div>

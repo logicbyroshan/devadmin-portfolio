@@ -13,7 +13,7 @@
       radial-gradient(at 0% 100%, #040508 0px, transparent 50%);
     background-attachment: fixed;
     color: #f8fafc;
-    font-size: 14px;
+    font-size: 16px; /* Browser standard — text-xs=12px, text-sm=14px, text-base=16px */
   }
 }
 
@@ -26,8 +26,7 @@
 
 /* ============================================
    DESIGN SYSTEM — BUTTONS (Consistent Heights)
-   All buttons target h-9 (36px) default height
-   Small card buttons target h-8 (32px)
+   All buttons use h-9 (36px) — uniform across all pages
    ============================================ */
 
 /* Primary gradient action button */

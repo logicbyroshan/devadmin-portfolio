@@ -117,17 +117,17 @@ export default function DashboardView({ onNavigate, activeWebsite }) {
         {/* Total Live Blogs */}
         <div 
           onClick={() => onNavigate('manage-blogs')}
-          className="p-3.5 sm:p-4 rounded-xl cursor-pointer bg-gradient-to-br from-blue-950/50 via-[#070b16] to-[#04060c] border border-blue-500/30 hover:border-blue-400/80 shadow-lg shadow-blue-950/40 hover:shadow-blue-500/20 transition-all duration-200 flex items-center justify-between gap-3 group hover:-translate-y-0.5"
+          className="p-4 rounded-xl cursor-pointer bg-gradient-to-br from-blue-950/50 via-[#070b16] to-[#04060c] border border-blue-500/30 hover:border-blue-400/80 shadow-lg shadow-blue-950/40 hover:shadow-blue-500/20 transition-all duration-200 flex items-center justify-between gap-3 group hover:-translate-y-0.5"
         >
           <div className="text-left min-w-0">
-            <div className="text-xl sm:text-2xl font-bold text-white leading-none tracking-tight group-hover:text-blue-200 transition-colors font-accent">15</div>
-            <div className="text-xs font-medium text-neutral-300 mt-1.5 truncate">Total Live Blogs</div>
-            <div className="text-[10px] font-semibold text-blue-400/90 mt-0.5 flex items-center gap-1">
+            <div className="text-2xl sm:text-3xl font-bold text-white leading-none tracking-tight group-hover:text-blue-200 transition-colors font-accent">15</div>
+            <div className="text-sm font-medium text-neutral-300 mt-1.5 truncate">Total Live Blogs</div>
+            <div className="text-xs font-semibold text-blue-400 mt-1 flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
               <span>Active Articles</span>
             </div>
           </div>
-          <div className="p-2.5 sm:p-3 rounded-lg bg-blue-500/15 text-blue-400 border border-blue-500/30 shadow-md shadow-blue-500/10 flex-shrink-0 group-hover:scale-110 group-hover:bg-blue-500/25 group-hover:border-blue-400 transition-all duration-200">
+          <div className="p-3 rounded-lg bg-blue-500/15 text-blue-400 border border-blue-500/30 shadow-md shadow-blue-500/10 flex-shrink-0 group-hover:scale-110 group-hover:bg-blue-500/25 group-hover:border-blue-400 transition-all duration-200">
             <FileText className="w-5 h-5" />
           </div>
         </div>
@@ -135,17 +135,17 @@ export default function DashboardView({ onNavigate, activeWebsite }) {
         {/* Total Experiences */}
         <div 
           onClick={() => onNavigate('manage-experiences')}
-          className="p-3.5 sm:p-4 rounded-xl cursor-pointer bg-gradient-to-br from-amber-950/50 via-[#120e06] to-[#04060c] border border-amber-500/30 hover:border-amber-400/80 shadow-lg shadow-amber-950/40 hover:shadow-amber-500/20 transition-all duration-200 flex items-center justify-between gap-3 group hover:-translate-y-0.5"
+          className="p-4 rounded-xl cursor-pointer bg-gradient-to-br from-amber-950/50 via-[#120e06] to-[#04060c] border border-amber-500/30 hover:border-amber-400/80 shadow-lg shadow-amber-950/40 hover:shadow-amber-500/20 transition-all duration-200 flex items-center justify-between gap-3 group hover:-translate-y-0.5"
         >
           <div className="text-left min-w-0">
-            <div className="text-xl sm:text-2xl font-bold text-white leading-none tracking-tight group-hover:text-amber-200 transition-colors font-accent">6</div>
-            <div className="text-xs font-medium text-neutral-300 mt-1.5 truncate">Total Experiences</div>
-            <div className="text-[10px] font-semibold text-amber-400/90 mt-0.5 flex items-center gap-1">
+            <div className="text-2xl sm:text-3xl font-bold text-white leading-none tracking-tight group-hover:text-amber-200 transition-colors font-accent">6</div>
+            <div className="text-sm font-medium text-neutral-300 mt-1.5 truncate">Total Experiences</div>
+            <div className="text-xs font-semibold text-amber-400 mt-1 flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
               <span>Career Milestones</span>
             </div>
           </div>
-          <div className="p-2.5 sm:p-3 rounded-lg bg-amber-500/15 text-amber-400 border border-amber-500/30 shadow-md shadow-amber-500/10 flex-shrink-0 group-hover:scale-110 group-hover:bg-amber-500/25 group-hover:border-amber-400 transition-all duration-200">
+          <div className="p-3 rounded-lg bg-amber-500/15 text-amber-400 border border-amber-500/30 shadow-md shadow-amber-500/10 flex-shrink-0 group-hover:scale-110 group-hover:bg-amber-500/25 group-hover:border-amber-400 transition-all duration-200">
             <Briefcase className="w-5 h-5" />
           </div>
         </div>
@@ -153,17 +153,17 @@ export default function DashboardView({ onNavigate, activeWebsite }) {
         {/* Total Projects */}
         <div 
           onClick={() => onNavigate('manage-projects')}
-          className="p-3.5 sm:p-4 rounded-xl cursor-pointer bg-gradient-to-br from-purple-950/50 via-[#10071c] to-[#04060c] border border-purple-500/30 hover:border-purple-400/80 shadow-lg shadow-purple-950/40 hover:shadow-purple-500/20 transition-all duration-200 flex items-center justify-between gap-3 group hover:-translate-y-0.5"
+          className="p-4 rounded-xl cursor-pointer bg-gradient-to-br from-purple-950/50 via-[#10071c] to-[#04060c] border border-purple-500/30 hover:border-purple-400/80 shadow-lg shadow-purple-950/40 hover:shadow-purple-500/20 transition-all duration-200 flex items-center justify-between gap-3 group hover:-translate-y-0.5"
         >
           <div className="text-left min-w-0">
-            <div className="text-xl sm:text-2xl font-bold text-white leading-none tracking-tight group-hover:text-purple-200 transition-colors font-accent">27</div>
-            <div className="text-xs font-medium text-neutral-300 mt-1.5 truncate">Total Projects</div>
-            <div className="text-[10px] font-semibold text-purple-400/90 mt-0.5 flex items-center gap-1">
+            <div className="text-2xl sm:text-3xl font-bold text-white leading-none tracking-tight group-hover:text-purple-200 transition-colors font-accent">27</div>
+            <div className="text-sm font-medium text-neutral-300 mt-1.5 truncate">Total Projects</div>
+            <div className="text-xs font-semibold text-purple-400 mt-1 flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
               <span>15 Live Online</span>
             </div>
           </div>
-          <div className="p-2.5 sm:p-3 rounded-lg bg-purple-500/15 text-purple-400 border border-purple-500/30 shadow-md shadow-purple-500/10 flex-shrink-0 group-hover:scale-110 group-hover:bg-purple-500/25 group-hover:border-purple-400 transition-all duration-200">
+          <div className="p-3 rounded-lg bg-purple-500/15 text-purple-400 border border-purple-500/30 shadow-md shadow-purple-500/10 flex-shrink-0 group-hover:scale-110 group-hover:bg-purple-500/25 group-hover:border-purple-400 transition-all duration-200">
             <FolderKanban className="w-5 h-5" />
           </div>
         </div>
@@ -171,17 +171,17 @@ export default function DashboardView({ onNavigate, activeWebsite }) {
         {/* Total Skills */}
         <div 
           onClick={() => onNavigate('manage-skills')}
-          className="p-3.5 sm:p-4 rounded-xl cursor-pointer bg-gradient-to-br from-emerald-950/50 via-[#05140e] to-[#04060c] border border-emerald-500/30 hover:border-emerald-400/80 shadow-lg shadow-emerald-950/40 hover:shadow-emerald-500/20 transition-all duration-200 flex items-center justify-between gap-3 group hover:-translate-y-0.5"
+          className="p-4 rounded-xl cursor-pointer bg-gradient-to-br from-emerald-950/50 via-[#05140e] to-[#04060c] border border-emerald-500/30 hover:border-emerald-400/80 shadow-lg shadow-emerald-950/40 hover:shadow-emerald-500/20 transition-all duration-200 flex items-center justify-between gap-3 group hover:-translate-y-0.5"
         >
           <div className="text-left min-w-0">
-            <div className="text-xl sm:text-2xl font-bold text-white leading-none tracking-tight group-hover:text-emerald-200 transition-colors font-accent">32</div>
-            <div className="text-xs font-medium text-neutral-300 mt-1.5 truncate">Total Skills</div>
-            <div className="text-[10px] font-semibold text-emerald-400/90 mt-0.5 flex items-center gap-1">
+            <div className="text-2xl sm:text-3xl font-bold text-white leading-none tracking-tight group-hover:text-emerald-200 transition-colors font-accent">32</div>
+            <div className="text-sm font-medium text-neutral-300 mt-1.5 truncate">Total Skills</div>
+            <div className="text-xs font-semibold text-emerald-400 mt-1 flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
               <span>Tech Stack Tags</span>
             </div>
           </div>
-          <div className="p-2.5 sm:p-3 rounded-lg bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 shadow-md shadow-emerald-500/10 flex-shrink-0 group-hover:scale-110 group-hover:bg-emerald-500/25 group-hover:border-emerald-400 transition-all duration-200">
+          <div className="p-3 rounded-lg bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 shadow-md shadow-emerald-500/10 flex-shrink-0 group-hover:scale-110 group-hover:bg-emerald-500/25 group-hover:border-emerald-400 transition-all duration-200">
             <Cpu className="w-5 h-5" />
           </div>
         </div>
@@ -189,17 +189,17 @@ export default function DashboardView({ onNavigate, activeWebsite }) {
         {/* Received Messages */}
         <div 
           onClick={() => onNavigate('manage-contacts')}
-          className="p-3.5 sm:p-4 rounded-xl cursor-pointer bg-gradient-to-br from-sky-950/50 via-[#07131e] to-[#04060c] border border-sky-500/30 hover:border-sky-400/80 shadow-lg shadow-sky-950/40 hover:shadow-sky-500/20 transition-all duration-200 flex items-center justify-between gap-3 col-span-2 sm:col-span-1 lg:col-span-2 xl:col-span-1 group hover:-translate-y-0.5"
+          className="p-4 rounded-xl cursor-pointer bg-gradient-to-br from-sky-950/50 via-[#07131e] to-[#04060c] border border-sky-500/30 hover:border-sky-400/80 shadow-lg shadow-sky-950/40 hover:shadow-sky-500/20 transition-all duration-200 flex items-center justify-between gap-3 col-span-2 sm:col-span-1 lg:col-span-2 xl:col-span-1 group hover:-translate-y-0.5"
         >
           <div className="text-left min-w-0">
-            <div className="text-xl sm:text-2xl font-bold text-white leading-none tracking-tight group-hover:text-sky-200 transition-colors font-accent">48</div>
-            <div className="text-xs font-medium text-neutral-300 mt-1.5 truncate">Received Messages</div>
-            <div className="text-[10px] font-semibold text-sky-400/90 mt-0.5 flex items-center gap-1">
+            <div className="text-2xl sm:text-3xl font-bold text-white leading-none tracking-tight group-hover:text-sky-200 transition-colors font-accent">48</div>
+            <div className="text-sm font-medium text-neutral-300 mt-1.5 truncate">Received Messages</div>
+            <div className="text-xs font-semibold text-sky-400 mt-1 flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse"></span>
               <span>2 Unread Inquiries</span>
             </div>
           </div>
-          <div className="p-2.5 sm:p-3 rounded-lg bg-sky-500/15 text-sky-400 border border-sky-500/30 shadow-md shadow-sky-500/10 flex-shrink-0 group-hover:scale-110 group-hover:bg-sky-500/25 group-hover:border-sky-400 transition-all duration-200">
+          <div className="p-3 rounded-lg bg-sky-500/15 text-sky-400 border border-sky-500/30 shadow-md shadow-sky-500/10 flex-shrink-0 group-hover:scale-110 group-hover:bg-sky-500/25 group-hover:border-sky-400 transition-all duration-200">
             <Mail className="w-5 h-5" />
           </div>
         </div>
@@ -548,9 +548,9 @@ export default function DashboardView({ onNavigate, activeWebsite }) {
         <div className="p-4 grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
           {/* Left Side: Incoming Messages Feed (Left Aligned Previews) */}
           <div className="lg:col-span-5 space-y-2.5">
-            <div className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider flex items-center justify-between px-1">
+            <div className="text-xs font-bold text-neutral-400 uppercase tracking-wider flex items-center justify-between px-1">
               <span>Incoming Inquiries</span>
-              <span className="text-[10px] text-blue-400 font-semibold">{messages.filter(m => m.unread).length} Unread</span>
+              <span className="text-xs text-blue-400 font-semibold">{messages.filter(m => m.unread).length} Unread</span>
             </div>
 
             <div className="space-y-2">
@@ -563,33 +563,33 @@ export default function DashboardView({ onNavigate, activeWebsite }) {
                       setSelectedMessageId(msg.id);
                       setReplySubject(`Re: ${msg.tag} inquiry from ${msg.name}`);
                     }}
-                    className={`p-3 rounded-lg border cursor-pointer transition-all duration-200 space-y-2 ${
+                    className={`p-3.5 rounded-lg border cursor-pointer transition-all duration-200 space-y-2 ${
                       isSelected 
                         ? 'bg-[#0d1222] border-blue-500/60 shadow-md shadow-blue-500/10' 
                         : 'bg-[#050609] hover:bg-neutral-900/80 border-neutral-800/80'
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <div className={`w-7 h-7 rounded-md ${isSelected ? 'bg-blue-600 text-white' : 'bg-neutral-800 text-neutral-300'} font-bold text-xs flex items-center justify-center flex-shrink-0 font-accent`}>
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className={`w-8 h-8 rounded-lg ${isSelected ? 'bg-gradient-to-br from-blue-600 to-indigo-600 text-white' : 'bg-neutral-800 text-neutral-300'} font-bold text-xs flex items-center justify-center flex-shrink-0 font-accent`}>
                           {msg.name.charAt(0)}
                         </div>
                         <div className="min-w-0">
                           <div className="flex items-center gap-1.5">
-                            <h4 className="text-xs font-bold text-neutral-100 truncate font-accent">{msg.name}</h4>
+                            <h4 className="text-sm font-bold text-neutral-100 truncate font-accent">{msg.name}</h4>
                             {msg.unread && (
-                              <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse flex-shrink-0"></span>
+                              <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse flex-shrink-0"></span>
                             )}
                           </div>
-                          <p className="text-[10px] text-neutral-400 truncate">{msg.email}</p>
+                          <p className="text-xs text-neutral-400 truncate">{msg.email}</p>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-1.5 flex-shrink-0">
-                        <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-500/15 text-blue-400 border border-blue-500/30">
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <span className="px-2.5 py-1 rounded-md text-xs font-bold bg-blue-500/15 text-blue-400 border border-blue-500/30">
                           {msg.tag}
                         </span>
-                        <span className="text-[10px] text-neutral-500">{msg.time}</span>
+                        <span className="text-xs text-neutral-500">{msg.time}</span>
                       </div>
                     </div>
 
@@ -611,15 +611,15 @@ export default function DashboardView({ onNavigate, activeWebsite }) {
                   <div className="p-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/30">
                     <Mail className="w-3.5 h-3.5" />
                   </div>
-                  <div className="text-xs min-w-0">
+                  <div className="text-xs sm:text-sm min-w-0">
                     <span className="text-neutral-400 font-medium">Replying via Email to: </span>
                     <span className="font-bold text-white font-accent">{currentMsg?.name}</span>
-                    <span className="text-neutral-400 text-[11px] ml-1">({currentMsg?.email})</span>
+                    <span className="text-neutral-400 text-xs ml-1">({currentMsg?.email})</span>
                   </div>
                 </div>
 
-                <span className="text-[10px] text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20 font-semibold flex items-center gap-1">
-                  <CheckCircle className="w-3 h-3" /> Direct SMTP Relay
+                <span className="text-xs text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-md border border-blue-500/20 font-semibold flex items-center gap-1.5">
+                  <CheckCircle className="w-3.5 h-3.5" /> Direct SMTP Relay
                 </span>
               </div>
 

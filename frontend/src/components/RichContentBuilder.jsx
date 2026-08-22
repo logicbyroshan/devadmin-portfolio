@@ -23,7 +23,8 @@ import {
   Play, 
   ChevronRight,
   Activity,
-  Box
+  Box,
+  FileText
 } from 'lucide-react';
 
 export default function RichContentBuilder({ 

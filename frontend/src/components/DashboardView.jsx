@@ -758,8 +758,8 @@ export default function DashboardView({ onNavigate, activeWebsite }) {
                 
                 {/* 7 Days of the Week Column Headers */}
                 <div className="grid grid-cols-7 gap-1 text-center font-bold text-[9px] text-neutral-500">
-                  {dayLabels.map((dayLabel) => (
-                    <span key={dayLabel}>{dayLabel}</span>
+                  {dayLabels.map((dayLabel, dIdx) => (
+                    <span key={`${monthName}-${dayLabel}-${dIdx}`}>{dayLabel}</span>
                   ))}
                 </div>
 

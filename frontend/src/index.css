@@ -5,10 +5,6 @@
 @tailwind utilities;
 
 @layer base {
-  html {
-    font-size: 110% !important; /* Increases all font sizes across the entire project by 10% */
-  }
-
   html, body, #root {
     font-family: 'Inter', 'Space Grotesk', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background-color: #000000;
@@ -17,20 +13,177 @@
       radial-gradient(at 0% 100%, #040508 0px, transparent 50%);
     background-attachment: fixed;
     color: #f8fafc;
+    font-size: 14px;
   }
 }
 
+/* ============================================
+   FONT ACCENT
+   ============================================ */
 .font-courgette, .font-accent {
   font-family: 'Courgette', cursive, sans-serif !important;
 }
 
+/* ============================================
+   DESIGN SYSTEM — BUTTONS (Consistent Heights)
+   All buttons target h-9 (36px) default height
+   Small card buttons target h-8 (32px)
+   ============================================ */
 
+/* Primary gradient action button */
+.btn-primary {
+  @apply px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:brightness-110 text-white font-bold text-sm flex items-center gap-2 shadow-lg shadow-blue-500/20 transition-all duration-200 select-none;
+  height: 36px;
+  white-space: nowrap;
+}
 
+/* Secondary / ghost button */
+.btn-secondary {
+  @apply px-4 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-200 font-semibold text-sm border border-neutral-800 hover:border-neutral-700 transition-all duration-200 select-none;
+  height: 36px;
+  white-space: nowrap;
+}
 
+/* Danger button (delete) */
+.btn-danger {
+  @apply p-2 rounded-lg bg-rose-950/20 hover:bg-rose-950/50 text-rose-400 border border-rose-900/40 hover:border-rose-700/60 transition-all duration-200 select-none;
+  height: 36px;
+  width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
+/* Icon-only ghost button */
+.btn-icon {
+  @apply p-2 rounded-lg bg-neutral-900/60 hover:bg-neutral-800 text-neutral-300 hover:text-white border border-neutral-800 transition-all duration-200 select-none;
+  height: 36px;
+  width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
+/* Visible toggle button (green) */
+.btn-visible {
+  @apply px-3 py-2 rounded-lg bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-bold text-xs flex items-center gap-1.5 transition-all duration-200 select-none hover:bg-emerald-500/25;
+  height: 36px;
+  white-space: nowrap;
+  min-width: 90px;
+}
 
-/* Custom Scrollbars */
+/* Hidden toggle button (grey) */
+.btn-hidden {
+  @apply px-3 py-2 rounded-lg bg-neutral-800/60 text-neutral-400 border border-neutral-700 font-bold text-xs flex items-center gap-1.5 transition-all duration-200 select-none hover:bg-neutral-800;
+  height: 36px;
+  white-space: nowrap;
+  min-width: 90px;
+}
+
+/* Edit button in cards */
+.btn-edit {
+  @apply px-3 py-2 rounded-lg bg-neutral-900/60 hover:bg-neutral-800 text-neutral-200 hover:text-white font-semibold text-xs border border-neutral-800 flex items-center gap-1.5 transition-all duration-200 select-none;
+  height: 36px;
+  white-space: nowrap;
+}
+
+/* ============================================
+   DESIGN SYSTEM — BADGES / TAGS (Consistent)
+   ============================================ */
+
+/* Category / type badge */
+.badge {
+  @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold leading-none;
+}
+
+.badge-blue {
+  @apply badge bg-blue-500/15 text-blue-400 border border-blue-500/30;
+}
+
+.badge-emerald {
+  @apply badge bg-emerald-500/15 text-emerald-400 border border-emerald-500/30;
+}
+
+.badge-amber {
+  @apply badge bg-amber-500/15 text-amber-400 border border-amber-500/30;
+}
+
+.badge-rose {
+  @apply badge bg-rose-500/15 text-rose-400 border border-rose-500/30;
+}
+
+.badge-neutral {
+  @apply badge bg-neutral-800 text-neutral-400 border border-neutral-700;
+}
+
+/* Status badge (LIVE, PUBLISHED, CURRENT, etc.) */
+.status-badge {
+  @apply inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-extrabold uppercase tracking-wide leading-none;
+}
+
+/* ============================================
+   DESIGN SYSTEM — SELECTS / DROPDOWNS
+   Same height as buttons (h-9 = 36px)
+   ============================================ */
+.select-filter {
+  @apply px-3.5 py-2 rounded-lg bg-neutral-900/60 border border-neutral-800 text-sm font-semibold text-neutral-200 focus:outline-none focus:border-blue-500 transition-all duration-200 appearance-none cursor-pointer;
+  height: 36px;
+}
+
+/* ============================================
+   DESIGN SYSTEM — FORM INPUTS (Consistent)
+   ============================================ */
+.form-input {
+  @apply w-full px-4 py-2.5 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 transition-colors;
+  height: 42px;
+}
+
+.form-input-sm {
+  @apply w-full px-3.5 py-2 rounded-lg bg-[#050609] border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 transition-colors;
+  height: 38px;
+}
+
+/* ============================================
+   CARD ACTION ROW — Consistent alignment
+   ============================================ */
+.card-actions {
+  @apply flex items-center justify-between pt-3 border-t border-neutral-800/80 gap-2;
+  min-height: 52px;
+}
+
+.card-actions-right {
+  @apply flex items-center gap-1.5 flex-shrink-0;
+}
+
+/* ============================================
+   SECTION HEADER — Consistent page headers
+   ============================================ */
+.page-header {
+  @apply p-5 rounded-xl bg-[#07080d] border border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl;
+}
+
+.page-header-icon {
+  @apply p-3 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/30 flex-shrink-0;
+}
+
+.page-header-title {
+  @apply text-lg font-extrabold text-white;
+}
+
+.page-header-desc {
+  @apply text-xs text-neutral-400 mt-0.5;
+}
+
+/* ============================================
+   CARD BASE
+   ============================================ */
+.data-card {
+  @apply p-5 rounded-xl bg-[#07080d] border border-neutral-800 hover:border-neutral-700 transition-all duration-200 flex flex-col shadow-lg;
+}
+
+/* ============================================
+   CUSTOM SCROLLBARS
+   ============================================ */
 ::-webkit-scrollbar {
   width: 5px;
   height: 5px;
@@ -46,49 +199,49 @@
   background: rgba(255, 255, 255, 0.3);
 }
 
-/* Deep Pitch Black Aesthetics (Layered Black Variations) */
+/* ============================================
+   GLASS UTILITIES
+   ============================================ */
 .glass-card {
   background: rgba(10, 11, 15, 0.95);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.8);
-  border-radius: 8px;
-}
-
-.glass-card-hover {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.glass-card-hover:hover {
-  background: rgba(18, 20, 26, 0.95);
-  border-color: rgba(255, 255, 255, 0.18);
-  box-shadow: 0 0 20px -3px rgba(0, 0, 0, 0.9);
-  transform: translateY(-1px);
-}
-
-.glass-navbar {
-  background: rgba(2, 2, 4, 0.96);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.glass-sidebar {
-  background: rgba(2, 2, 4, 0.98);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
 }
 
 .glass-input {
   background: rgba(6, 7, 10, 0.9);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #f1f5f9;
-  border-radius: 6px;
+  border-radius: 8px;
   transition: all 0.2s ease;
 }
 .glass-input:focus {
   outline: none;
-  border-color: rgba(255, 255, 255, 0.3);
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.1);
+  border-color: rgba(96, 165, 250, 0.6);
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.15);
+}
+
+/* ============================================
+   ANIMATE-IN UTILITY
+   ============================================ */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-in {
+  animation: fade-in 0.15s ease-out;
+}
+
+/* Zoom-in for modals */
+@keyframes zoom-in-95 {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.zoom-in-95 {
+  animation: zoom-in-95 0.12s ease-out;
 }

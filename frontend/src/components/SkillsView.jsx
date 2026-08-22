@@ -299,13 +299,13 @@ export default function SkillsView({ onNavigate, activeWebsite }) {
         </div>
 
         {/* Right Actions: Category Filter Dropdown & Add Button */}
-        <div className="flex items-center gap-3 flex-wrap">
-          {/* Category Dropdown */}
+        <div className="flex items-center gap-2.5 flex-wrap">
+          {/* Category Dropdown — h-9 to match Add button */}
           <div className="relative">
             <select
               value={selectedCategory}
               onChange={e => setSelectedCategory(e.target.value)}
-              className="px-3.5 py-2.5 rounded-lg bg-[#050609] hover:bg-neutral-900 border border-neutral-800 text-xs font-bold text-neutral-200 focus:outline-none focus:border-blue-500 transition-colors cursor-pointer appearance-none pr-8"
+              className="h-9 pl-3.5 pr-8 rounded-lg bg-neutral-900/60 border border-neutral-800 text-sm font-semibold text-neutral-200 focus:outline-none focus:border-blue-500 transition-colors cursor-pointer appearance-none"
             >
               <option value="ALL">All Categories ({skills.length})</option>
               {categories.filter(c => c !== 'ALL').map(cat => (
@@ -317,7 +317,7 @@ export default function SkillsView({ onNavigate, activeWebsite }) {
 
           <button
             onClick={handleOpenAddPage}
-            className="px-4 py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:brightness-110 text-white font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-blue-500/20 transition-all flex-shrink-0"
+            className="h-9 px-4 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:brightness-110 text-white font-bold text-sm flex items-center gap-2 shadow-lg shadow-blue-500/20 transition-all flex-shrink-0"
           >
             <Plus className="w-4 h-4" />
             <span>Add Skill</span>
@@ -362,37 +362,37 @@ export default function SkillsView({ onNavigate, activeWebsite }) {
                 </div>
               </div>
 
-              {/* Action Buttons with Working Visibility Toggle */}
+              {/* Action Buttons — consistent h-9 (36px) */}
               <div className="flex items-center justify-between pt-3 border-t border-neutral-800/80 gap-2">
                 <button
                   type="button"
                   onClick={() => handleToggleVisible(skill.id)}
-                  className={`px-2.5 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all truncate ${
+                  className={`h-9 px-3 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all flex-shrink-0 ${
                     skill.visible
-                      ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-                      : 'bg-neutral-800/60 text-neutral-400 border border-neutral-700'
+                      ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/25'
+                      : 'bg-neutral-800/60 text-neutral-400 border border-neutral-700 hover:bg-neutral-800'
                   }`}
                   title="Toggle Live Visibility"
                 >
-                  {skill.visible ? <Eye className="w-3.5 h-3.5 flex-shrink-0" /> : <EyeOff className="w-3.5 h-3.5 flex-shrink-0" />}
-                  <span className="truncate">{skill.visible ? 'Visible' : 'Hidden'}</span>
+                  {skill.visible ? <Eye className="w-4 h-4 flex-shrink-0" /> : <EyeOff className="w-4 h-4 flex-shrink-0" />}
+                  <span>{skill.visible ? 'Visible' : 'Hidden'}</span>
                 </button>
 
                 <div className="flex items-center gap-1.5 flex-shrink-0">
                   <button
                     type="button"
                     onClick={() => handleOpenEditPage(skill)}
-                    className="px-2.5 py-1.5 rounded-md bg-[#050609] hover:bg-neutral-800 text-neutral-300 hover:text-white text-xs font-semibold flex items-center gap-1.5 border border-neutral-800 transition-all"
+                    className="h-9 px-3 rounded-lg bg-neutral-900/60 hover:bg-neutral-800 text-neutral-200 hover:text-white text-sm font-semibold flex items-center gap-1.5 border border-neutral-800 transition-all"
                   >
-                    <Edit2 className="w-3.5 h-3.5" /> Edit
+                    <Edit2 className="w-4 h-4" /> Edit
                   </button>
                   <button
                     type="button"
                     onClick={() => handleDelete(skill.id)}
-                    className="p-1.5 rounded-md bg-rose-950/20 hover:bg-rose-950/40 text-rose-400 text-xs font-medium flex items-center gap-1.5 border border-rose-900/30 transition-all"
+                    className="h-9 w-9 rounded-lg bg-rose-950/20 hover:bg-rose-950/50 text-rose-400 border border-rose-900/40 hover:border-rose-700/60 transition-all flex items-center justify-center"
                     title="Delete Skill"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>

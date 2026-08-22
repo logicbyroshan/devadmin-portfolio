@@ -462,13 +462,13 @@ data:
         </div>
 
         {/* Right Actions: Category Dropdown & Add Button */}
-        <div className="flex items-center gap-3 flex-wrap">
-          {/* Category Dropdown */}
+        <div className="flex items-center gap-2.5 flex-wrap">
+          {/* Category Dropdown — same height as Add button (h-9) */}
           <div className="relative">
             <select
               value={selectedCategory}
               onChange={e => setSelectedCategory(e.target.value)}
-              className="px-3.5 py-2.5 rounded-lg bg-[#050609] hover:bg-neutral-900 border border-neutral-800 text-xs font-bold text-neutral-200 focus:outline-none focus:border-blue-500 transition-colors cursor-pointer appearance-none pr-8"
+              className="h-9 pl-3.5 pr-8 rounded-lg bg-neutral-900/60 border border-neutral-800 text-sm font-semibold text-neutral-200 focus:outline-none focus:border-blue-500 transition-colors cursor-pointer appearance-none"
             >
               <option value="ALL">All Categories ({projects.length})</option>
               {categories.filter(c => c !== 'ALL').map(cat => (
@@ -480,7 +480,7 @@ data:
 
           <button
             onClick={handleOpenAddPage}
-            className="px-4 py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:brightness-110 text-white font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-blue-500/20 transition-all flex-shrink-0"
+            className="h-9 px-4 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:brightness-110 text-white font-bold text-sm flex items-center gap-2 shadow-lg shadow-blue-500/20 transition-all flex-shrink-0"
           >
             <Plus className="w-4 h-4" />
             <span>Add New Project</span>
@@ -507,16 +507,16 @@ data:
                   }}
                 />
                 <div className="absolute top-3 right-3 flex items-center gap-2">
-                  <span className={`px-2.5 py-0.5 rounded text-[10px] font-black uppercase tracking-wider ${
+                  <span className={`px-2.5 py-1 rounded-md text-xs font-extrabold uppercase tracking-wide ${
                     proj.status === 'LIVE'
                       ? 'bg-emerald-500/90 text-slate-950 shadow-md shadow-emerald-500/30'
-                      : 'bg-black/90 text-neutral-400 border border-neutral-700'
+                      : 'bg-black/90 text-neutral-300 border border-neutral-700'
                   }`}>
                     {proj.status}
                   </span>
                 </div>
                 <div className="absolute bottom-3 left-3">
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-black/80 backdrop-blur-md text-blue-400 border border-blue-500/30">
+                  <span className="px-2.5 py-1 rounded-md text-xs font-bold bg-black/80 backdrop-blur-md text-blue-400 border border-blue-500/30">
                     {proj.category}
                   </span>
                 </div>
@@ -538,20 +538,20 @@ data:
               </div>
             </div>
 
-            {/* Card Action Buttons with Working Visibility Toggle */}
-            <div className="p-4 pt-0 flex items-center justify-between gap-2 border-t border-neutral-800/80 pt-3">
+            {/* Card Action Buttons — consistent h-9 (36px) */}
+            <div className="px-4 py-3 flex items-center justify-between gap-2 border-t border-neutral-800/80">
               <button
                 type="button"
                 onClick={() => handleToggleVisible(proj.id)}
-                className={`px-2.5 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all truncate ${
+                className={`h-9 px-3 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all flex-shrink-0 ${
                   proj.visible
-                    ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-                    : 'bg-neutral-800/60 text-neutral-400 border border-neutral-700'
+                    ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/25'
+                    : 'bg-neutral-800/60 text-neutral-400 border border-neutral-700 hover:bg-neutral-800'
                 }`}
                 title="Toggle Live Visibility"
               >
-                {proj.visible ? <Eye className="w-3.5 h-3.5 flex-shrink-0" /> : <EyeOff className="w-3.5 h-3.5 flex-shrink-0" />}
-                <span className="truncate">{proj.visible ? 'Visible' : 'Hidden'}</span>
+                {proj.visible ? <Eye className="w-4 h-4 flex-shrink-0" /> : <EyeOff className="w-4 h-4 flex-shrink-0" />}
+                <span>{proj.visible ? 'Visible' : 'Hidden'}</span>
               </button>
 
               <div className="flex items-center gap-1.5 flex-shrink-0">
@@ -560,24 +560,24 @@ data:
                     href={proj.demoUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="p-1.5 rounded-md bg-neutral-900 hover:bg-neutral-800 text-neutral-300 hover:text-white border border-neutral-800 transition-colors"
+                    className="h-9 w-9 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-300 hover:text-white border border-neutral-800 transition-colors flex items-center justify-center"
                     title="Live Demo"
                   >
-                    <Globe className="w-3.5 h-3.5" />
+                    <Globe className="w-4 h-4" />
                   </a>
                 )}
                 <button
                   onClick={() => handleOpenEditPage(proj)}
-                  className="px-2.5 py-1.5 rounded-md bg-[#050609] hover:bg-neutral-800 text-neutral-300 hover:text-white text-xs font-semibold flex items-center gap-1.5 border border-neutral-800 transition-all"
+                  className="h-9 px-3 rounded-lg bg-neutral-900/60 hover:bg-neutral-800 text-neutral-200 hover:text-white text-sm font-semibold flex items-center gap-1.5 border border-neutral-800 transition-all"
                 >
-                  <Edit2 className="w-3.5 h-3.5" /> Edit
+                  <Edit2 className="w-4 h-4" /> Edit
                 </button>
                 <button
                   onClick={() => handleDelete(proj.id)}
-                  className="p-1.5 rounded-md bg-rose-950/20 hover:bg-rose-950/40 text-rose-400 text-xs font-medium flex items-center gap-1.5 border border-rose-900/30 transition-all"
+                  className="h-9 w-9 rounded-lg bg-rose-950/20 hover:bg-rose-950/50 text-rose-400 border border-rose-900/40 hover:border-rose-700/60 transition-all flex items-center justify-center"
                   title="Delete Project"
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
+                  <Trash2 className="w-4 h-4" />
                 </button>
               </div>
             </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   FolderKanban, 
   Plus, 
@@ -14,6 +14,7 @@ import {
   ChevronDown
 } from 'lucide-react';
 import RichContentBuilder from './RichContentBuilder';
+import { projectsApi } from '../services/api';
 
 export default function ProjectsView({ onNavigate, activeWebsite }) {
   const [viewMode, setViewMode] = useState('LIST'); // 'LIST' | 'EDITOR'
@@ -149,6 +150,36 @@ nodes:
     return p.category === selectedCategory;
   });
 
+  // Fetch projects from Django REST Framework API with multi-tenant filtering
+  useEffect(() => {
+    let isMounted = true;
+    const fetchProjects = async () => {
+      try {
+        const siteSlug = activeWebsite?.slug || 'dev-meet';
+        const data = await projectsApi.getAll({ website: siteSlug });
+        const list = Array.isArray(data) ? data : (data.results || []);
+        if (isMounted && list.length > 0) {
+          setProjects(list.map(p => ({
+            id: p.id,
+            title: p.title,
+            status: p.status,
+            category: p.category || 'Web Application',
+            description: p.description || '',
+            completed: p.completed_date || p.completed || '',
+            image: p.image || 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80',
+            demoUrl: p.demo_url || p.demoUrl || '',
+            githubUrl: p.github_url || p.githubUrl || '',
+            visible: p.visible !== false
+          })));
+        }
+      } catch {
+        // Graceful fallback to client state if offline
+      }
+    };
+    fetchProjects();
+    return () => { isMounted = false; };
+  }, [activeWebsite]);
+
   // Open separate Editor Page for Adding
   const handleOpenAddPage = () => {
     setEditingId(null);
@@ -206,21 +237,46 @@ data:
   };
 
   // Save Form (Add or Edit)
-  const handleSaveForm = (e) => {
+  const handleSaveForm = async (e) => {
     e?.preventDefault();
     if (!formData.title.trim()) {
       alert('Please enter a Project Title.');
       return;
     }
 
+    const payload = {
+      title: formData.title,
+      slug: formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || `project-${Date.now()}`,
+      status: formData.status,
+      category: formData.category,
+      description: formData.description,
+      completed_date: formData.completed,
+      image: formData.image,
+      demo_url: formData.demoUrl,
+      github_url: formData.githubUrl,
+      visible: formData.visible,
+      website: activeWebsite?.id || 1
+    };
+
     if (editingId) {
       setProjects(projects.map(p => p.id === editingId ? { ...formData, id: editingId } : p));
+      try {
+        await projectsApi.patch(editingId, payload);
+      } catch {
+        // Fallback local update maintained
+      }
     } else {
-      const newEntry = {
-        ...formData,
-        id: Date.now()
-      };
+      const tempId = Date.now();
+      const newEntry = { ...formData, id: tempId };
       setProjects([newEntry, ...projects]);
+      try {
+        const created = await projectsApi.create(payload);
+        if (created && created.id) {
+          setProjects(prev => prev.map(p => p.id === tempId ? { ...p, id: created.id } : p));
+        }
+      } catch {
+        // Fallback local creation maintained
+      }
     }
 
     setViewMode('LIST');
@@ -229,15 +285,25 @@ data:
   };
 
   // Delete project
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (confirm('Delete project portfolio item?')) {
       setProjects(projects.filter(p => p.id !== id));
+      try {
+        await projectsApi.delete(id);
+      } catch {
+        // Fallback
+      }
     }
   };
 
   // Toggle visibility
-  const handleToggleVisible = (id) => {
+  const handleToggleVisible = async (id) => {
     setProjects(projects.map(p => p.id === id ? { ...p, visible: !p.visible } : p));
+    try {
+      await projectsApi.toggleVisibility(id);
+    } catch {
+      // Fallback
+    }
   };
 
   // ==========================================

@@ -1,16 +1,16 @@
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .models import Skill
-from .serializers import SkillSerializer
+from .models import Faq
+from .serializers import FaqSerializer
 
-class SkillViewSet(viewsets.ModelViewSet):
-    queryset = Skill.objects.select_related('website').all()
-    serializer_class = SkillSerializer
+class FaqViewSet(viewsets.ModelViewSet):
+    queryset = Faq.objects.select_related('website').all()
+    serializer_class = FaqSerializer
     permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
-        queryset = Skill.objects.select_related('website').all()
+        queryset = Faq.objects.select_related('website').all()
         website_slug = self.request.query_params.get('website', None)
         if website_slug:
             queryset = queryset.filter(website__slug=website_slug)
@@ -27,7 +27,7 @@ class SkillViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def toggle_visibility(self, request, pk=None):
-        skill = self.get_object()
-        skill.visible = not skill.visible
-        skill.save(update_fields=['visible', 'updated_at'])
-        return Response({'id': skill.id, 'visible': skill.visible, 'status': 'success'}, status=status.HTTP_200_OK)
+        faq = self.get_object()
+        faq.visible = not faq.visible
+        faq.save(update_fields=['visible', 'updated_at'])
+        return Response({'id': faq.id, 'visible': faq.visible, 'status': 'success'}, status=status.HTTP_200_OK)

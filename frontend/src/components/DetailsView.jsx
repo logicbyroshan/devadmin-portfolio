@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   User, 
   Save, 
@@ -17,9 +17,11 @@ import {
   Code
 } from 'lucide-react';
 import RichContentBuilder from './RichContentBuilder';
+import { profilesApi } from '../services/api';
 
 export default function DetailsView({ onNavigate, activeWebsite }) {
   const [saved, setSaved] = useState(false);
+  const [profileId, setProfileId] = useState(null);
   const [details, setDetails] = useState({
     name: 'Roshan Kumar',
     title: 'Senior Full Stack Developer & UI Architect',
@@ -36,6 +38,41 @@ export default function DetailsView({ onNavigate, activeWebsite }) {
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80'
   });
 
+  // Load profile from Django REST Framework API
+  useEffect(() => {
+    let isMounted = true;
+    const fetchProfile = async () => {
+      try {
+        const siteSlug = activeWebsite?.slug || 'dev-meet';
+        const res = await profilesApi.getByWebsite(siteSlug);
+        const list = Array.isArray(res) ? res : (res.results || []);
+        if (isMounted && list.length > 0) {
+          const p = list[0];
+          setProfileId(p.id);
+          setDetails({
+            name: p.name || 'Roshan Kumar',
+            title: p.title || '',
+            bio: p.bio || '',
+            location: p.location || '',
+            email: p.email || '',
+            phone: p.phone || '',
+            experienceYears: p.experience_years || '5+ Years',
+            github: p.github || '',
+            linkedin: p.linkedin || '',
+            twitter: p.twitter || '',
+            website: p.website_url || '',
+            resumeUrl: p.resume_url || '',
+            avatar: p.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80'
+          });
+        }
+      } catch {
+        // Fallback maintained
+      }
+    };
+    fetchProfile();
+    return () => { isMounted = false; };
+  }, [activeWebsite]);
+
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -44,9 +81,35 @@ export default function DetailsView({ onNavigate, activeWebsite }) {
     }
   };
 
-  const handleSave = (e) => {
-    e.preventDefault();
+  const handleSave = async (e) => {
+    e?.preventDefault();
     setSaved(true);
+
+    const payload = {
+      name: details.name,
+      title: details.title,
+      bio: details.bio,
+      location: details.location,
+      email: details.email,
+      phone: details.phone,
+      experience_years: details.experienceYears,
+      github: details.github,
+      linkedin: details.linkedin,
+      twitter: details.twitter,
+      website_url: details.website,
+      resume_url: details.resumeUrl,
+      avatar: details.avatar,
+      website: activeWebsite?.id || 1
+    };
+
+    try {
+      if (profileId) {
+        await profilesApi.patch(profileId, payload);
+      }
+    } catch {
+      // Fallback
+    }
+
     setTimeout(() => setSaved(false), 3500);
   };
 

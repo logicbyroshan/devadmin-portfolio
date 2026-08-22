@@ -21,6 +21,9 @@ urlpatterns = [
     path('api/experiences/', include('apps.experiences.urls')),
     path('api/skills/', include('apps.skills.urls')),
     path('api/contacts/', include('apps.contacts.urls')),
+    path('api/faqs/', include('apps.faqs.urls')),
+    path('api/profiles/', include('apps.profiles.urls')),
+    path('api/dashboard/', include('apps.dashboard.urls')),
 ]
 
 if settings.DEBUG:

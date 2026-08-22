@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Briefcase, 
   Plus, 
@@ -11,6 +11,7 @@ import {
   Save, 
   ChevronDown
 } from 'lucide-react';
+import { experiencesApi } from '../services/api';
 
 export default function ExperiencesView({ onNavigate, activeWebsite }) {
   const [viewMode, setViewMode] = useState('LIST'); // 'LIST' | 'EDITOR'
@@ -73,6 +74,35 @@ export default function ExperiencesView({ onNavigate, activeWebsite }) {
     return exp.category === selectedCategory;
   });
 
+  // Fetch experiences from Django REST Framework API with multi-tenant filtering
+  useEffect(() => {
+    let isMounted = true;
+    const fetchExperiences = async () => {
+      try {
+        const siteSlug = activeWebsite?.slug || 'dev-meet';
+        const data = await experiencesApi.getAll({ website: siteSlug });
+        const list = Array.isArray(data) ? data : (data.results || []);
+        if (isMounted && list.length > 0) {
+          setExperiences(list.map(e => ({
+            id: e.id,
+            role: e.role,
+            company: e.company,
+            status: e.status || (e.is_current ? 'CURRENT' : 'PAST'),
+            category: e.category || 'Engineering',
+            period: e.period || (e.start_date ? `${e.start_date} - ${e.end_date || 'Present'}` : '2023 - Present'),
+            location: e.location || 'Remote',
+            description: e.description || '',
+            visible: e.visible !== false
+          })));
+        }
+      } catch {
+        // Fallback maintained
+      }
+    };
+    fetchExperiences();
+    return () => { isMounted = false; };
+  }, [activeWebsite]);
+
   // Navigate to separate Editor Page for Adding
   const handleOpenAddPage = () => {
     setEditingId(null);
@@ -80,10 +110,10 @@ export default function ExperiencesView({ onNavigate, activeWebsite }) {
       role: '',
       company: '',
       status: 'CURRENT',
+      category: 'Engineering',
+      period: '2024 - Present',
+      location: 'Remote',
       description: '',
-      category: 'Full-Stack Engineering',
-      joined: new Date().toISOString().split('T')[0],
-      left: 'Present',
       visible: true
     });
     setViewMode('EDITOR');
@@ -106,21 +136,45 @@ export default function ExperiencesView({ onNavigate, activeWebsite }) {
   };
 
   // Save Form (Add or Edit)
-  const handleSaveForm = (e) => {
+  const handleSaveForm = async (e) => {
     e?.preventDefault();
     if (!formData.role.trim() || !formData.company.trim()) {
       alert('Please enter both Role Title and Company Name.');
       return;
     }
 
+    const payload = {
+      role: formData.role,
+      company: formData.company,
+      category: formData.category,
+      period: formData.period,
+      location: formData.location,
+      status: formData.status,
+      is_current: formData.status === 'CURRENT',
+      description: formData.description,
+      visible: formData.visible,
+      website: activeWebsite?.id || 1
+    };
+
     if (editingId) {
       setExperiences(experiences.map(e => e.id === editingId ? { ...formData, id: editingId } : e));
+      try {
+        await experiencesApi.update(editingId, payload);
+      } catch {
+        // Fallback
+      }
     } else {
-      const newEntry = {
-        ...formData,
-        id: Date.now()
-      };
+      const tempId = Date.now();
+      const newEntry = { ...formData, id: tempId };
       setExperiences([newEntry, ...experiences]);
+      try {
+        const created = await experiencesApi.create(payload);
+        if (created && created.id) {
+          setExperiences(prev => prev.map(e => e.id === tempId ? { ...e, id: created.id } : e));
+        }
+      } catch {
+        // Fallback
+      }
     }
 
     setViewMode('LIST');
@@ -129,15 +183,25 @@ export default function ExperiencesView({ onNavigate, activeWebsite }) {
   };
 
   // Delete experience
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (confirm('Delete this experience entry?')) {
       setExperiences(experiences.filter(e => e.id !== id));
+      try {
+        await experiencesApi.delete(id);
+      } catch {
+        // Fallback
+      }
     }
   };
 
   // Toggle visibility directly on card
-  const handleToggleVisible = (id) => {
+  const handleToggleVisible = async (id) => {
     setExperiences(experiences.map(e => e.id === id ? { ...e, visible: !e.visible } : e));
+    try {
+      await experiencesApi.toggleVisibility(id);
+    } catch {
+      // Fallback
+    }
   };
 
   // ==========================================

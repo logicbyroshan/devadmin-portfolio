@@ -1,191 +1,266 @@
 from django.core.management.base import BaseCommand
-from django.contrib.auth import get_user_model
 from apps.websites.models import Website
-from apps.blogs.models import BlogPost
 from apps.projects.models import Project
+from apps.blogs.models import BlogPost
 from apps.experiences.models import Experience
 from apps.skills.models import Skill
 from apps.contacts.models import ContactInquiry
-import datetime
-
-User = get_user_model()
+from apps.faqs.models import Faq
+from apps.profiles.models import PortfolioProfile
 
 class Command(BaseCommand):
-    help = 'Seeds initial database for DevAdmin multi-website platform (Dev-Meet, Dev-Mitra, Dev-Mate)'
+    help = 'Seeds multi-tenant portfolio data for DevMeet, DevMitra, and DevMate'
 
-    def handle(self, *args, **options):
-        self.stdout.write(self.style.SUCCESS("Starting database seeding process..."))
+    def handle(self, *args, **kwargs):
+        self.stdout.write('Seeding database with multi-tenant data...')
 
-        # 1. Superuser setup
-        if not User.objects.filter(username='admin').exists():
-            User.objects.create_superuser('admin', 'admin@devadmin.com', 'admin123')
-            self.stdout.write(self.style.SUCCESS("[OK] Created Superuser: admin / admin123"))
-        else:
-            self.stdout.write(self.style.SUCCESS("[OK] Superuser admin already exists."))
-
-        # 2. Websites setup
-        websites_data = [
+        # 1. Websites
+        sites_data = [
             {
                 'slug': 'dev-meet',
-                'name': 'Dev-Meet',
+                'name': 'DevMeet',
                 'badge': 'MEET',
-                'tag': 'Developer Meetings & Calls Portal',
+                'tag': 'Multi-Peer Video Collaboration & WebRTC Engine',
                 'primary_color': 'blue'
             },
             {
                 'slug': 'dev-mitra',
-                'name': 'Dev-Mitra',
+                'name': 'DevMitra',
                 'badge': 'MITRA',
-                'tag': 'Peer Support & Community Hub',
+                'tag': 'AI Peer Pairing & Mentorship Engine',
                 'primary_color': 'sky'
             },
             {
                 'slug': 'dev-mate',
-                'name': 'Dev-Mate',
+                'name': 'DevMate',
                 'badge': 'MATE',
-                'tag': 'Pair Programming & Matcher',
+                'tag': 'In-Browser Cloud Sandbox & Code IDE',
                 'primary_color': 'violet'
-            },
+            }
         ]
 
-        website_instances = {}
-        for data in websites_data:
-            site, created = Website.objects.get_or_create(slug=data['slug'], defaults=data)
-            website_instances[site.slug] = site
-            status_str = "Created" if created else "Exists"
-            self.stdout.write(self.style.SUCCESS(f"[OK] Website {site.name} [{status_str}]"))
+        websites = {}
+        for site in sites_data:
+            w, _ = Website.objects.get_or_create(slug=site['slug'], defaults=site)
+            websites[site['slug']] = w
 
-        # 3. Blogs setup
-        blogs_sample = [
+        # 2. Portfolio Profiles
+        for slug, site in websites.items():
+            PortfolioProfile.objects.update_or_create(
+                website=site,
+                defaults={
+                    'name': 'Roshan Kumar',
+                    'title': f'Senior Full Stack Developer & UI Architect ({site.name})',
+                    'bio': f'Passionate software engineer building high-performance React web applications, scalable Node.js microservices, and elegant OLED dark glassmorphic user interfaces for {site.name}.\n\n```architecture\nFrontend:React 18 -> API Gateway:Kong -> Backend:Django REST -> DB:MySQL\n```\n\nExperienced in real-time WebRTC, distributed caching, and micro-frontend architecture.',
+                    'location': 'New Delhi, India',
+                    'email': f'roshan@{slug}.dev',
+                    'phone': '+91 98765 43210',
+                    'experience_years': '5+ Years',
+                    'github': 'https://github.com/roshan-dev',
+                    'linkedin': 'https://linkedin.com/in/roshan-dev',
+                    'twitter': '@roshan_dev',
+                    'website_url': f'https://{slug}.dev',
+                    'resume_url': f'https://{slug}.dev/resume.pdf',
+                    'avatar': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80'
+                }
+            )
+
+        # 3. Projects
+        projects_data = [
             {
-                'website': website_instances['dev-meet'],
-                'title': 'Optimizing Real-time Video Calls in WebRTC',
-                'slug': 'optimizing-webrtc-video-calls',
-                'summary': 'A deep dive into WebRTC peer connection configuration and bandwidth management.',
-                'content': 'WebRTC enables real-time peer-to-peer audio and video communication...',
-                'status': 'PUBLISHED',
-                'views_count': 1420
+                'website': websites['dev-meet'],
+                'title': 'Dev-Meet Video Conference Suite',
+                'slug': 'dev-meet-video-conference-suite',
+                'category': 'Web Application',
+                'status': 'LIVE',
+                'completed_date': '2025-05-15',
+                'image': 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80',
+                'demo_url': 'https://devmeet.live',
+                'github_url': 'https://github.com/roshan-dev/dev-meet',
+                'description': 'High-Performance WebRTC Video Conferencing Suite supporting up to 50 concurrent peer mesh channels with sub-80ms audio/video latency.\n\n```architecture\nBrowser:React -> SFU:Mediasoup -> Signaling:WebSockets -> Redis:State\n```\n\n```chart:barchart\ntitle:Media Processing Throughput\nWebRTC Mesh:1200fps\nSFU Relay:4800fps\nMCU Transcoding:850fps\n```',
+                'visible': True
             },
             {
-                'website': website_instances['dev-mitra'],
-                'title': 'Building Peer Mentorship Communities in Tech',
-                'slug': 'building-peer-mentorship-communities',
-                'summary': 'Strategies for fostering collaborative peer support groups for junior engineers.',
-                'content': 'Community building requires empathetic communication and structured feedback loops...',
-                'status': 'PUBLISHED',
-                'views_count': 980
+                'website': websites['dev-mitra'],
+                'title': 'Mitra Peer Pairing Matcher',
+                'slug': 'mitra-peer-pairing-matcher',
+                'category': 'Community Platform',
+                'status': 'LIVE',
+                'completed_date': '2025-06-01',
+                'image': 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&auto=format&fit=crop&q=80',
+                'demo_url': 'https://devmitra.org',
+                'github_url': 'https://github.com/roshan-dev/dev-mitra',
+                'description': 'Intelligent Developer Mentorship & Pairing Platform using vector embeddings and cosine similarity to match junior devs with senior mentors.',
+                'visible': True
             },
             {
-                'website': website_instances['dev-mate'],
-                'title': 'Pair Programming Patterns: Driver & Navigator Dynamics',
-                'slug': 'pair-programming-patterns-guide',
-                'summary': 'How effective pair programming accelerates code quality and knowledge sharing.',
-                'content': 'Effective pair programming relies on clear role switching between Driver and Navigator...',
+                'website': websites['dev-mate'],
+                'title': 'Dev-Mate Collaborative IDE Sandbox',
+                'slug': 'dev-mate-collaborative-ide-sandbox',
+                'category': 'Developer Tools',
+                'status': 'OFFLINE',
+                'completed_date': '2025-06-20',
+                'image': 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&auto=format&fit=crop&q=80',
+                'demo_url': 'https://devmate.io',
+                'github_url': 'https://github.com/roshan-dev/dev-mate',
+                'description': 'In-Browser Cloud Compilation & Code Sandbox supporting Node.js, Python, and Rust in WebAssembly micro-containers.',
+                'visible': False
+            }
+        ]
+
+        for p in projects_data:
+            Project.objects.update_or_create(slug=p['slug'], defaults=p)
+
+        # 4. Blogs
+        blogs_data = [
+            {
+                'website': websites['dev-meet'],
+                'title': 'Optimizing Node.js APIs for High Scale Throughput',
+                'slug': 'optimizing-nodejs-apis-for-high-scale',
+                'category': 'Backend Architecture',
+                'status': 'PUBLISHED',
+                'date': '2025-06-18',
+                'read_time': '6 min read',
+                'views_count': 1420,
+                'summary': 'Deep dive into event loop lag, cluster worker pooling, and Redis pipeline caching for 100k req/sec microservices.',
+                'content': '## Architecture Overview\n\nScaling Node.js requires understanding the event loop.\n\n```architecture\nLoad Balancer:Nginx -> Node Cluster:4 Cores -> Redis:Cache -> Postgres:DB\n```',
+                'visible': True
+            },
+            {
+                'website': websites['dev-mitra'],
+                'title': 'Vector Search & Embedding Similarity for Mentorship',
+                'slug': 'vector-search-embedding-similarity',
+                'category': 'Machine Learning',
+                'status': 'PUBLISHED',
+                'date': '2025-06-12',
+                'read_time': '8 min read',
+                'views_count': 980,
+                'summary': 'How we built real-time developer mentor matching using pgvector and OpenAI text-embedding-3-small.',
+                'content': '## Vector Matching Pipeline\n\nComparing developer skill vectors in multidimensional space.',
+                'visible': True
+            },
+            {
+                'website': websites['dev-mate'],
+                'title': 'Running Python & Rust in the Browser via WebAssembly',
+                'slug': 'running-python-rust-in-browser-wasm',
+                'category': 'WebAssembly',
                 'status': 'DRAFT',
-                'views_count': 320
-            },
+                'date': '2025-06-25',
+                'read_time': '5 min read',
+                'views_count': 0,
+                'summary': 'Compiling language runtimes to WASM for client-side zero-latency code execution.',
+                'content': 'Draft article for next week.',
+                'visible': False
+            }
         ]
 
-        for blog in blogs_sample:
-            BlogPost.objects.get_or_create(slug=blog['slug'], defaults=blog)
+        for b in blogs_data:
+            BlogPost.objects.update_or_create(slug=b['slug'], defaults=b)
 
-        # 4. Projects setup
-        projects_sample = [
+        # 5. Experiences
+        experiences_data = [
             {
-                'website': website_instances['dev-meet'],
-                'title': 'Dev-Meet WebRTC Conference Engine',
-                'slug': 'devmeet-webrtc-conference-engine',
-                'description': 'Low-latency video conferencing platform supporting up to 50 concurrent video feeds.',
-                'status': 'DONE',
-                'live_url': 'https://dev-meet.io',
-                'github_url': 'https://github.com/logicbyroshan/dev-meet',
-                'technologies': 'React, WebRTC, Node.js, Socket.io',
-                'featured': True
-            },
-            {
-                'website': website_instances['dev-mitra'],
-                'title': 'Dev-Mitra Community Peer Hub',
-                'slug': 'devmitra-community-peer-hub',
-                'description': 'Real-time Q&A, mentor matching, and code review queue for developers.',
-                'status': 'IN_PROGRESS',
-                'live_url': 'https://dev-mitra.org',
-                'github_url': 'https://github.com/logicbyroshan/dev-mitra',
-                'technologies': 'Next.js, Django REST Framework, PostgreSQL',
-                'featured': True
-            },
-            {
-                'website': website_instances['dev-mate'],
-                'title': 'Dev-Mate Collaborative Code Editor',
-                'slug': 'devmate-collaborative-code-editor',
-                'description': 'Real-time collaborative code workspace with operational transformation.',
-                'status': 'PLANNED',
-                'github_url': 'https://github.com/logicbyroshan/dev-mate',
-                'technologies': 'Monaco Editor, WebSockets, Python, Redis',
-                'featured': False
-            },
-        ]
-
-        for proj in projects_sample:
-            Project.objects.get_or_create(slug=proj['slug'], defaults=proj)
-
-        # 5. Experiences setup
-        experiences_sample = [
-            {
-                'website': website_instances['dev-meet'],
-                'role': 'Senior Full Stack Engineer',
-                'company': 'TechCorp Solutions',
-                'location': 'Remote',
-                'start_date': datetime.date(2023, 1, 15),
+                'website': websites['dev-meet'],
+                'role': 'Senior Full Stack & Cloud Architect',
+                'company': 'HyperScale Tech Corp',
+                'category': 'Engineering',
+                'period': '2023 - Present',
+                'location': 'Remote / New Delhi',
+                'status': 'CURRENT',
                 'is_current': True,
-                'description': 'Architected high-density admin dashboards and backend microservices.'
+                'description': 'Leading frontend architecture across 4 engineering pods. Designed real-time collaboration canvas reducing render latencies by 42%.',
+                'visible': True
             },
             {
-                'website': website_instances['dev-mitra'],
-                'role': 'Lead Backend Developer',
-                'company': 'Mitra Labs',
-                'location': 'San Francisco, CA',
-                'start_date': datetime.date(2021, 6, 1),
-                'end_date': datetime.date(2022, 12, 31),
+                'website': websites['dev-meet'],
+                'role': 'Lead React UI Developer',
+                'company': 'Nova Digital Labs',
+                'category': 'Frontend',
+                'period': '2021 - 2023',
+                'location': 'Bengaluru, India',
+                'status': 'PAST',
                 'is_current': False,
-                'description': 'Scaled Django REST API infrastructure to serve 250k daily active users.'
-            },
+                'description': 'Built modern dark-mode component libraries and real-time dashboard analytics tooling used by 200k+ monthly active users.',
+                'visible': True
+            }
         ]
 
-        for exp in experiences_sample:
-            Experience.objects.get_or_create(role=exp['role'], company=exp['company'], defaults=exp)
+        for e in experiences_data:
+            Experience.objects.get_or_create(role=e['role'], company=e['company'], website=e['website'], defaults=e)
 
-        # 6. Skills setup
-        skills_sample = [
-            {'website': website_instances['dev-meet'], 'name': 'React & Vite', 'category': 'FRONTEND', 'proficiency_percentage': 95},
-            {'website': website_instances['dev-meet'], 'name': 'Python & Django REST Framework', 'category': 'BACKEND', 'proficiency_percentage': 92},
-            {'website': website_instances['dev-mitra'], 'name': 'MySQL & PostgreSQL', 'category': 'DATABASE', 'proficiency_percentage': 88},
-            {'website': website_instances['dev-mate'], 'name': 'Docker & CI/CD Pipelines', 'category': 'DEVOPS', 'proficiency_percentage': 85},
+        # 6. Skills
+        skills_data = [
+            {'website': websites['dev-meet'], 'name': 'React 18 & Next.js', 'category': 'Frontend', 'level': 95, 'icon_name': 'Code2', 'visible': True},
+            {'website': websites['dev-meet'], 'name': 'TypeScript & ESNext', 'category': 'Frontend', 'level': 92, 'icon_name': 'Terminal', 'visible': True},
+            {'website': websites['dev-meet'], 'name': 'Node.js & Express', 'category': 'Backend', 'level': 90, 'icon_name': 'Server', 'visible': True},
+            {'website': websites['dev-meet'], 'name': 'Python & Django REST', 'category': 'Backend', 'level': 88, 'icon_name': 'Server', 'visible': True},
+            {'website': websites['dev-meet'], 'name': 'PostgreSQL & MySQL', 'category': 'Database', 'level': 86, 'icon_name': 'Database', 'visible': True},
+            {'website': websites['dev-meet'], 'name': 'Docker & Kubernetes', 'category': 'DevOps', 'level': 82, 'icon_name': 'Layers', 'visible': True},
         ]
 
-        for skill in skills_sample:
-            Skill.objects.get_or_create(website=skill['website'], name=skill['name'], defaults=skill)
+        for s in skills_data:
+            Skill.objects.get_or_create(name=s['name'], website=s['website'], defaults=s)
 
-        # 7. Contacts setup
-        contacts_sample = [
+        # 7. FAQs
+        faqs_data = [
             {
-                'website': website_instances['dev-meet'],
+                'website': websites['dev-meet'],
+                'question': 'What technology stack is used in DevAdmin?',
+                'answer': 'DevAdmin is built with React 18, Vite, Tailwind CSS, Lucide icons on the frontend, and Django REST Framework with MySQL/SQLite and JWT authentication on the backend.',
+                'category': 'Architecture',
+                'order': 1,
+                'visible': True
+            },
+            {
+                'website': websites['dev-meet'],
+                'question': 'How does multi-site portfolio management work?',
+                'answer': 'All modules (Projects, Blogs, Skills, Experiences, Messages, FAQs) are partitioned by the active website slug (e.g. dev-meet, dev-mitra, dev-mate) with composite database indexes for blazing query performance.',
+                'category': 'Multi-Site',
+                'order': 2,
+                'visible': True
+            },
+            {
+                'website': websites['dev-meet'],
+                'question': 'Are architecture diagrams and charts supported in blogs?',
+                'answer': 'Yes! The custom RichContentBuilder component allows rendering live visual node topologies, latency graphs, and benchmark bars directly in your articles.',
+                'category': 'Features',
+                'order': 3,
+                'visible': True
+            }
+        ]
+
+        for f in faqs_data:
+            Faq.objects.get_or_create(question=f['question'], website=f['website'], defaults=f)
+
+        # 8. Contact Inquiries
+        contacts_data = [
+            {
+                'website': websites['dev-meet'],
                 'name': 'John Doe',
                 'email': 'john@example.com',
-                'message': 'Inquiry regarding Dev-Meet platform integration for enterprise calls.',
+                'subject': 'Inquiry regarding DevMeet platform features',
+                'message': 'Hello Roshan, I saw your portfolio and would like to ask about scheduling a custom WebRTC integration demo for our enterprise platform.',
                 'tag': 'Inquiry',
-                'is_read': False
+                'is_read': False,
+                'starred': True,
+                'replied': False
             },
             {
-                'website': website_instances['dev-mitra'],
+                'website': websites['dev-meet'],
                 'name': 'Renuka Dashbanda',
                 'email': 'renuka@design.co',
-                'message': 'Loved the new UI update and peer mentor workflow!',
+                'subject': 'Loved the dark OLED glassmorphism design',
+                'message': 'Great work on the UI update! Loved the dark glassmorphic design and the crisp typography.',
                 'tag': 'Feedback',
-                'is_read': True
-            },
+                'is_read': True,
+                'starred': False,
+                'replied': True,
+                'reply_subject': 'Re: Loved the dark OLED glassmorphism design',
+                'reply_text': 'Thank you so much Renuka! Glad you loved the design aesthetic.'
+            }
         ]
 
-        for msg in contacts_sample:
-            ContactInquiry.objects.get_or_create(email=msg['email'], message=msg['message'], defaults=msg)
+        for c in contacts_data:
+            ContactInquiry.objects.get_or_create(email=c['email'], subject=c['subject'], website=c['website'], defaults=c)
 
-        self.stdout.write(self.style.SUCCESS("Database seeding completed successfully!"))
+        self.stdout.write(self.style.SUCCESS('Successfully seeded database for all 3 portfolio sites!'))

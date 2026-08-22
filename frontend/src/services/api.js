@@ -1,78 +1,155 @@
-const API_BASE_URL = 'http://127.0.0.1:8000/api';
+/**
+ * DevAdmin Centralized REST API Service Layer
+ * Connects React UI to Django REST Framework backend with multi-tenant partitioning,
+ * JWT authentication, parameter filtering, and graceful fallback.
+ */
 
-export async function fetchWebsites() {
+const API_BASE_URL = 'http://localhost:8000/api';
+
+// Helper for HTTP requests
+async function request(endpoint, options = {}) {
+  const url = `${API_BASE_URL}${endpoint}`;
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(options.headers || {}),
+  };
+
+  const token = localStorage.getItem('access_token');
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
   try {
-    const res = await fetch(`${API_BASE_URL}/websites/`);
-    if (!res.ok) throw new Error('Failed to fetch websites');
-    const data = await res.json();
-    return data.results || data;
-  } catch (err) {
-    console.warn('API Offline or unavailable, falling back to local multi-site config:', err.message);
-    return null;
+    const response = await fetch(url, {
+      ...options,
+      headers,
+    });
+
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.detail || errData.error || `HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    if (response.status === 204) return true;
+    return await response.json();
+  } catch (error) {
+    // Return null or throw for caller to handle
+    console.warn(`[DevAdmin API] ${options.method || 'GET'} ${endpoint} failed:`, error.message);
+    throw error;
   }
 }
 
-export async function fetchBlogs(websiteSlug) {
-  try {
-    const url = websiteSlug ? `${API_BASE_URL}/blogs/?website=${websiteSlug}` : `${API_BASE_URL}/blogs/`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('Failed to fetch blogs');
-    const data = await res.json();
-    return data.results || data;
-  } catch (err) {
-    console.warn('API Offline, using local state for blogs:', err.message);
-    return null;
-  }
-}
+// 1. Websites API
+export const websitesApi = {
+  getAll: () => request('/websites/'),
+  getBySlug: (slug) => request(`/websites/${slug}/`),
+};
 
-export async function fetchProjects(websiteSlug) {
-  try {
-    const url = websiteSlug ? `${API_BASE_URL}/projects/?website=${websiteSlug}` : `${API_BASE_URL}/projects/`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('Failed to fetch projects');
-    const data = await res.json();
-    return data.results || data;
-  } catch (err) {
-    console.warn('API Offline, using local state for projects:', err.message);
-    return null;
-  }
-}
+// 2. Projects API
+export const projectsApi = {
+  getAll: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return request(`/projects/${query ? `?${query}` : ''}`);
+  },
+  getById: (id) => request(`/projects/${id}/`),
+  create: (data) => request('/projects/', { method: 'POST', body: JSON.stringify(data) }),
+  update: (id, data) => request(`/projects/${id}/`, { method: 'PUT', body: JSON.stringify(data) }),
+  patch: (id, data) => request(`/projects/${id}/`, { method: 'PATCH', body: JSON.stringify(data) }),
+  delete: (id) => request(`/projects/${id}/`, { method: 'DELETE' }),
+  toggleVisibility: (id) => request(`/projects/${id}/toggle_visibility/`, { method: 'POST' }),
+};
 
-export async function fetchExperiences(websiteSlug) {
-  try {
-    const url = websiteSlug ? `${API_BASE_URL}/experiences/?website=${websiteSlug}` : `${API_BASE_URL}/experiences/`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('Failed to fetch experiences');
-    const data = await res.json();
-    return data.results || data;
-  } catch (err) {
-    console.warn('API Offline, using local state for experiences:', err.message);
-    return null;
-  }
-}
+// 3. Blogs API
+export const blogsApi = {
+  getAll: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return request(`/blogs/${query ? `?${query}` : ''}`);
+  },
+  getById: (id) => request(`/blogs/${id}/`),
+  create: (data) => request('/blogs/', { method: 'POST', body: JSON.stringify(data) }),
+  update: (id, data) => request(`/blogs/${id}/`, { method: 'PUT', body: JSON.stringify(data) }),
+  delete: (id) => request(`/blogs/${id}/`, { method: 'DELETE' }),
+  toggleVisibility: (id) => request(`/blogs/${id}/toggle_visibility/`, { method: 'POST' }),
+};
 
-export async function fetchSkills(websiteSlug) {
-  try {
-    const url = websiteSlug ? `${API_BASE_URL}/skills/?website=${websiteSlug}` : `${API_BASE_URL}/skills/`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('Failed to fetch skills');
-    const data = await res.json();
-    return data.results || data;
-  } catch (err) {
-    console.warn('API Offline, using local state for skills:', err.message);
-    return null;
-  }
-}
+// 4. Experiences API
+export const experiencesApi = {
+  getAll: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return request(`/experiences/${query ? `?${query}` : ''}`);
+  },
+  getById: (id) => request(`/experiences/${id}/`),
+  create: (data) => request('/experiences/', { method: 'POST', body: JSON.stringify(data) }),
+  update: (id, data) => request(`/experiences/${id}/`, { method: 'PUT', body: JSON.stringify(data) }),
+  delete: (id) => request(`/experiences/${id}/`, { method: 'DELETE' }),
+  toggleVisibility: (id) => request(`/experiences/${id}/toggle_visibility/`, { method: 'POST' }),
+};
 
-export async function fetchContacts(websiteSlug) {
-  try {
-    const url = websiteSlug ? `${API_BASE_URL}/contacts/?website=${websiteSlug}` : `${API_BASE_URL}/contacts/`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('Failed to fetch contacts');
-    const data = await res.json();
-    return data.results || data;
-  } catch (err) {
-    console.warn('API Offline, using local state for contacts:', err.message);
-    return null;
-  }
-}
+// 5. Skills API
+export const skillsApi = {
+  getAll: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return request(`/skills/${query ? `?${query}` : ''}`);
+  },
+  getById: (id) => request(`/skills/${id}/`),
+  create: (data) => request('/skills/', { method: 'POST', body: JSON.stringify(data) }),
+  update: (id, data) => request(`/skills/${id}/`, { method: 'PUT', body: JSON.stringify(data) }),
+  delete: (id) => request(`/skills/${id}/`, { method: 'DELETE' }),
+  toggleVisibility: (id) => request(`/skills/${id}/toggle_visibility/`, { method: 'POST' }),
+};
+
+// 6. FAQs API
+export const faqsApi = {
+  getAll: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return request(`/faqs/${query ? `?${query}` : ''}`);
+  },
+  getById: (id) => request(`/faqs/${id}/`),
+  create: (data) => request('/faqs/', { method: 'POST', body: JSON.stringify(data) }),
+  update: (id, data) => request(`/faqs/${id}/`, { method: 'PUT', body: JSON.stringify(data) }),
+  delete: (id) => request(`/faqs/${id}/`, { method: 'DELETE' }),
+  toggleVisibility: (id) => request(`/faqs/${id}/toggle_visibility/`, { method: 'POST' }),
+};
+
+// 7. Contact Inquiries & SMTP Relay API
+export const contactsApi = {
+  getAll: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return request(`/contacts/${query ? `?${query}` : ''}`);
+  },
+  getById: (id) => request(`/contacts/${id}/`),
+  create: (data) => request('/contacts/', { method: 'POST', body: JSON.stringify(data) }),
+  reply: (id, replySubject, replyText) => request(`/contacts/${id}/reply/`, {
+    method: 'POST',
+    body: JSON.stringify({ reply_subject: replySubject, reply_text: replyText }),
+  }),
+  toggleStar: (id) => request(`/contacts/${id}/toggle_star/`, { method: 'POST' }),
+  markRead: (id) => request(`/contacts/${id}/mark_read/`, { method: 'POST' }),
+  delete: (id) => request(`/contacts/${id}/`, { method: 'DELETE' }),
+};
+
+// 8. Portfolio Profile Details API
+export const profilesApi = {
+  getByWebsite: (websiteSlug) => request(`/profiles/?website=${websiteSlug}`),
+  update: (id, data) => request(`/profiles/${id}/`, { method: 'PUT', body: JSON.stringify(data) }),
+  patch: (id, data) => request(`/profiles/${id}/`, { method: 'PATCH', body: JSON.stringify(data) }),
+};
+
+// 9. Dashboard Analytics API
+export const dashboardApi = {
+  getStats: (websiteSlug) => request(`/dashboard/stats/${websiteSlug ? `?website=${websiteSlug}` : ''}`),
+  getActivities: (websiteSlug) => request(`/dashboard/activities/${websiteSlug ? `?website=${websiteSlug}` : ''}`),
+  getHeatmap: () => request('/dashboard/heatmap/'),
+};
+
+export default {
+  websites: websitesApi,
+  projects: projectsApi,
+  blogs: blogsApi,
+  experiences: experiencesApi,
+  skills: skillsApi,
+  faqs: faqsApi,
+  contacts: contactsApi,
+  profiles: profilesApi,
+  dashboard: dashboardApi,
+};

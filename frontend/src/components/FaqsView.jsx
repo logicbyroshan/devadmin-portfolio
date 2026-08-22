@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   HelpCircle, 
   Plus, 
@@ -10,6 +10,7 @@ import {
   ChevronDown, 
   Tag
 } from 'lucide-react';
+import { faqsApi } from '../services/api';
 
 export default function FaqsView({ onNavigate, activeWebsite }) {
   const [viewMode, setViewMode] = useState('LIST'); // 'LIST' | 'EDITOR'
@@ -76,6 +77,31 @@ export default function FaqsView({ onNavigate, activeWebsite }) {
     return faq.category === selectedCategory;
   });
 
+  // Fetch FAQs from Django REST Framework API with multi-tenant filtering
+  useEffect(() => {
+    let isMounted = true;
+    const fetchFaqs = async () => {
+      try {
+        const siteSlug = activeWebsite?.slug || 'dev-meet';
+        const data = await faqsApi.getAll({ website: siteSlug });
+        const list = Array.isArray(data) ? data : (data.results || []);
+        if (isMounted && list.length > 0) {
+          setFaqs(list.map(f => ({
+            id: f.id,
+            question: f.question,
+            answer: f.answer,
+            category: f.category || 'General',
+            visible: f.visible !== false
+          })));
+        }
+      } catch {
+        // Fallback maintained
+      }
+    };
+    fetchFaqs();
+    return () => { isMounted = false; };
+  }, [activeWebsite]);
+
   // Open separate Editor Page for Adding
   const handleOpenAddPage = () => {
     setEditingId(null);
@@ -105,21 +131,40 @@ export default function FaqsView({ onNavigate, activeWebsite }) {
   };
 
   // Save FAQ Form (Add or Edit)
-  const handleSaveForm = (e) => {
+  const handleSaveForm = async (e) => {
     e?.preventDefault();
     if (!formData.question.trim() || !formData.answer.trim()) {
       alert('Please enter both Question and Answer.');
       return;
     }
 
+    const payload = {
+      question: formData.question,
+      answer: formData.answer,
+      category: formData.category,
+      visible: formData.visible,
+      website: activeWebsite?.id || 1
+    };
+
     if (editingId) {
       setFaqs(faqs.map(f => f.id === editingId ? { ...formData, id: editingId } : f));
+      try {
+        await faqsApi.update(editingId, payload);
+      } catch {
+        // Fallback
+      }
     } else {
-      const newEntry = {
-        ...formData,
-        id: Date.now()
-      };
+      const tempId = Date.now();
+      const newEntry = { ...formData, id: tempId };
       setFaqs([newEntry, ...faqs]);
+      try {
+        const created = await faqsApi.create(payload);
+        if (created && created.id) {
+          setFaqs(prev => prev.map(f => f.id === tempId ? { ...f, id: created.id } : f));
+        }
+      } catch {
+        // Fallback
+      }
     }
 
     setViewMode('LIST');
@@ -128,15 +173,25 @@ export default function FaqsView({ onNavigate, activeWebsite }) {
   };
 
   // Delete FAQ
-  const handleDelete = (id) => {
-    if (confirm('Delete this FAQ entry?')) {
+  const handleDelete = async (id) => {
+    if (confirm('Delete this FAQ record?')) {
       setFaqs(faqs.filter(f => f.id !== id));
+      try {
+        await faqsApi.delete(id);
+      } catch {
+        // Fallback
+      }
     }
   };
 
-  // Toggle visibility directly on card
-  const handleToggleVisible = (id) => {
+  // Toggle visibility directly
+  const handleToggleVisible = async (id) => {
     setFaqs(faqs.map(f => f.id === id ? { ...f, visible: !f.visible } : f));
+    try {
+      await faqsApi.toggleVisibility(id);
+    } catch {
+      // Fallback
+    }
   };
 
   // ==========================================

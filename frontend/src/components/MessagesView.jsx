@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Mail, 
   Star, 
@@ -11,14 +11,15 @@ import {
   X, 
   Search, 
   Check, 
-  ArrowRight,
-  MessageSquare,
-  Sparkles,
-  Inbox,
-  User,
-  ExternalLink,
-  ShieldCheck
+  ArrowRight, 
+  MessageSquare, 
+  Sparkles, 
+  Inbox, 
+  User, 
+  ExternalLink, 
+  ShieldCheck 
 } from 'lucide-react';
+import { contactsApi } from '../services/api';
 
 export default function MessagesView({ onNavigate, activeWebsite }) {
   const [filter, setFilter] = useState('ALL');
@@ -79,6 +80,40 @@ export default function MessagesView({ onNavigate, activeWebsite }) {
     }
   ]);
 
+  // Fetch contact inquiries from Django REST Framework API with multi-tenant filtering
+  useEffect(() => {
+    let isMounted = true;
+    const fetchContacts = async () => {
+      try {
+        const siteSlug = activeWebsite?.slug || 'dev-meet';
+        const data = await contactsApi.getAll({ website: siteSlug });
+        const list = Array.isArray(data) ? data : (data.results || []);
+        if (isMounted && list.length > 0) {
+          const mapped = list.map(c => ({
+            id: c.id,
+            sender: c.name,
+            email: c.email,
+            subject: c.subject || 'General Inquiry',
+            body: c.message,
+            tag: c.tag || 'Inquiry',
+            read: c.is_read,
+            starred: c.starred,
+            date: c.created_at ? c.created_at.split('T')[0] : '2025-06-20',
+            time: 'Recently'
+          }));
+          setMessages(mapped);
+          if (mapped.length > 0) {
+            setSelectedId(mapped[0].id);
+          }
+        }
+      } catch {
+        // Fallback maintained
+      }
+    };
+    fetchContacts();
+    return () => { isMounted = false; };
+  }, [activeWebsite]);
+
   const filteredMessages = messages.filter(m => {
     const matchesSearch = 
       m.sender.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -97,34 +132,60 @@ export default function MessagesView({ onNavigate, activeWebsite }) {
 
   const selectedMessage = messages.find(m => m.id === selectedId) || filteredMessages[0] || messages[0];
 
-  const toggleStar = (id, e) => {
+  const toggleStar = async (id, e) => {
     e?.stopPropagation();
     setMessages(messages.map(m => m.id === id ? { ...m, starred: !m.starred } : m));
+    try {
+      await contactsApi.toggleStar(id);
+    } catch {
+      // Fallback
+    }
   };
 
-  const toggleReadStatus = (id) => {
+  const toggleReadStatus = async (id) => {
     setMessages(messages.map(m => m.id === id ? { ...m, read: !m.read } : m));
+    try {
+      await contactsApi.markRead(id);
+    } catch {
+      // Fallback
+    }
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (confirm('Delete this message conversation?')) {
       const remaining = messages.filter(m => m.id !== id);
       setMessages(remaining);
       if (selectedId === id && remaining.length > 0) {
         setSelectedId(remaining[0].id);
       }
+      try {
+        await contactsApi.delete(id);
+      } catch {
+        // Fallback
+      }
     }
   };
 
-  const handleSendReply = (e) => {
+  const handleSendReply = async (e) => {
     e?.preventDefault();
     if (!replyText.trim()) {
       alert('Please enter an email reply message.');
       return;
     }
+    const currentSubject = replySubject || `Re: ${selectedMessage?.subject || 'Inquiry'}`;
+    const currentText = replyText;
     setIsSentToast(true);
     setReplyText('');
     setReplySubject('');
+
+    try {
+      if (selectedMessage?.id) {
+        await contactsApi.reply(selectedMessage.id, currentSubject, currentText);
+      }
+    } catch {
+      // Fallback simulation
+    }
+
     setTimeout(() => {
       setIsSentToast(false);
     }, 3500);

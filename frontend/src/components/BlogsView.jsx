@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   FileText, 
   Plus, 
@@ -13,6 +13,7 @@ import {
   ChevronDown
 } from 'lucide-react';
 import RichContentBuilder from './RichContentBuilder';
+import { blogsApi } from '../services/api';
 
 export default function BlogsView({ onNavigate, activeWebsite }) {
   const [viewMode, setViewMode] = useState('LIST'); // 'LIST' | 'EDITOR'
@@ -176,6 +177,37 @@ points:
     return b.category === selectedCategory;
   });
 
+  // Fetch blogs from Django REST Framework API with multi-tenant filtering
+  useEffect(() => {
+    let isMounted = true;
+    const fetchBlogs = async () => {
+      try {
+        const siteSlug = activeWebsite?.slug || 'dev-meet';
+        const data = await blogsApi.getAll({ website: siteSlug });
+        const list = Array.isArray(data) ? data : (data.results || []);
+        if (isMounted && list.length > 0) {
+          setBlogs(list.map(b => ({
+            id: b.id,
+            title: b.title,
+            slug: b.slug || '',
+            category: b.category || 'Engineering',
+            status: b.status,
+            date: b.date || (b.created_at ? b.created_at.split('T')[0] : 'Recently'),
+            readTime: b.read_time || b.readTime || '5 min read',
+            views: b.views_count || b.views || 0,
+            summary: b.summary || '',
+            content: b.content || '',
+            visible: b.visible !== false
+          })));
+        }
+      } catch {
+        // Fallback maintained
+      }
+    };
+    fetchBlogs();
+    return () => { isMounted = false; };
+  }, [activeWebsite]);
+
   // Open separate Editor Page for Adding
   const handleOpenAddPage = () => {
     setEditingId(null);
@@ -234,21 +266,45 @@ data:
   };
 
   // Save Blog (Add or Edit)
-  const handleSaveForm = (e) => {
+  const handleSaveForm = async (e) => {
     e?.preventDefault();
     if (!formData.title.trim()) {
       alert('Please enter an Article Title.');
       return;
     }
 
+    const payload = {
+      title: formData.title,
+      slug: formData.slug || formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || `blog-${Date.now()}`,
+      category: formData.category,
+      status: formData.status,
+      date: formData.date,
+      read_time: formData.readTime,
+      summary: formData.summary,
+      content: formData.content,
+      visible: formData.visible,
+      website: activeWebsite?.id || 1
+    };
+
     if (editingId) {
       setBlogs(blogs.map(b => b.id === editingId ? { ...formData, id: editingId } : b));
+      try {
+        await blogsApi.update(editingId, payload);
+      } catch {
+        // Fallback
+      }
     } else {
-      const newEntry = {
-        ...formData,
-        id: Date.now()
-      };
+      const tempId = Date.now();
+      const newEntry = { ...formData, id: tempId };
       setBlogs([newEntry, ...blogs]);
+      try {
+        const created = await blogsApi.create(payload);
+        if (created && created.id) {
+          setBlogs(prev => prev.map(b => b.id === tempId ? { ...b, id: created.id } : b));
+        }
+      } catch {
+        // Fallback
+      }
     }
 
     setViewMode('LIST');
@@ -257,15 +313,25 @@ data:
   };
 
   // Delete blog
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (confirm('Delete this blog article?')) {
       setBlogs(blogs.filter(b => b.id !== id));
+      try {
+        await blogsApi.delete(id);
+      } catch {
+        // Fallback
+      }
     }
   };
 
   // Toggle visibility directly on card
-  const handleToggleVisible = (id) => {
+  const handleToggleVisible = async (id) => {
     setBlogs(blogs.map(b => b.id === id ? { ...b, visible: !b.visible } : b));
+    try {
+      await blogsApi.toggleVisibility(id);
+    } catch {
+      // Fallback
+    }
   };
 
   const handleTitleChange = (val) => {

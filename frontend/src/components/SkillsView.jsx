@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Cpu, 
   Plus, 
@@ -15,6 +15,7 @@ import {
   ChevronDown,
   Tag
 } from 'lucide-react';
+import { skillsApi } from '../services/api';
 
 export default function SkillsView({ onNavigate, activeWebsite }) {
   const [viewMode, setViewMode] = useState('LIST'); // 'LIST' | 'EDITOR'
@@ -47,13 +48,40 @@ export default function SkillsView({ onNavigate, activeWebsite }) {
     return s.category === selectedCategory;
   });
 
+  // Fetch skills from Django REST Framework API with multi-tenant filtering
+  useEffect(() => {
+    let isMounted = true;
+    const fetchSkills = async () => {
+      try {
+        const siteSlug = activeWebsite?.slug || 'dev-meet';
+        const data = await skillsApi.getAll({ website: siteSlug });
+        const list = Array.isArray(data) ? data : (data.results || []);
+        if (isMounted && list.length > 0) {
+          setSkills(list.map(s => ({
+            id: s.id,
+            name: s.name,
+            category: s.category || 'Frontend',
+            level: s.level || 85,
+            icon: s.icon_name || 'code',
+            years: '3+ Years',
+            visible: s.visible !== false
+          })));
+        }
+      } catch {
+        // Fallback maintained
+      }
+    };
+    fetchSkills();
+    return () => { isMounted = false; };
+  }, [activeWebsite]);
+
   // Open separate Editor Page for Adding
   const handleOpenAddPage = () => {
     setEditingId(null);
     setFormData({
       name: '',
       category: 'Frontend',
-      level: 85,
+      level: 80,
       icon: 'code',
       years: '2+ Years',
       visible: true
@@ -78,21 +106,41 @@ export default function SkillsView({ onNavigate, activeWebsite }) {
   };
 
   // Save Form (Handles both Add and Edit on the separate page)
-  const handleSaveForm = (e) => {
+  const handleSaveForm = async (e) => {
     e?.preventDefault();
     if (!formData.name.trim()) {
       alert('Please enter a Skill Name.');
       return;
     }
 
+    const payload = {
+      name: formData.name,
+      category: formData.category,
+      level: formData.level,
+      icon_name: formData.icon,
+      visible: formData.visible,
+      website: activeWebsite?.id || 1
+    };
+
     if (editingId) {
       setSkills(skills.map(s => s.id === editingId ? { ...formData, id: editingId } : s));
+      try {
+        await skillsApi.update(editingId, payload);
+      } catch {
+        // Fallback
+      }
     } else {
-      const newEntry = {
-        ...formData,
-        id: Date.now()
-      };
+      const tempId = Date.now();
+      const newEntry = { ...formData, id: tempId };
       setSkills([...skills, newEntry]);
+      try {
+        const created = await skillsApi.create(payload);
+        if (created && created.id) {
+          setSkills(prev => prev.map(s => s.id === tempId ? { ...s, id: created.id } : s));
+        }
+      } catch {
+        // Fallback
+      }
     }
 
     setViewMode('LIST');
@@ -101,15 +149,25 @@ export default function SkillsView({ onNavigate, activeWebsite }) {
   };
 
   // Delete skill
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (confirm('Delete this skill record?')) {
       setSkills(skills.filter(s => s.id !== id));
+      try {
+        await skillsApi.delete(id);
+      } catch {
+        // Fallback
+      }
     }
   };
 
   // Toggle visibility directly
-  const handleToggleVisible = (id) => {
+  const handleToggleVisible = async (id) => {
     setSkills(skills.map(s => s.id === id ? { ...s, visible: !s.visible } : s));
+    try {
+      await skillsApi.toggleVisibility(id);
+    } catch {
+      // Fallback
+    }
   };
 
   const getSkillIcon = (iconName) => {

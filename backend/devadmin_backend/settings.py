@@ -27,8 +27,10 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
+    'drf_spectacular',
     
     # DevAdmin Domain Apps
+    'apps.common',
     'apps.websites',
     'apps.blogs',
     'apps.projects',
@@ -126,8 +128,18 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10
+}
+
+# Spectacular OpenAPI Documentation Settings
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'DevAdmin Multi-Site Management REST API',
+    'DESCRIPTION': 'High-performance multi-tenant API for managing developer portfolios (DevMeet, DevMitra, DevMate), projects, technical blogs, career experiences, skills, FAQs, contact inquiries, and analytics.',
+    'VERSION': '2.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True,
 }
 
 # SimpleJWT Settings

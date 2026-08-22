@@ -1,33 +1,13 @@
-from rest_framework import viewsets, permissions, status
-from rest_framework.decorators import action
-from rest_framework.response import Response
+from rest_framework import viewsets, permissions
+from apps.common.mixins import MultiTenantViewSetMixin
 from .models import Skill
 from .serializers import SkillSerializer
 
-class SkillViewSet(viewsets.ModelViewSet):
+class SkillViewSet(MultiTenantViewSetMixin, viewsets.ModelViewSet):
+    """
+    Technical Skills & Proficiency API.
+    Supports multi-tenant scoping, proficiency percentage, and visibility toggling.
+    """
     queryset = Skill.objects.select_related('website').all()
     serializer_class = SkillSerializer
     permission_classes = [permissions.AllowAny]
-
-    def get_queryset(self):
-        queryset = Skill.objects.select_related('website').all()
-        website_slug = self.request.query_params.get('website', None)
-        if website_slug:
-            queryset = queryset.filter(website__slug=website_slug)
-            
-        category_param = self.request.query_params.get('category', None)
-        if category_param and category_param.upper() != 'ALL':
-            queryset = queryset.filter(category__iexact=category_param)
-            
-        visible_param = self.request.query_params.get('visible', None)
-        if visible_param is not None:
-            queryset = queryset.filter(visible=(visible_param.lower() == 'true'))
-            
-        return queryset
-
-    @action(detail=True, methods=['post'])
-    def toggle_visibility(self, request, pk=None):
-        skill = self.get_object()
-        skill.visible = not skill.visible
-        skill.save(update_fields=['visible', 'updated_at'])
-        return Response({'id': skill.id, 'visible': skill.visible, 'status': 'success'}, status=status.HTTP_200_OK)

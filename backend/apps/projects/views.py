@@ -1,37 +1,13 @@
-from rest_framework import viewsets, permissions, status
-from rest_framework.decorators import action
-from rest_framework.response import Response
+from rest_framework import viewsets, permissions
+from apps.common.mixins import MultiTenantViewSetMixin
 from .models import Project
 from .serializers import ProjectSerializer
 
-class ProjectViewSet(viewsets.ModelViewSet):
+class ProjectViewSet(MultiTenantViewSetMixin, viewsets.ModelViewSet):
+    """
+    Projects Management API.
+    Supports multi-tenant scoping, category filtering, search, and visibility toggling.
+    """
     queryset = Project.objects.select_related('website').all()
     serializer_class = ProjectSerializer
-    permission_classes = [permissions.AllowAny] # Open for local dev / API client
-
-    def get_queryset(self):
-        queryset = Project.objects.select_related('website').all()
-        website_slug = self.request.query_params.get('website', None)
-        if website_slug:
-            queryset = queryset.filter(website__slug=website_slug)
-        
-        category_param = self.request.query_params.get('category', None)
-        if category_param and category_param.upper() != 'ALL':
-            queryset = queryset.filter(category__iexact=category_param)
-            
-        status_param = self.request.query_params.get('status', None)
-        if status_param:
-            queryset = queryset.filter(status=status_param.upper())
-            
-        visible_param = self.request.query_params.get('visible', None)
-        if visible_param is not None:
-            queryset = queryset.filter(visible=(visible_param.lower() == 'true'))
-            
-        return queryset
-
-    @action(detail=True, methods=['post'])
-    def toggle_visibility(self, request, pk=None):
-        project = self.get_object()
-        project.visible = not project.visible
-        project.save(update_fields=['visible', 'updated_at'])
-        return Response({'id': project.id, 'visible': project.visible, 'status': 'success'}, status=status.HTTP_200_OK)
+    permission_classes = [permissions.AllowAny]

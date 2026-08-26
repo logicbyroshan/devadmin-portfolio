@@ -53,7 +53,7 @@ export default function SkillsView({ onNavigate, activeWebsite }) {
     let isMounted = true;
     const fetchSkills = async () => {
       try {
-        const siteSlug = activeWebsite?.slug || 'dev-meet';
+        const siteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-meet';
         const data = await skillsApi.getAll({ website: siteSlug });
         const list = Array.isArray(data) ? data : (data.results || []);
         if (isMounted && list.length > 0) {
@@ -113,13 +113,14 @@ export default function SkillsView({ onNavigate, activeWebsite }) {
       return;
     }
 
+    const currentSiteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-meet';
     const payload = {
       name: formData.name,
       category: formData.category,
       level: formData.level,
       icon_name: formData.icon,
       visible: formData.visible,
-      website: activeWebsite?.id || 1
+      website: currentSiteSlug
     };
 
     if (editingId) {
@@ -231,7 +232,7 @@ export default function SkillsView({ onNavigate, activeWebsite }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
                 <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2">
-                  Skill / Technology Name <span className="text-blue-400">*</span>
+                  Skill / Technology Name <span className={activeWebsite?.accentText || "text-blue-400"}>*</span>
                 </label>
                 <input
                   type="text"
@@ -240,7 +241,7 @@ export default function SkillsView({ onNavigate, activeWebsite }) {
                   value={formData.name}
                   onChange={e => setFormData({ ...formData, name: e.target.value })}
                   placeholder="e.g. React 18, PostgreSQL, Kubernetes"
-                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 transition-colors font-bold"
+                  className="w-full px-4 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 transition-all font-bold"
                 />
               </div>
 
@@ -251,7 +252,7 @@ export default function SkillsView({ onNavigate, activeWebsite }) {
                 <select
                   value={formData.category}
                   onChange={e => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
+                  className="w-full px-4 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-sm text-white focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 transition-all"
                 >
                   <option value="Frontend">Frontend Development</option>
                   <option value="Backend">Backend & APIs</option>
@@ -268,7 +269,7 @@ export default function SkillsView({ onNavigate, activeWebsite }) {
                   <label className="text-xs font-bold text-neutral-300 uppercase tracking-wider">
                     Proficiency Level ({formData.level}%)
                   </label>
-                  <span className="text-sm font-bold text-blue-400">{formData.level}%</span>
+                  <span className={`text-sm font-bold ${activeWebsite?.accentText || 'text-blue-400'}`}>{formData.level}%</span>
                 </div>
                 <input
                   type="range"
@@ -289,7 +290,7 @@ export default function SkillsView({ onNavigate, activeWebsite }) {
                   value={formData.years}
                   onChange={e => setFormData({ ...formData, years: e.target.value })}
                   placeholder="e.g. 4+ Years"
-                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 transition-colors"
+                  className="w-full px-4 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 transition-all"
                 />
               </div>
             </div>

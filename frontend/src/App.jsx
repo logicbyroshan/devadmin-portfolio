@@ -13,15 +13,16 @@ import SettingsView from './components/SettingsView';
 import LogoutModal from './components/LogoutModal';
 import LoginView from './components/LoginView';
 import SignupView from './components/SignupView';
-import { AuthProvider } from './context/AuthContext';
+import { useAuth } from './context/AuthContext';
 import AuthModal from './components/AuthModal';
 
 export const WEBSITES = [
   { 
     id: 'dev-meet', 
+    slug: 'dev-meet',
     name: 'DevMeet', 
     badge: 'DevMeet', 
-    tag: 'Developer Meetings & Calls', 
+    tag: 'Multi-Peer Video Collaboration & WebRTC Engine', 
     primaryColor: 'blue',
     accentText: 'text-blue-400',
     accentBg: 'bg-blue-500/10',
@@ -39,51 +40,54 @@ export const WEBSITES = [
   },
   { 
     id: 'dev-mitra', 
+    slug: 'dev-mitra',
     name: 'DevMitra', 
     badge: 'DevMitra', 
-    tag: 'Peer Support & Community Hub', 
-    primaryColor: 'blue',
-    accentText: 'text-blue-400',
-    accentBg: 'bg-blue-500/10',
-    accentBorder: 'border-blue-500/30',
-    badgeStyle: 'bg-blue-500/15 text-blue-400 border-blue-500/30',
-    gradient: 'from-blue-600 to-indigo-600',
-    glow: 'shadow-blue-500/20',
-    dotColor: 'bg-blue-400',
+    tag: 'AI Peer Pairing & Mentorship Engine', 
+    primaryColor: 'sky',
+    accentText: 'text-sky-400',
+    accentBg: 'bg-sky-500/10',
+    accentBorder: 'border-sky-500/30',
+    badgeStyle: 'bg-sky-500/15 text-sky-400 border-sky-500/30',
+    gradient: 'from-sky-600 to-blue-600',
+    glow: 'shadow-sky-500/20',
+    dotColor: 'bg-sky-400',
     heatmapColors: {
-      4: 'bg-blue-400 shadow-sm shadow-blue-400/50',
-      3: 'bg-blue-500/80',
-      2: 'bg-blue-600/50',
-      1: 'bg-blue-950/60 border border-blue-500/20',
+      4: 'bg-sky-400 shadow-sm shadow-sky-400/50',
+      3: 'bg-sky-500/80',
+      2: 'bg-sky-600/50',
+      1: 'bg-sky-950/60 border border-sky-500/20',
     }
   },
   { 
     id: 'dev-mate', 
+    slug: 'dev-mate',
     name: 'DevMate', 
     badge: 'DevMate', 
-    tag: 'Pair Programming & Matcher', 
-    primaryColor: 'blue',
-    accentText: 'text-blue-400',
-    accentBg: 'bg-blue-500/10',
-    accentBorder: 'border-blue-500/30',
-    badgeStyle: 'bg-blue-500/15 text-blue-400 border-blue-500/30',
-    gradient: 'from-blue-600 to-indigo-600',
-    glow: 'shadow-blue-500/20',
-    dotColor: 'bg-blue-400',
+    tag: 'In-Browser Cloud Sandbox & Code IDE', 
+    primaryColor: 'violet',
+    accentText: 'text-violet-400',
+    accentBg: 'bg-violet-500/10',
+    accentBorder: 'border-violet-500/30',
+    badgeStyle: 'bg-violet-500/15 text-violet-400 border-violet-500/30',
+    gradient: 'from-violet-600 to-indigo-600',
+    glow: 'shadow-violet-500/20',
+    dotColor: 'bg-violet-400',
     heatmapColors: {
-      4: 'bg-blue-400 shadow-sm shadow-blue-400/50',
-      3: 'bg-blue-500/80',
-      2: 'bg-blue-600/50',
-      1: 'bg-blue-950/60 border border-blue-500/20',
+      4: 'bg-violet-400 shadow-sm shadow-violet-400/50',
+      3: 'bg-violet-500/80',
+      2: 'bg-violet-600/50',
+      1: 'bg-violet-950/60 border border-violet-500/20',
     }
   },
 ];
 
 export default function App() {
+  const { isAuthenticated, logout } = useAuth();
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [activeWebsite, setActiveWebsite] = useState('dev-meet');
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [authState, setAuthState] = useState('AUTHENTICATED'); // 'AUTHENTICATED' | 'LOGIN' | 'SIGNUP'
+  const [authView, setAuthView] = useState(null); // null | 'LOGIN' | 'SIGNUP'
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   const handleNavigate = (page) => {
@@ -95,135 +99,133 @@ export default function App() {
     }
   };
 
-
   const handleConfirmLogout = () => {
+    logout();
     setShowLogoutModal(false);
-    setAuthState('LOGIN');
+    setAuthView('LOGIN');
   };
 
-  if (authState === 'LOGIN') {
+  if (authView === 'LOGIN') {
     return (
       <LoginView
         onLoginSuccess={() => {
-          setAuthState('AUTHENTICATED');
+          setAuthView(null);
           setCurrentPage('dashboard');
         }}
-        onSwitchToSignup={() => setAuthState('SIGNUP')}
+        onSwitchToSignup={() => setAuthView('SIGNUP')}
       />
     );
   }
 
-  if (authState === 'SIGNUP') {
+  if (authView === 'SIGNUP') {
     return (
       <SignupView
         onSignupSuccess={() => {
-          setAuthState('AUTHENTICATED');
+          setAuthView(null);
           setCurrentPage('dashboard');
         }}
-        onSwitchToLogin={() => setAuthState('LOGIN')}
+        onSwitchToLogin={() => setAuthView('LOGIN')}
       />
     );
   }
 
-  const selectedSite = WEBSITES.find(w => w.id === activeWebsite) || WEBSITES[0];
+  const selectedSite = WEBSITES.find(w => w.id === activeWebsite || w.slug === activeWebsite) || WEBSITES[0];
 
   return (
-    <AuthProvider>
-      <div className="min-h-screen bg-black text-slate-100 flex flex-col selection:bg-blue-500/30 selection:text-blue-200 overflow-x-hidden">
-        {/* Container wrapper locking layout above 1920px */}
-        <div className="w-full max-w-[1920px] mx-auto min-h-screen flex flex-col relative">
-          {/* Fixed Navbar (Full-Width Header) */}
-          <Navbar 
+    <div className="min-h-screen bg-black text-slate-100 flex flex-col selection:bg-blue-500/30 selection:text-blue-200 overflow-x-hidden">
+      {/* Container wrapper locking layout above 1920px */}
+      <div className="w-full max-w-[1920px] mx-auto min-h-screen flex flex-col relative">
+        {/* Fixed Navbar (Full-Width Header) */}
+        <Navbar 
+          onNavigate={handleNavigate} 
+          currentPage={currentPage}
+          activeWebsite={selectedSite}
+          onSelectWebsite={(site) => setActiveWebsite(typeof site === 'object' ? (site.slug || site.id) : site)}
+          isMobileSidebarOpen={isMobileSidebarOpen}
+          onToggleMobileSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
+        />
+
+        {/* Main Body Container */}
+        <div className="flex flex-1 pt-16">
+          {/* Sidebar */}
+          <Sidebar 
+            currentPage={currentPage} 
             onNavigate={handleNavigate} 
-            currentPage={currentPage}
             activeWebsite={selectedSite}
-            onSelectWebsite={(site) => setActiveWebsite(typeof site === 'object' ? site.id : site)}
-            isMobileSidebarOpen={isMobileSidebarOpen}
-            onToggleMobileSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
+            isOpen={isMobileSidebarOpen}
+            onClose={() => setIsMobileSidebarOpen(false)}
           />
 
-          {/* Main Body Container */}
-          <div className="flex flex-1 pt-16">
-            {/* Sidebar */}
-            <Sidebar 
-              currentPage={currentPage} 
-              onNavigate={handleNavigate} 
-              activeWebsite={selectedSite}
-              isOpen={isMobileSidebarOpen}
-              onClose={() => setIsMobileSidebarOpen(false)}
-            />
-
-            {/* Main View Area (w-48 sidebar offset) */}
-            <main className="flex-1 ml-0 md:ml-48 p-3.5 sm:p-5 min-h-[calc(100vh-4rem)] w-full overflow-x-hidden">
-              {currentPage === 'dashboard' && (
-                <DashboardView 
-                  onNavigate={handleNavigate} 
-                  activeWebsite={selectedSite}
-                />
-              )}
-              {currentPage === 'manage-experiences' && (
-                <ExperiencesView 
-                  onNavigate={handleNavigate} 
-                  activeWebsite={selectedSite} 
-                />
-              )}
-              {currentPage === 'manage-skills' && (
-                <SkillsView 
-                  onNavigate={handleNavigate} 
-                  activeWebsite={selectedSite} 
-                />
-              )}
-              {currentPage === 'manage-projects' && (
-                <ProjectsView 
-                  onNavigate={handleNavigate} 
-                  activeWebsite={selectedSite} 
-                />
-              )}
-              {currentPage === 'manage-blogs' && (
-                <BlogsView 
-                  onNavigate={handleNavigate} 
-                  activeWebsite={selectedSite} 
-                />
-              )}
-              {currentPage === 'manage-contacts' && (
-                <MessagesView 
-                  onNavigate={handleNavigate} 
-                  activeWebsite={selectedSite} 
-                />
-              )}
-              {currentPage === 'manage-portfolio' && (
-                <DetailsView 
-                  onNavigate={handleNavigate} 
-                  activeWebsite={selectedSite} 
-                />
-              )}
-              {currentPage === 'manage-faq' && (
-                <FaqsView 
-                  onNavigate={handleNavigate} 
-                  activeWebsite={selectedSite} 
-                />
-              )}
-              {currentPage === 'manage-settings' && (
-                <SettingsView 
-                  onNavigate={handleNavigate} 
-                  activeWebsite={selectedSite} 
-                />
-              )}
-            </main>
-          </div>
+          {/* Main View Area (w-48 sidebar offset) */}
+          <main className="flex-1 ml-0 md:ml-48 p-3.5 sm:p-5 min-h-[calc(100vh-4rem)] w-full overflow-x-hidden">
+            {currentPage === 'dashboard' && (
+              <DashboardView 
+                onNavigate={handleNavigate} 
+                activeWebsite={selectedSite}
+              />
+            )}
+            {currentPage === 'manage-experiences' && (
+              <ExperiencesView 
+                onNavigate={handleNavigate} 
+                activeWebsite={selectedSite} 
+              />
+            )}
+            {currentPage === 'manage-skills' && (
+              <SkillsView 
+                onNavigate={handleNavigate} 
+                activeWebsite={selectedSite} 
+              />
+            )}
+            {currentPage === 'manage-projects' && (
+              <ProjectsView 
+                onNavigate={handleNavigate} 
+                activeWebsite={selectedSite} 
+              />
+            )}
+            {currentPage === 'manage-blogs' && (
+              <BlogsView 
+                onNavigate={handleNavigate} 
+                activeWebsite={selectedSite} 
+              />
+            )}
+            {currentPage === 'manage-contacts' && (
+              <MessagesView 
+                onNavigate={handleNavigate} 
+                activeWebsite={selectedSite} 
+              />
+            )}
+            {currentPage === 'manage-portfolio' && (
+              <DetailsView 
+                onNavigate={handleNavigate} 
+                activeWebsite={selectedSite} 
+              />
+            )}
+            {currentPage === 'manage-faq' && (
+              <FaqsView 
+                onNavigate={handleNavigate} 
+                activeWebsite={selectedSite} 
+              />
+            )}
+            {currentPage === 'manage-settings' && (
+              <SettingsView 
+                onNavigate={handleNavigate} 
+                activeWebsite={selectedSite} 
+              />
+            )}
+          </main>
         </div>
-
-        {/* Global Authentication Modal */}
-        <AuthModal />
-
-        {/* Logout Confirmation Modal */}
-        {showLogoutModal && (
-          <LogoutModal
-            onCancel={() => setShowLogoutModal(false)}
-            onConfirmLogout={handleConfirmLogout}
-          />
-        )}
       </div>
-    </AuthProvider>
+
+      {/* Global Authentication Modal */}
+      <AuthModal />
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutModal && (
+        <LogoutModal
+          onCancel={() => setShowLogoutModal(false)}
+          onConfirmLogout={handleConfirmLogout}
+        />
+      )}
+    </div>
   );
 }

@@ -1,13 +1,13 @@
 /**
  * DevAdmin Centralized REST API Service Layer
  * Connects React UI to Django REST Framework backend with multi-tenant partitioning,
- * JWT authentication, parameter filtering, and graceful fallback.
+ * JWT authentication, automatic token refresh, parameter filtering, and error handling.
  */
 
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
-// Helper for HTTP requests
-async function request(endpoint, options = {}) {
+// Helper for HTTP requests with automatic JWT Bearer token attachment and 401 refresh
+async function request(endpoint, options = {}, isRetry = false) {
   const url = `${API_BASE_URL}${endpoint}`;
   const headers = {
     'Content-Type': 'application/json',
@@ -25,15 +25,38 @@ async function request(endpoint, options = {}) {
       headers,
     });
 
+    // Handle token expiration / 401 Unauthorized
+    if (response.status === 401 && !isRetry && !endpoint.includes('/auth/token/')) {
+      const refreshToken = localStorage.getItem('refresh_token');
+      if (refreshToken) {
+        try {
+          const refreshRes = await fetch(`${API_BASE_URL}/auth/token/refresh/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refresh: refreshToken }),
+          });
+          if (refreshRes.ok) {
+            const data = await refreshRes.json();
+            if (data.access) {
+              localStorage.setItem('access_token', data.access);
+              return request(endpoint, options, true);
+            }
+          }
+        } catch {
+          // Token refresh failed; proceed to error handling
+        }
+      }
+    }
+
     if (!response.ok) {
       const errData = await response.json().catch(() => ({}));
-      throw new Error(errData.detail || errData.error || `HTTP ${response.status}: ${response.statusText}`);
+      const errorMessage = errData.error || errData.detail || errData.message || (typeof errData === 'object' ? Object.entries(errData).map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(' ') : v}`).join(' | ') : null) || `HTTP ${response.status}: ${response.statusText}`;
+      throw new Error(errorMessage);
     }
 
     if (response.status === 204) return true;
     return await response.json();
   } catch (error) {
-    // Return null or throw for caller to handle
     console.warn(`[DevAdmin API] ${options.method || 'GET'} ${endpoint} failed:`, error.message);
     throw error;
   }
@@ -43,6 +66,8 @@ async function request(endpoint, options = {}) {
 export const websitesApi = {
   getAll: () => request('/websites/'),
   getBySlug: (slug) => request(`/websites/${slug}/`),
+  update: (slug, data) => request(`/websites/${slug}/`, { method: 'PUT', body: JSON.stringify(data) }),
+  patch: (slug, data) => request(`/websites/${slug}/`, { method: 'PATCH', body: JSON.stringify(data) }),
 };
 
 // 2. Projects API
@@ -68,6 +93,7 @@ export const blogsApi = {
   getById: (id) => request(`/blogs/${id}/`),
   create: (data) => request('/blogs/', { method: 'POST', body: JSON.stringify(data) }),
   update: (id, data) => request(`/blogs/${id}/`, { method: 'PUT', body: JSON.stringify(data) }),
+  patch: (id, data) => request(`/blogs/${id}/`, { method: 'PATCH', body: JSON.stringify(data) }),
   delete: (id) => request(`/blogs/${id}/`, { method: 'DELETE' }),
   toggleVisibility: (id) => request(`/blogs/${id}/toggle_visibility/`, { method: 'POST' }),
 };
@@ -81,6 +107,7 @@ export const experiencesApi = {
   getById: (id) => request(`/experiences/${id}/`),
   create: (data) => request('/experiences/', { method: 'POST', body: JSON.stringify(data) }),
   update: (id, data) => request(`/experiences/${id}/`, { method: 'PUT', body: JSON.stringify(data) }),
+  patch: (id, data) => request(`/experiences/${id}/`, { method: 'PATCH', body: JSON.stringify(data) }),
   delete: (id) => request(`/experiences/${id}/`, { method: 'DELETE' }),
   toggleVisibility: (id) => request(`/experiences/${id}/toggle_visibility/`, { method: 'POST' }),
 };
@@ -94,6 +121,7 @@ export const skillsApi = {
   getById: (id) => request(`/skills/${id}/`),
   create: (data) => request('/skills/', { method: 'POST', body: JSON.stringify(data) }),
   update: (id, data) => request(`/skills/${id}/`, { method: 'PUT', body: JSON.stringify(data) }),
+  patch: (id, data) => request(`/skills/${id}/`, { method: 'PATCH', body: JSON.stringify(data) }),
   delete: (id) => request(`/skills/${id}/`, { method: 'DELETE' }),
   toggleVisibility: (id) => request(`/skills/${id}/toggle_visibility/`, { method: 'POST' }),
 };
@@ -107,6 +135,7 @@ export const faqsApi = {
   getById: (id) => request(`/faqs/${id}/`),
   create: (data) => request('/faqs/', { method: 'POST', body: JSON.stringify(data) }),
   update: (id, data) => request(`/faqs/${id}/`, { method: 'PUT', body: JSON.stringify(data) }),
+  patch: (id, data) => request(`/faqs/${id}/`, { method: 'PATCH', body: JSON.stringify(data) }),
   delete: (id) => request(`/faqs/${id}/`, { method: 'DELETE' }),
   toggleVisibility: (id) => request(`/faqs/${id}/toggle_visibility/`, { method: 'POST' }),
 };
@@ -142,7 +171,12 @@ export const dashboardApi = {
   getHeatmap: () => request('/dashboard/heatmap/'),
 };
 
-// 10. Authentication API
+// 10. Health API
+export const healthApi = {
+  check: () => request('/health/'),
+};
+
+// 11. Authentication API
 export const authApi = {
   login: (username, password) => request('/auth/token/', {
     method: 'POST',
@@ -157,6 +191,10 @@ export const authApi = {
     body: JSON.stringify({ refresh }),
   }),
   getMe: () => request('/auth/me/'),
+  changePassword: (current_password, new_password) => request('/auth/change-password/', {
+    method: 'POST',
+    body: JSON.stringify({ current_password, new_password }),
+  }),
 };
 
 export default {
@@ -170,4 +208,5 @@ export default {
   contacts: contactsApi,
   profiles: profilesApi,
   dashboard: dashboardApi,
+  health: healthApi,
 };

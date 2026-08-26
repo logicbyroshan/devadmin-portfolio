@@ -11,6 +11,7 @@ import {
   Save, 
   ChevronDown
 } from 'lucide-react';
+import CustomDatePicker from './CustomDatePicker';
 import { experiencesApi } from '../services/api';
 
 export default function ExperiencesView({ onNavigate, activeWebsite }) {
@@ -79,7 +80,7 @@ export default function ExperiencesView({ onNavigate, activeWebsite }) {
     let isMounted = true;
     const fetchExperiences = async () => {
       try {
-        const siteSlug = activeWebsite?.slug || 'dev-meet';
+        const siteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-meet';
         const data = await experiencesApi.getAll({ website: siteSlug });
         const list = Array.isArray(data) ? data : (data.results || []);
         if (isMounted && list.length > 0) {
@@ -143,6 +144,7 @@ export default function ExperiencesView({ onNavigate, activeWebsite }) {
       return;
     }
 
+    const currentSiteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-meet';
     const payload = {
       role: formData.role,
       company: formData.company,
@@ -153,7 +155,7 @@ export default function ExperiencesView({ onNavigate, activeWebsite }) {
       is_current: formData.status === 'CURRENT',
       description: formData.description,
       visible: formData.visible,
-      website: activeWebsite?.id || 1
+      website: currentSiteSlug
     };
 
     if (editingId) {
@@ -263,13 +265,13 @@ export default function ExperiencesView({ onNavigate, activeWebsite }) {
                   value={formData.role}
                   onChange={e => setFormData({ ...formData, role: e.target.value })}
                   placeholder="e.g. Lead Platform Architect"
-                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 transition-colors font-accent"
+                  className="w-full px-4 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 transition-all font-accent"
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2">
-                  Company / Organization <span className="text-blue-400">*</span>
+                  Company / Organization <span className={activeWebsite?.accentText || "text-blue-400"}>*</span>
                 </label>
                 <input
                   type="text"
@@ -277,7 +279,7 @@ export default function ExperiencesView({ onNavigate, activeWebsite }) {
                   value={formData.company}
                   onChange={e => setFormData({ ...formData, company: e.target.value })}
                   placeholder="e.g. DevAdmin Cloud Labs"
-                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 transition-colors font-accent text-blue-400"
+                  className={`w-full px-4 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 transition-all font-accent ${activeWebsite?.accentText || 'text-blue-400'}`}
                 />
               </div>
             </div>
@@ -292,7 +294,7 @@ export default function ExperiencesView({ onNavigate, activeWebsite }) {
                   value={formData.category}
                   onChange={e => setFormData({ ...formData, category: e.target.value })}
                   placeholder="e.g. Full-Stack Engineering, Frontend Architecture"
-                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 transition-colors"
+                  className="w-full px-4 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 transition-all"
                 />
               </div>
 
@@ -307,7 +309,7 @@ export default function ExperiencesView({ onNavigate, activeWebsite }) {
                     status: e.target.value, 
                     left: e.target.value === 'CURRENT' ? 'Present' : (formData.left === 'Present' ? '' : formData.left) 
                   })}
-                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
+                  className="w-full px-4 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-sm text-white focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 transition-all"
                 >
                   <option value="CURRENT">CURRENT (Active Position)</option>
                   <option value="PAST">PAST (Former Position)</option>
@@ -317,14 +319,12 @@ export default function ExperiencesView({ onNavigate, activeWebsite }) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
-                <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2">
-                  Start / Joined Date
-                </label>
-                <input
-                  type="date"
+                <CustomDatePicker
+                  label="Start / Joined Date"
                   value={formData.joined}
-                  onChange={e => setFormData({ ...formData, joined: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
+                  onChange={val => setFormData({ ...formData, joined: val })}
+                  activeWebsite={activeWebsite}
+                  placeholder="Select join date"
                 />
               </div>
 
@@ -337,7 +337,7 @@ export default function ExperiencesView({ onNavigate, activeWebsite }) {
                   value={formData.left}
                   onChange={e => setFormData({ ...formData, left: e.target.value })}
                   placeholder="e.g. Present or 2024-12-31"
-                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 transition-colors"
+                  className="w-full px-4 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 transition-all"
                 />
               </div>
             </div>
@@ -351,7 +351,7 @@ export default function ExperiencesView({ onNavigate, activeWebsite }) {
                 value={formData.description}
                 onChange={e => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Detail your responsibilities, architecture decisions, and tech stack utilized..."
-                className="w-full p-4 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 resize-none leading-relaxed transition-colors"
+                className="w-full p-4 rounded-lg bg-[#050609] border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 resize-none leading-relaxed transition-all"
               />
             </div>
 

@@ -11,13 +11,14 @@ Welcome to the **DevAdmin Multi-Site Portfolio Management REST API** specificati
                 │          React 18 Frontend (Vite)            │
                 │        (frontend/src/services/api.js)        │
                 └──────────────────────┬───────────────────────┘
-                                       │ HTTP / REST / JSON
+                                       │ HTTP / REST / JSON (JWT Bearer)
                                        ▼
                 ┌──────────────────────────────────────────────┐
                 │    Django REST Framework Ingress Layer       │
                 │  - drf-spectacular (OpenAPI 3.0 / Swagger)   │
-                │  - JWT Bearer Authentication                 │
-                │  - CORS Headers & XSS Prevention             │
+                │  - JWT Bearer Authentication (SimpleJWT)     │
+                │  - CORS Dynamic Origin Parsing & Headers     │
+                │  - Anon & User Rate Throttling Middleware    │
                 └──────────────────────┬───────────────────────┘
                                        │
                                        ▼
@@ -58,19 +59,20 @@ Welcome to the **DevAdmin Multi-Site Portfolio Management REST API** specificati
 | **Swagger UI** | `GET /api/docs/` | Interactive Swagger UI console with executable API testing |
 | **ReDoc** | `GET /api/redoc/` | Clean, searchable technical API reference |
 | **OpenAPI 3.0 Schema** | `GET /api/schema/` | Raw OpenAPI 3.0 YAML/JSON specification schema |
+| **System Health Probe** | `GET /api/health/` | Real-time database connectivity and server latency check |
 
 ---
 
-## 🔐 Authentication & Headers
+## 🔐 Authentication & Session Management
 
-All requests from the frontend client can include standard JSON headers and optional JWT Bearer tokens:
+All authenticated endpoints require standard JSON headers and JWT Bearer tokens:
 
 ```http
 Content-Type: application/json
 Authorization: Bearer <access_token>
 ```
 
-### Obtain JWT Token Pair
+### 1. Obtain JWT Token Pair
 - **Endpoint**: `POST /api/auth/token/`
 - **Payload**:
   ```json
@@ -84,6 +86,50 @@ Authorization: Bearer <access_token>
   {
     "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
     "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }
+  ```
+
+### 2. Refresh Expired Access Token
+- **Endpoint**: `POST /api/auth/token/refresh/`
+- **Payload**: `{ "refresh": "<refresh_token>" }`
+- **Response** `200 OK`: `{ "access": "<new_access_token>" }`
+
+### 3. Current User Profile Session
+- **Endpoint**: `GET /api/auth/me/`
+- **Response** `200 OK`:
+  ```json
+  {
+    "id": 1,
+    "username": "admin",
+    "email": "admin@devadmin.io",
+    "first_name": "Roshan",
+    "last_name": "Kumar",
+    "role": "Super User",
+    "is_staff": true,
+    "is_superuser": true
+  }
+  ```
+
+### 4. Change Account Password
+- **Endpoint**: `POST /api/auth/change-password/`
+- **Payload**:
+  ```json
+  {
+    "old_password": "current_password",
+    "new_password": "new_secure_password"
+  }
+  ```
+
+### 5. Register Admin User
+- **Endpoint**: `POST /api/auth/register/`
+- **Payload**:
+  ```json
+  {
+    "username": "newadmin",
+    "email": "newadmin@example.com",
+    "first_name": "Alex",
+    "last_name": "Morgan",
+    "password": "SecurePassword123!"
   }
   ```
 
@@ -126,7 +172,7 @@ Authorization: Bearer <access_token>
   "github_url": "https://github.com/roshan-dev/dev-meet",
   "description": "## High Performance WebRTC Suite\n\n```architecture\nBrowser -> SFU -> Redis\n```",
   "visible": true,
-  "website": 1
+  "website": "dev-meet"
 }
 ```
 
@@ -185,20 +231,12 @@ Authorization: Bearer <access_token>
 
 | Method | Endpoint | Query Parameters | Description |
 |---|---|---|---|
-| `GET` | `/api/contacts/` | `?website=dev-meet&unread=true&starred=true` | List incoming inquiries |
-| `POST` | `/api/contacts/` | — | Submit new inquiry from public website |
+| `GET` | `/api/contacts/` | `?website=dev-meet&unread=true&starred=true` | List incoming inquiries (Authenticated) |
+| `POST` | `/api/contacts/` | — | Submit new inquiry (Public endpoint) |
 | `POST` | `/api/contacts/<id>/reply/` | — | Dispatch email reply via SMTP relay |
 | `POST` | `/api/contacts/<id>/toggle_star/` | — | Toggle starred flag |
 | `POST` | `/api/contacts/<id>/mark_read/` | — | Mark inquiry as read |
 | `DELETE` | `/api/contacts/<id>/` | — | Delete conversation |
-
-**Dispatch Reply Sample (`POST /api/contacts/1/reply/`)**:
-```json
-{
-  "reply_subject": "Re: Inquiry regarding DevMeet platform demo",
-  "reply_text": "Hello John, thank you for reaching out! We would be delighted to host a demo call this Thursday at 3 PM."
-}
-```
 
 ---
 
@@ -218,36 +256,3 @@ Authorization: Bearer <access_token>
 | `GET` | `/api/dashboard/stats/` | `?website=dev-meet` | Single-pass counts breakdown across all modules |
 | `GET` | `/api/dashboard/activities/` | `?website=dev-meet` | Live stream of recent project & blog deployments |
 | `GET` | `/api/dashboard/heatmap/` | — | 12-month annual contribution matrix (365 days) |
-
-**Sample Dashboard Metrics Response (`GET /api/dashboard/stats/?website=dev-meet`)**:
-```json
-{
-  "website": "dev-meet",
-  "blogs": {
-    "total": 4,
-    "live": 2,
-    "scheduled": 1,
-    "draft": 1
-  },
-  "projects": {
-    "total": 3,
-    "live": 2,
-    "offline": 1
-  },
-  "experiences": {
-    "total": 2,
-    "current": 1
-  },
-  "skills": {
-    "total": 6
-  },
-  "messages": {
-    "total": 2,
-    "unread": 1,
-    "starred": 1
-  },
-  "faqs": {
-    "total": 3
-  }
-}
-```

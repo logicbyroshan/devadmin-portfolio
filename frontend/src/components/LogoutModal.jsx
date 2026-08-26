@@ -12,7 +12,7 @@ export default function LogoutModal({ onCancel, onConfirmLogout }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-70 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
       <div className="w-full max-w-sm bg-[#07080d] border border-neutral-800 rounded-xl p-6 text-center space-y-4 animate-in fade-in zoom-in-95 duration-150 shadow-2xl">
         {!loggingOut ? (
           <>

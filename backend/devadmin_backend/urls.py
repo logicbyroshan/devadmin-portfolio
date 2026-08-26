@@ -12,7 +12,8 @@ from drf_spectacular.views import (
     SpectacularRedocView,
 )
 
-from apps.websites.views_auth import RegisterView, CurrentUserView
+from apps.websites.views_auth import RegisterView, CurrentUserView, ChangePasswordView
+from apps.common.views_health import HealthCheckView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -22,11 +23,16 @@ urlpatterns = [
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     
+    # Health Check Endpoint
+    path('api/health/', HealthCheckView.as_view(), name='health_check'),
+    path('health/', HealthCheckView.as_view(), name='health_check_root'),
+    
     # JWT Authentication Endpoints
     path('api/auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/auth/register/', RegisterView.as_view(), name='auth_register'),
     path('api/auth/me/', CurrentUserView.as_view(), name='auth_current_user'),
+    path('api/auth/change-password/', ChangePasswordView.as_view(), name='auth_change_password'),
     
     # Multi-Site App Domain API Endpoints
     path('api/websites/', include('apps.websites.urls')),

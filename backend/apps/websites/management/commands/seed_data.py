@@ -11,7 +11,15 @@ from apps.profiles.models import PortfolioProfile
 class Command(BaseCommand):
     help = 'Seeds multi-tenant portfolio data for DevMeet, DevMitra, and DevMate'
 
-    def handle(self, *args, **kwargs):
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--force',
+            action='store_true',
+            help='Force overwrite existing records with initial seed data'
+        )
+
+    def handle(self, *args, **options):
+        force = options.get('force', False)
         self.stdout.write('Seeding database with multi-tenant data...')
 
         # 1. Websites
@@ -41,29 +49,33 @@ class Command(BaseCommand):
 
         websites = {}
         for site in sites_data:
-            w, _ = Website.objects.get_or_create(slug=site['slug'], defaults=site)
+            if force:
+                w, _ = Website.objects.update_or_create(slug=site['slug'], defaults=site)
+            else:
+                w, _ = Website.objects.get_or_create(slug=site['slug'], defaults=site)
             websites[site['slug']] = w
 
         # 2. Portfolio Profiles
         for slug, site in websites.items():
-            PortfolioProfile.objects.update_or_create(
-                website=site,
-                defaults={
-                    'name': 'Roshan Kumar',
-                    'title': f'Senior Full Stack Developer & UI Architect ({site.name})',
-                    'bio': f'Passionate software engineer building high-performance React web applications, scalable Node.js microservices, and elegant OLED dark glassmorphic user interfaces for {site.name}.\n\n```architecture\nFrontend:React 18 -> API Gateway:Kong -> Backend:Django REST -> DB:MySQL\n```\n\nExperienced in real-time WebRTC, distributed caching, and micro-frontend architecture.',
-                    'location': 'New Delhi, India',
-                    'email': f'roshan@{slug}.dev',
-                    'phone': '+91 98765 43210',
-                    'experience_years': '5+ Years',
-                    'github': 'https://github.com/roshan-dev',
-                    'linkedin': 'https://linkedin.com/in/roshan-dev',
-                    'twitter': '@roshan_dev',
-                    'website_url': f'https://{slug}.dev',
-                    'resume_url': f'https://{slug}.dev/resume.pdf',
-                    'avatar': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80'
-                }
-            )
+            profile_defaults = {
+                'name': 'Roshan Kumar',
+                'title': f'Senior Full Stack Developer & UI Architect ({site.name})',
+                'bio': f'Passionate software engineer building high-performance React web applications, scalable Node.js microservices, and elegant OLED dark glassmorphic user interfaces for {site.name}.\n\n```architecture\nFrontend:React 18 -> API Gateway:Kong -> Backend:Django REST -> DB:MySQL\n```\n\nExperienced in real-time WebRTC, distributed caching, and micro-frontend architecture.',
+                'location': 'New Delhi, India',
+                'email': f'roshan@{slug}.dev',
+                'phone': '+91 98765 43210',
+                'experience_years': '5+ Years',
+                'github': 'https://github.com/roshan-dev',
+                'linkedin': 'https://linkedin.com/in/roshan-dev',
+                'twitter': '@roshan_dev',
+                'website_url': f'https://{slug}.dev',
+                'resume_url': f'https://{slug}.dev/resume.pdf',
+                'avatar': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80'
+            }
+            if force:
+                PortfolioProfile.objects.update_or_create(website=site, defaults=profile_defaults)
+            else:
+                PortfolioProfile.objects.get_or_create(website=site, defaults=profile_defaults)
 
         # 3. Projects
         projects_data = [
@@ -77,7 +89,7 @@ class Command(BaseCommand):
                 'image': 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80',
                 'demo_url': 'https://devmeet.live',
                 'github_url': 'https://github.com/roshan-dev/dev-meet',
-                'description': 'High-Performance WebRTC Video Conferencing Suite supporting up to 50 concurrent peer mesh channels with sub-80ms audio/video latency.\n\n```architecture\nBrowser:React -> SFU:Mediasoup -> Signaling:WebSockets -> Redis:State\n```\n\n```chart:barchart\ntitle:Media Processing Throughput\nWebRTC Mesh:1200fps\nSFU Relay:4800fps\nMCU Transcoding:850fps\n```',
+                'description': 'High-Performance WebRTC Video Conferencing Suite supporting up to 50 concurrent peer mesh channels with sub-80ms audio/video latency.\n\n```architecture\nBrowser:React -> SFU:Mediasoup -> Signaling:WebSockets -> Redis:State\n```\n\n```chart:barchart\ntitle:Media Processing Throughput\nWebRTC Mesh:1200fps\nSFU Relay:4800fps\nMCO Transcoding:850fps\n```',
                 'visible': True
             },
             {
@@ -109,7 +121,10 @@ class Command(BaseCommand):
         ]
 
         for p in projects_data:
-            Project.objects.update_or_create(slug=p['slug'], defaults=p)
+            if force:
+                Project.objects.update_or_create(slug=p['slug'], defaults=p)
+            else:
+                Project.objects.get_or_create(slug=p['slug'], defaults=p)
 
         # 4. Blogs
         blogs_data = [
@@ -155,7 +170,10 @@ class Command(BaseCommand):
         ]
 
         for b in blogs_data:
-            BlogPost.objects.update_or_create(slug=b['slug'], defaults=b)
+            if force:
+                BlogPost.objects.update_or_create(slug=b['slug'], defaults=b)
+            else:
+                BlogPost.objects.get_or_create(slug=b['slug'], defaults=b)
 
         # 5. Experiences
         experiences_data = [
@@ -186,7 +204,10 @@ class Command(BaseCommand):
         ]
 
         for e in experiences_data:
-            Experience.objects.get_or_create(role=e['role'], company=e['company'], website=e['website'], defaults=e)
+            if force:
+                Experience.objects.update_or_create(role=e['role'], company=e['company'], website=e['website'], defaults=e)
+            else:
+                Experience.objects.get_or_create(role=e['role'], company=e['company'], website=e['website'], defaults=e)
 
         # 6. Skills
         skills_data = [
@@ -199,7 +220,10 @@ class Command(BaseCommand):
         ]
 
         for s in skills_data:
-            Skill.objects.get_or_create(name=s['name'], website=s['website'], defaults=s)
+            if force:
+                Skill.objects.update_or_create(name=s['name'], website=s['website'], defaults=s)
+            else:
+                Skill.objects.get_or_create(name=s['name'], website=s['website'], defaults=s)
 
         # 7. FAQs
         faqs_data = [
@@ -230,7 +254,10 @@ class Command(BaseCommand):
         ]
 
         for f in faqs_data:
-            Faq.objects.get_or_create(question=f['question'], website=f['website'], defaults=f)
+            if force:
+                Faq.objects.update_or_create(question=f['question'], website=f['website'], defaults=f)
+            else:
+                Faq.objects.get_or_create(question=f['question'], website=f['website'], defaults=f)
 
         # 8. Contact Inquiries
         contacts_data = [
@@ -261,6 +288,9 @@ class Command(BaseCommand):
         ]
 
         for c in contacts_data:
-            ContactInquiry.objects.get_or_create(email=c['email'], subject=c['subject'], website=c['website'], defaults=c)
+            if force:
+                ContactInquiry.objects.update_or_create(email=c['email'], subject=c['subject'], website=c['website'], defaults=c)
+            else:
+                ContactInquiry.objects.get_or_create(email=c['email'], subject=c['subject'], website=c['website'], defaults=c)
 
         self.stdout.write(self.style.SUCCESS('Successfully seeded database for all 3 portfolio sites!'))

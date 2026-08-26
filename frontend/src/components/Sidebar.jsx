@@ -30,11 +30,16 @@ export default function Sidebar({
     { id: 'manage-settings', label: 'Settings', icon: Settings },
   ];
 
-
   const handleNavClick = (id) => {
     onNavigate(id);
     if (onClose) onClose();
   };
+
+  const gradient = activeWebsite?.gradient || 'from-blue-600 to-indigo-600';
+  const accentText = activeWebsite?.accentText || 'text-blue-400';
+  const accentBg = activeWebsite?.accentBg || 'bg-blue-500/15';
+  const accentBorder = activeWebsite?.accentBorder || 'border-blue-500/30';
+  const glow = activeWebsite?.glow || 'shadow-blue-500/20';
 
   return (
     <>
@@ -42,7 +47,7 @@ export default function Sidebar({
       {isOpen && (
         <div 
           onClick={onClose}
-          className="fixed inset-0 bg-black/90 backdrop-blur-md z-40 md:hidden transition-opacity"
+          className="fixed inset-0 bg-black/90 backdrop-blur-md z-35 md:hidden transition-opacity"
         />
       )}
 
@@ -57,16 +62,16 @@ export default function Sidebar({
             onClick={() => handleNavClick('dashboard')}
             className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-bold transition-all duration-200 ${
               currentPage === 'dashboard'
-                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20'
+                ? `bg-gradient-to-r ${gradient} text-white shadow-md ${glow}`
                 : 'text-neutral-300 hover:text-white hover:bg-neutral-900/60'
             }`}
           >
-            <LayoutDashboard className={`w-4 h-4 ${currentPage === 'dashboard' ? 'text-white' : 'text-blue-400'}`} />
+            <LayoutDashboard className={`w-4 h-4 ${currentPage === 'dashboard' ? 'text-white' : accentText}`} />
             <span>Dashboard</span>
           </button>
         </div>
 
-        {/* Middle Section: Navigation Modules (Including Settings) */}
+        {/* Middle Section: Navigation Modules */}
         <div className="flex-1 overflow-y-auto p-2.5 space-y-1.5">
           {middleNavItems.map((item) => {
             const Icon = item.icon;
@@ -77,18 +82,18 @@ export default function Sidebar({
                 onClick={() => handleNavClick(item.id)}
                 className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-150 border ${
                   isActive
-                    ? 'bg-blue-500/15 text-blue-400 border-blue-500/30 font-bold shadow-sm'
+                    ? `${accentBg} ${accentText} ${accentBorder} font-bold shadow-sm`
                     : 'text-neutral-300 hover:text-white hover:bg-neutral-900/60 border-transparent'
                 }`}
               >
-                <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-blue-400' : 'text-neutral-400'}`} />
+                <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? accentText : 'text-neutral-400'}`} />
                 <span className="truncate">{item.label}</span>
               </button>
             );
           })}
         </div>
 
-        {/* Bottom Section: ONLY Logout Button below divide line */}
+        {/* Bottom Section: Logout Button */}
         <div className="p-2.5 border-t border-neutral-800/80">
           <button
             onClick={() => handleNavClick('manage-logout')}
@@ -99,7 +104,6 @@ export default function Sidebar({
           </button>
         </div>
       </aside>
-
     </>
   );
 }

@@ -13,6 +13,7 @@ import {
   ChevronDown
 } from 'lucide-react';
 import RichContentBuilder from './RichContentBuilder';
+import CustomDatePicker from './CustomDatePicker';
 import { blogsApi } from '../services/api';
 
 export default function BlogsView({ onNavigate, activeWebsite }) {
@@ -182,7 +183,7 @@ points:
     let isMounted = true;
     const fetchBlogs = async () => {
       try {
-        const siteSlug = activeWebsite?.slug || 'dev-meet';
+        const siteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-meet';
         const data = await blogsApi.getAll({ website: siteSlug });
         const list = Array.isArray(data) ? data : (data.results || []);
         if (isMounted && list.length > 0) {
@@ -273,6 +274,7 @@ data:
       return;
     }
 
+    const currentSiteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-meet';
     const payload = {
       title: formData.title,
       slug: formData.slug || formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || `blog-${Date.now()}`,
@@ -283,7 +285,7 @@ data:
       summary: formData.summary,
       content: formData.content,
       visible: formData.visible,
-      website: activeWebsite?.id || 1
+      website: currentSiteSlug
     };
 
     if (editingId) {
@@ -415,7 +417,7 @@ data:
                   value={formData.slug}
                   onChange={e => setFormData({ ...formData, slug: e.target.value })}
                   placeholder="e.g. building-modern-glassmorphism-uis"
-                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-neutral-300 placeholder-neutral-500 focus:outline-none focus:border-blue-500 transition-colors font-mono text-xs"
+                  className="w-full px-4 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-sm text-neutral-300 placeholder-neutral-500 focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 transition-all font-mono text-xs"
                 />
               </div>
             </div>
@@ -431,7 +433,7 @@ data:
                   value={formData.category}
                   onChange={e => setFormData({ ...formData, category: e.target.value })}
                   placeholder="e.g. React & Frontend"
-                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 transition-colors"
+                  className="w-full px-4 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 transition-all"
                 />
               </div>
 
@@ -442,7 +444,7 @@ data:
                 <select
                   value={formData.status}
                   onChange={e => setFormData({ ...formData, status: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
+                  className="w-full px-4 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-sm text-white focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 transition-all"
                 >
                   <option value="PUBLISHED">PUBLISHED</option>
                   <option value="SCHEDULED">SCHEDULED</option>
@@ -451,14 +453,12 @@ data:
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2">
-                  Publish Date
-                </label>
-                <input
-                  type="date"
+                <CustomDatePicker
+                  label="Publish Date"
                   value={formData.date}
-                  onChange={e => setFormData({ ...formData, date: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
+                  onChange={val => setFormData({ ...formData, date: val })}
+                  activeWebsite={activeWebsite}
+                  placeholder="Select publish date"
                 />
               </div>
 
@@ -471,7 +471,7 @@ data:
                   value={formData.readTime}
                   onChange={e => setFormData({ ...formData, readTime: e.target.value })}
                   placeholder="e.g. 5 min read"
-                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 transition-colors"
+                  className="w-full px-4 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 transition-all"
                 />
               </div>
             </div>
@@ -486,7 +486,7 @@ data:
                 value={formData.summary}
                 onChange={e => setFormData({ ...formData, summary: e.target.value })}
                 placeholder="Write a concise overview of what readers will learn in this post..."
-                className="w-full p-3.5 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 resize-none leading-relaxed transition-colors"
+                className="w-full p-3.5 rounded-lg bg-[#050609] border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 resize-none leading-relaxed transition-all"
               />
             </div>
 

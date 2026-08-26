@@ -25,7 +25,7 @@
 ### 1. 🏢 Multi-Tenant Site Partitioning
 - Manage multiple independent developer portfolio websites from a single unified control console.
 - Pre-configured sites: **DevMeet** (WebRTC Video Suite), **DevMitra** (AI Peer Pairing), and **DevMate** (Cloud IDE Sandbox).
-- Instant multi-site switching from the top navbar with synchronized tenant-scoped API queries.
+- Instant multi-site switching from the top navbar with synchronized tenant-scoped API queries (`?website=slug` or integer ID).
 
 ### 2. 🎴 3-Card Responsive Grid Layouts
 - Uniform, high-density **3-card grids** (`grid-cols-1 md:grid-cols-2 lg:grid-cols-3`) across all modules:
@@ -36,7 +36,13 @@
   - **Frequently Asked Questions (FAQs)**
 - Category filter pills, one-click visibility toggles, and direct Edit/Delete card actions.
 
-### 3. ✍️ Ultra-Rich Content & System Architecture Builder (`RichContentBuilder`)
+### 3. 📅 Custom OLED Dark Glassmorphic DatePicker (`CustomDatePicker.jsx`)
+- Built-in, fully customizable calendar picker replacing browser native date inputs.
+- Month and year navigation with previous/next month day padding.
+- Theme accent gradients matching active portfolio site (`blue`, `sky`, `violet`).
+- Today quick-select action, clear button, and click-outside dismissal.
+
+### 4. ✍️ Ultra-Rich Content & System Architecture Builder (`RichContentBuilder`)
 - Integrated into Projects, Technical Blogs, and Profile Bio.
 - **Write**, **Split (Side-by-Side Editor & Live Preview)**, and **Preview** modes.
 - Visual custom widgets:
@@ -47,18 +53,19 @@
   - 🎬 **Video Walkthrough Embeds** (` ```video:embed `)
   - 💡 **Alert Callout Blocks** (`> [!NOTE]`, `> [!TIP]`, `> [!WARNING]`)
 
-### 4. 📊 12-Month Contribution Activity Heatmap
+### 5. 📊 12-Month Contribution Activity Heatmap
 - Full 365-day annual commit and deployment activity matrix (January through December).
 - 4-level color-coded contribution intensity legend.
 
-### 5. 📬 Authenticated SMTP Email Reply Console
+### 6. 📬 Authenticated SMTP Email Reply Console
 - Split 2-column contact inquiry feed and direct email composer.
 - Dispatch live email replies via authenticated SMTP relay with timestamp tracking (`replied_at`, `is_read=True`).
 - Quick canned reply suggestions (*"Available for work"*, *"Schedule Call"*).
 
-### 6. 🔐 Full JWT Authentication System
+### 7. 🔐 Full JWT Authentication & Security Console
 - Dark glassmorphic **Security Console Modal** (`AuthModal.jsx`).
-- Secure JWT token pair generation (`/api/auth/token/`), automatic token attachment to all outgoing requests, and persistent session storage.
+- Secure JWT token pair generation (`/api/auth/token/`), automatic token refresh (`/api/auth/token/refresh/`), and persistent session state.
+- Change password endpoint (`/api/auth/change-password/`) with Django password validator enforcement.
 - Administrator registration (`/api/auth/register/`) and one-click quick demo login.
 
 ---
@@ -68,7 +75,7 @@
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                         React 18 Frontend SPA                               │
-│       Vite │ Tailwind CSS │ Lucide Icons │ RichContentBuilder │ AuthContext │
+│       Vite │ Tailwind CSS │ Lucide Icons │ CustomDatePicker │ AuthContext   │
 └──────────────────────────────────────┬──────────────────────────────────────┘
                                        │ REST API (JSON / JWT Bearer)
                                        ▼
@@ -108,6 +115,7 @@ When running the backend server locally or in production, interactive documentat
 - **Swagger UI**: [`http://localhost:8000/api/docs/`](http://localhost:8000/api/docs/)
 - **ReDoc**: [`http://localhost:8000/api/redoc/`](http://localhost:8000/api/redoc/)
 - **OpenAPI Schema (JSON/YAML)**: [`http://localhost:8000/api/schema/`](http://localhost:8000/api/schema/)
+- **Health Check Probe**: [`http://localhost:8000/api/health/`](http://localhost:8000/api/health/)
 - **Technical Specification Guide**: [backend/API_DOCUMENTATION.md](backend/API_DOCUMENTATION.md)
 
 ---
@@ -142,8 +150,8 @@ python manage.py migrate
 # 4. Seed database with realistic multi-site portfolio data
 python manage.py seed_data
 
-# 5. (Optional) Create superuser admin
-python manage.py createsuperuser
+# 5. Run automated test suite
+python manage.py test tests
 
 # 6. Start development server (Port 8000)
 python manage.py runserver
@@ -191,7 +199,7 @@ DevAdmin is engineered for high-performance direct deployment on Linux VPS serve
 Dev-Admin/
 ├── backend/
 │   ├── apps/
-│   │   ├── common/             # Reusable Service Layer (Tenant, Mail, Stats, Mixins)
+│   │   ├── common/             # Reusable Service Layer (Tenant, Mail, Stats, Mixins, Health)
 │   │   ├── websites/           # Multi-tenant websites & Auth endpoints
 │   │   ├── projects/           # Projects domain models & ViewSets
 │   │   ├── blogs/              # Technical blogs with rich content models
@@ -202,12 +210,13 @@ Dev-Admin/
 │   │   ├── profiles/           # Portfolio profile details & bio
 │   │   └── dashboard/          # Aggregated analytics & heatmap views
 │   ├── devadmin_backend/       # Root Django settings, WSGI, and URLs
+│   ├── tests/                  # Automated integration test suite
 │   ├── requirements.txt        # Frozen Python dependencies
 │   ├── API_DOCUMENTATION.md    # Complete REST API specification
 │   └── manage.py
 ├── frontend/
 │   ├── src/
-│   │   ├── components/         # All UI views (Dashboard, Projects, Blogs, Details, etc.)
+│   │   ├── components/         # All UI views (Dashboard, Projects, Blogs, CustomDatePicker, etc.)
 │   │   ├── context/            # AuthContext (JWT Session & state)
 │   │   ├── services/           # Centralized API service client (api.js)
 │   │   ├── App.jsx             # Main App layout & navigation state

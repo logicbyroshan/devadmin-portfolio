@@ -43,7 +43,7 @@ export default function DetailsView({ onNavigate, activeWebsite }) {
     let isMounted = true;
     const fetchProfile = async () => {
       try {
-        const siteSlug = activeWebsite?.slug || 'dev-meet';
+        const siteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-meet';
         const res = await profilesApi.getByWebsite(siteSlug);
         const list = Array.isArray(res) ? res : (res.results || []);
         if (isMounted && list.length > 0) {
@@ -76,8 +76,11 @@ export default function DetailsView({ onNavigate, activeWebsite }) {
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const url = URL.createObjectURL(file);
-      setDetails({ ...details, avatar: url });
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setDetails(prev => ({ ...prev, avatar: reader.result }));
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -85,6 +88,7 @@ export default function DetailsView({ onNavigate, activeWebsite }) {
     e?.preventDefault();
     setSaved(true);
 
+    const currentSiteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-meet';
     const payload = {
       name: details.name,
       title: details.title,
@@ -99,7 +103,7 @@ export default function DetailsView({ onNavigate, activeWebsite }) {
       website_url: details.website,
       resume_url: details.resumeUrl,
       avatar: details.avatar,
-      website: activeWebsite?.id || 1
+      website: currentSiteSlug
     };
 
     try {
@@ -136,7 +140,7 @@ export default function DetailsView({ onNavigate, activeWebsite }) {
 
           <button
             onClick={handleSave}
-            className="h-9 px-4 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:brightness-110 text-white font-bold text-sm flex items-center gap-2 shadow-lg shadow-blue-500/20 transition-all flex-shrink-0"
+            className={`h-9 px-4 rounded-lg bg-gradient-to-r ${activeWebsite?.gradient || 'from-blue-600 to-indigo-600'} hover:brightness-110 text-white font-bold text-sm flex items-center gap-2 shadow-lg shadow-blue-500/20 transition-all flex-shrink-0`}
           >
             <Save className="w-4 h-4" />
             <span>Save Profile Details</span>
@@ -160,7 +164,7 @@ export default function DetailsView({ onNavigate, activeWebsite }) {
 
           <div>
             <h3 className="text-base font-extrabold text-white font-accent">{details.name}</h3>
-            <p className="text-xs font-bold text-blue-400 mt-0.5">{details.title}</p>
+            <p className={`text-xs font-bold ${activeWebsite?.accentText || 'text-blue-400'} mt-0.5`}>{details.title}</p>
             <p className="text-[11px] text-neutral-400 mt-1 flex items-center justify-center gap-1">
               <MapPin className="w-3 h-3 text-neutral-500" />
               <span>{details.location}</span>
@@ -168,7 +172,7 @@ export default function DetailsView({ onNavigate, activeWebsite }) {
           </div>
 
           <label className="w-full py-2.5 px-3 rounded-lg bg-[#050609] hover:bg-neutral-800 text-neutral-200 font-semibold text-xs cursor-pointer flex items-center justify-center gap-2 border border-neutral-800 transition-all">
-            <Upload className="w-3.5 h-3.5 text-blue-400" />
+            <Upload className={`w-3.5 h-3.5 ${activeWebsite?.accentText || 'text-blue-400'}`} />
             <span>Change Profile Picture</span>
             <input type="file" onChange={handleAvatarChange} className="hidden" accept="image/*" />
           </label>
@@ -180,7 +184,7 @@ export default function DetailsView({ onNavigate, activeWebsite }) {
             </div>
             <div className="flex items-center justify-between text-neutral-400">
               <span>Current Portfolio:</span>
-              <span className="font-bold text-blue-400">{activeWebsite?.name || 'DevMeet'}</span>
+              <span className={`font-bold ${activeWebsite?.accentText || 'text-blue-400'}`}>{activeWebsite?.name || 'DevMeet'}</span>
             </div>
           </div>
         </div>
@@ -189,7 +193,7 @@ export default function DetailsView({ onNavigate, activeWebsite }) {
         <div className="lg:col-span-2 p-5 sm:p-6 rounded-xl bg-[#07080d] border border-neutral-800 space-y-6 shadow-xl">
           <div className="space-y-4">
             <h3 className="text-sm font-extrabold text-white pb-2.5 border-b border-neutral-800 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-blue-400"></span>
+              <span className={`w-2 h-2 rounded-full ${activeWebsite?.dotColor || 'bg-blue-400'}`}></span>
               <span>General Information</span>
             </h3>
 
@@ -201,7 +205,7 @@ export default function DetailsView({ onNavigate, activeWebsite }) {
                   required
                   value={details.name}
                   onChange={e => setDetails({ ...details, name: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-white font-accent focus:outline-none focus:border-blue-500"
+                  className="w-full px-3.5 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-white font-accent focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 transition-all"
                 />
               </div>
 
@@ -212,7 +216,7 @@ export default function DetailsView({ onNavigate, activeWebsite }) {
                   required
                   value={details.title}
                   onChange={e => setDetails({ ...details, title: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-white focus:outline-none focus:border-blue-500"
+                  className="w-full px-3.5 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-white focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 transition-all"
                 />
               </div>
 
@@ -223,7 +227,7 @@ export default function DetailsView({ onNavigate, activeWebsite }) {
                   required
                   value={details.email}
                   onChange={e => setDetails({ ...details, email: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-white focus:outline-none focus:border-blue-500"
+                  className="w-full px-3.5 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-white focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 transition-all"
                 />
               </div>
 
@@ -233,7 +237,7 @@ export default function DetailsView({ onNavigate, activeWebsite }) {
                   type="text"
                   value={details.phone}
                   onChange={e => setDetails({ ...details, phone: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-white focus:outline-none focus:border-blue-500"
+                  className="w-full px-3.5 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-white focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 transition-all"
                 />
               </div>
 
@@ -243,7 +247,7 @@ export default function DetailsView({ onNavigate, activeWebsite }) {
                   type="text"
                   value={details.location}
                   onChange={e => setDetails({ ...details, location: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-white focus:outline-none focus:border-blue-500"
+                  className="w-full px-3.5 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-white focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 transition-all"
                 />
               </div>
 
@@ -253,7 +257,7 @@ export default function DetailsView({ onNavigate, activeWebsite }) {
                   type="url"
                   value={details.resumeUrl}
                   onChange={e => setDetails({ ...details, resumeUrl: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-white focus:outline-none focus:border-blue-500 font-mono text-xs"
+                  className="w-full px-3.5 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-white focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 font-mono text-xs transition-all"
                 />
               </div>
             </div>
@@ -272,56 +276,56 @@ export default function DetailsView({ onNavigate, activeWebsite }) {
           {/* Social Media & Online Profiles */}
           <div className="space-y-4 pt-2">
             <h3 className="text-sm font-extrabold text-white pb-2.5 border-b border-neutral-800 flex items-center gap-2">
-              <Globe className="w-4 h-4 text-blue-400" />
+              <Globe className={`w-4 h-4 ${activeWebsite?.accentText || 'text-blue-400'}`} />
               <span>Social Profiles & Online Links</span>
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
               <div>
                 <label className="block text-neutral-300 font-bold text-xs mb-1.5 flex items-center gap-1.5">
-                  <Github className="w-3.5 h-3.5 text-blue-400" /> GitHub URL
+                  <Github className={`w-3.5 h-3.5 ${activeWebsite?.accentText || 'text-blue-400'}`} /> GitHub URL
                 </label>
                 <input
                   type="url"
                   value={details.github}
                   onChange={e => setDetails({ ...details, github: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-white focus:outline-none focus:border-blue-500 font-mono text-xs"
+                  className="w-full px-3.5 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-white focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 font-mono text-xs transition-all"
                 />
               </div>
 
               <div>
                 <label className="block text-neutral-300 font-bold text-xs mb-1.5 flex items-center gap-1.5">
-                  <Linkedin className="w-3.5 h-3.5 text-blue-400" /> LinkedIn URL
+                  <Linkedin className={`w-3.5 h-3.5 ${activeWebsite?.accentText || 'text-blue-400'}`} /> LinkedIn URL
                 </label>
                 <input
                   type="url"
                   value={details.linkedin}
                   onChange={e => setDetails({ ...details, linkedin: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-white focus:outline-none focus:border-blue-500 font-mono text-xs"
+                  className="w-full px-3.5 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-white focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 font-mono text-xs transition-all"
                 />
               </div>
 
               <div>
                 <label className="block text-neutral-300 font-bold text-xs mb-1.5 flex items-center gap-1.5">
-                  <Twitter className="w-3.5 h-3.5 text-blue-400" /> Twitter / X Handle
+                  <Twitter className={`w-3.5 h-3.5 ${activeWebsite?.accentText || 'text-blue-400'}`} /> Twitter / X Handle
                 </label>
                 <input
                   type="text"
                   value={details.twitter}
                   onChange={e => setDetails({ ...details, twitter: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-white focus:outline-none focus:border-blue-500"
+                  className="w-full px-3.5 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-white focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 transition-all"
                 />
               </div>
 
               <div>
                 <label className="block text-neutral-300 font-bold text-xs mb-1.5 flex items-center gap-1.5">
-                  <Globe className="w-3.5 h-3.5 text-blue-400" /> Personal Website
+                  <Globe className={`w-3.5 h-3.5 ${activeWebsite?.accentText || 'text-blue-400'}`} /> Personal Website
                 </label>
                 <input
                   type="url"
                   value={details.website}
                   onChange={e => setDetails({ ...details, website: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-white focus:outline-none focus:border-blue-500 font-mono text-xs"
+                  className="w-full px-3.5 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-white focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 font-mono text-xs transition-all"
                 />
               </div>
             </div>
@@ -330,7 +334,7 @@ export default function DetailsView({ onNavigate, activeWebsite }) {
           <div className="pt-4 border-t border-neutral-800 flex justify-end">
             <button
               type="submit"
-              className="h-9 px-5 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:brightness-110 text-white font-bold text-sm flex items-center gap-2 shadow-lg shadow-blue-500/20 transition-all"
+              className={`h-9 px-5 rounded-lg bg-gradient-to-r ${activeWebsite?.gradient || 'from-blue-600 to-indigo-600'} hover:brightness-110 text-white font-bold text-sm flex items-center gap-2 shadow-lg shadow-blue-500/20 transition-all`}
             >
               <Save className="w-4 h-4" />
               <span>Save Profile Details</span>

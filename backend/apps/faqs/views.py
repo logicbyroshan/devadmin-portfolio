@@ -10,4 +10,4 @@ class FaqViewSet(MultiTenantViewSetMixin, viewsets.ModelViewSet):
     """
     queryset = Faq.objects.select_related('website').all()
     serializer_class = FaqSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]

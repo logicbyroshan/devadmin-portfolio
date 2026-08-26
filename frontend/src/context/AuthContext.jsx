@@ -15,13 +15,7 @@ export function AuthProvider({ children }) {
         return null;
       }
     }
-    return {
-      username: 'admin',
-      name: 'Roshan Kumar',
-      email: 'roshan.dev@example.com',
-      role: 'Super Administrator',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'
-    };
+    return null;
   });
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -35,16 +29,22 @@ export function AuthProvider({ children }) {
         try {
           const profile = await authApi.getMe();
           if (profile) {
-            setUser({
+            const userData = {
+              id: profile.id,
               username: profile.username,
               name: `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || profile.username,
-              email: profile.email || 'roshan.dev@example.com',
-              role: profile.is_superuser ? 'Super Administrator' : 'Platform Administrator',
+              email: profile.email || `${profile.username}@devadmin.io`,
+              role: profile.is_superuser ? 'Super Administrator' : (profile.is_staff ? 'Platform Administrator' : 'Developer Admin'),
               avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'
-            });
+            };
+            setUser(userData);
+            localStorage.setItem('devadmin_user', JSON.stringify(userData));
           }
-        } catch {
-          // Keep local state if offline
+        } catch (err) {
+          // If token check fails and no user, clear
+          if (!localStorage.getItem('refresh_token')) {
+            logout();
+          }
         }
       }
     };
@@ -61,34 +61,27 @@ export function AuthProvider({ children }) {
         setToken(res.access);
         setRefreshToken(res.refresh || null);
 
+        // Fetch user profile from /auth/me/
+        let profile = null;
+        try {
+          profile = await authApi.getMe();
+        } catch {
+          profile = null;
+        }
+
         const newUser = {
-          username: username,
-          name: username === 'admin' ? 'Roshan Kumar' : username,
-          email: `${username}@devadmin.io`,
-          role: 'Administrator',
+          id: profile?.id || 1,
+          username: profile?.username || username,
+          name: profile ? (`${profile.first_name || ''} ${profile.last_name || ''}`.trim() || profile.username) : (username === 'admin' ? 'Roshan Kumar' : username),
+          email: profile?.email || `${username}@devadmin.io`,
+          role: profile?.is_superuser ? 'Super Administrator' : 'Platform Administrator',
           avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'
         };
         setUser(newUser);
         localStorage.setItem('devadmin_user', JSON.stringify(newUser));
         setIsAuthModalOpen(false);
-        return { success: true };
+        return { success: true, user: newUser };
       }
-    } catch (err) {
-      // Fallback demo login if offline/local
-      if (username === 'admin') {
-        const demoUser = {
-          username: 'admin',
-          name: 'Roshan Kumar',
-          email: 'roshan.dev@example.com',
-          role: 'Super Administrator',
-          avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'
-        };
-        setUser(demoUser);
-        localStorage.setItem('devadmin_user', JSON.stringify(demoUser));
-        setIsAuthModalOpen(false);
-        return { success: true };
-      }
-      throw err;
     } finally {
       setIsLoading(false);
     }
@@ -102,7 +95,10 @@ export function AuthProvider({ children }) {
         localStorage.setItem('access_token', res.access);
         if (res.refresh) localStorage.setItem('refresh_token', res.refresh);
         setToken(res.access);
+        setRefreshToken(res.refresh || null);
+
         const newUser = {
+          id: res.user?.id,
           username: res.user?.username || userData.username,
           name: `${res.user?.first_name || userData.first_name || ''} ${res.user?.last_name || userData.last_name || ''}`.trim() || userData.username,
           email: res.user?.email || userData.email,
@@ -112,8 +108,24 @@ export function AuthProvider({ children }) {
         setUser(newUser);
         localStorage.setItem('devadmin_user', JSON.stringify(newUser));
         setIsAuthModalOpen(false);
-        return { success: true };
+        return { success: true, user: newUser };
       }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const changePassword = async (currentPassword, newPassword) => {
+    setIsLoading(true);
+    try {
+      const res = await authApi.changePassword(currentPassword, newPassword);
+      if (res && res.access) {
+        localStorage.setItem('access_token', res.access);
+        if (res.refresh) localStorage.setItem('refresh_token', res.refresh);
+        setToken(res.access);
+        setRefreshToken(res.refresh || null);
+      }
+      return res;
     } finally {
       setIsLoading(false);
     }
@@ -126,7 +138,6 @@ export function AuthProvider({ children }) {
     setToken(null);
     setRefreshToken(null);
     setUser(null);
-    setIsAuthModalOpen(true);
   };
 
   return (
@@ -134,13 +145,14 @@ export function AuthProvider({ children }) {
       value={{
         user,
         token,
-        isAuthenticated: !!user,
+        isAuthenticated: !!token || !!user,
         isLoading,
         isAuthModalOpen,
         openAuthModal: () => setIsAuthModalOpen(true),
         closeAuthModal: () => setIsAuthModalOpen(false),
         login,
         register,
+        changePassword,
         logout,
       }}
     >

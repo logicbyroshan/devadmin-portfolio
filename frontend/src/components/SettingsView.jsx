@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { Settings, Shield, UserPlus, Save, Lock, Trash2, Edit2, CheckCircle2, AlertCircle, ToggleLeft, ToggleRight, X } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { websitesApi } from '../services/api';
 
 export default function SettingsView({ onNavigate, activeWebsite }) {
+  const { changePassword } = useAuth();
   const [siteTitle, setSiteTitle] = useState(`${activeWebsite?.name || 'Dev-Meet'} Admin Workspace`);
   const [seoDescription, setSeoDescription] = useState(`Official administrative control center for ${activeWebsite?.name || 'Dev-Meet'} developer platform.`);
-  const [seoKeywords, setSeoKeywords] = useState(`developer, portfolio, admin, ${activeWebsite?.id || 'dev-meet'}, react, fullstack`);
+  const [seoKeywords, setSeoKeywords] = useState(`developer, portfolio, admin, ${activeWebsite?.slug || activeWebsite?.id || 'dev-meet'}, react, fullstack`);
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [savedSettings, setSavedSettings] = useState(false);
 
@@ -19,10 +22,20 @@ export default function SettingsView({ onNavigate, activeWebsite }) {
 
   const [passwords, setPasswords] = useState({ current: '', new: '', confirm: '' });
   const [passFeedback, setPassFeedback] = useState(null);
+  const [isChangingPass, setIsChangingPass] = useState(false);
 
-  const handleSaveGeneral = (e) => {
+  const handleSaveGeneral = async (e) => {
     e.preventDefault();
     setSavedSettings(true);
+    try {
+      const siteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-meet';
+      await websitesApi.patch(siteSlug, {
+        name: activeWebsite?.name || 'DevMeet',
+        tag: seoDescription
+      });
+    } catch {
+      // Fallback
+    }
     setTimeout(() => setSavedSettings(false), 3000);
   };
 
@@ -39,15 +52,33 @@ export default function SettingsView({ onNavigate, activeWebsite }) {
     }
   };
 
-  const handlePasswordSubmit = (e) => {
+  const handlePasswordSubmit = async (e) => {
     e.preventDefault();
+    setPassFeedback(null);
+    if (!passwords.current || !passwords.new) {
+      setPassFeedback({ error: 'Please fill in all password fields.' });
+      return;
+    }
     if (passwords.new !== passwords.confirm) {
       setPassFeedback({ error: 'New passwords do not match!' });
       return;
     }
-    setPassFeedback({ success: 'Password updated successfully!' });
-    setPasswords({ current: '', new: '', confirm: '' });
-    setTimeout(() => setPassFeedback(null), 3000);
+    if (passwords.new.length < 8) {
+      setPassFeedback({ error: 'Password must be at least 8 characters long.' });
+      return;
+    }
+
+    setIsChangingPass(true);
+    try {
+      await changePassword(passwords.current, passwords.new);
+      setPassFeedback({ success: 'Password successfully changed!' });
+      setPasswords({ current: '', new: '', confirm: '' });
+    } catch (err) {
+      setPassFeedback({ error: err.message || 'Failed to update password. Verify current password.' });
+    } finally {
+      setIsChangingPass(false);
+      setTimeout(() => setPassFeedback(null), 5000);
+    }
   };
 
   return (
@@ -251,22 +282,24 @@ export default function SettingsView({ onNavigate, activeWebsite }) {
               required
               value={passwords.confirm}
               onChange={e => setPasswords({ ...passwords, confirm: e.target.value })}
-              className="w-full px-3.5 py-2.5 rounded-lg glass-input bg-[#050609] border-neutral-800"
+              className="w-full px-3.5 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-white focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 transition-all"
             />
           </div>
 
           <button
             type="submit"
-            className="px-5 py-2.5 rounded-lg bg-[#050609] hover:bg-neutral-800 text-neutral-200 hover:text-white border border-neutral-800 font-extrabold text-xs sm:text-sm flex items-center gap-2 transition-all shadow-md"
+            disabled={isChangingPass}
+            className="px-5 py-2.5 rounded-lg bg-[#050609] hover:bg-neutral-800 text-neutral-200 hover:text-white border border-neutral-800 font-extrabold text-xs sm:text-sm flex items-center gap-2 transition-all shadow-md disabled:opacity-50"
           >
-            <Lock className="w-3.5 h-3.5" /> Update Password
+            <Lock className={`w-3.5 h-3.5 ${activeWebsite?.accentText || 'text-blue-400'}`} />
+            <span>{isChangingPass ? 'Updating...' : 'Update Password'}</span>
           </button>
         </form>
       </div>
 
       {/* Add User Modal */}
       {showAddUserModal && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-70 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
           <div className="w-full max-w-md bg-[#07080d] border border-neutral-800 rounded-xl p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150 shadow-2xl">
             <div className="flex items-center justify-between pb-3 border-b border-neutral-800">
               <h3 className="text-base font-extrabold text-white flex items-center gap-2">
@@ -287,7 +320,7 @@ export default function SettingsView({ onNavigate, activeWebsite }) {
                   value={newUser.name}
                   onChange={e => setNewUser({ ...newUser, name: e.target.value })}
                   placeholder="e.g. Alex Morgan"
-                  className="w-full px-3.5 py-2.5 rounded-lg glass-input bg-[#050609] border-neutral-800"
+                  className="w-full px-3.5 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-white focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 transition-all"
                 />
               </div>
 
@@ -299,7 +332,7 @@ export default function SettingsView({ onNavigate, activeWebsite }) {
                   value={newUser.email}
                   onChange={e => setNewUser({ ...newUser, email: e.target.value })}
                   placeholder="alex@example.com"
-                  className="w-full px-3.5 py-2.5 rounded-lg glass-input bg-[#050609] border-neutral-800"
+                  className="w-full px-3.5 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-white focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 transition-all"
                 />
               </div>
 
@@ -308,7 +341,7 @@ export default function SettingsView({ onNavigate, activeWebsite }) {
                 <select
                   value={newUser.role}
                   onChange={e => setNewUser({ ...newUser, role: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-lg glass-input bg-[#050609] border-neutral-800"
+                  className="w-full px-3.5 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-white focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 transition-all"
                 >
                   <option value="Normal User">Normal User</option>
                   <option value="Super User">Super User</option>

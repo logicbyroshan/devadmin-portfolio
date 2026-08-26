@@ -14,6 +14,7 @@ import {
   ChevronDown
 } from 'lucide-react';
 import RichContentBuilder from './RichContentBuilder';
+import CustomDatePicker from './CustomDatePicker';
 import { projectsApi } from '../services/api';
 
 export default function ProjectsView({ onNavigate, activeWebsite }) {
@@ -155,7 +156,7 @@ nodes:
     let isMounted = true;
     const fetchProjects = async () => {
       try {
-        const siteSlug = activeWebsite?.slug || 'dev-meet';
+        const siteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-meet';
         const data = await projectsApi.getAll({ website: siteSlug });
         const list = Array.isArray(data) ? data : (data.results || []);
         if (isMounted && list.length > 0) {
@@ -244,6 +245,7 @@ data:
       return;
     }
 
+    const currentSiteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-meet';
     const payload = {
       title: formData.title,
       slug: formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || `project-${Date.now()}`,
@@ -255,7 +257,7 @@ data:
       demo_url: formData.demoUrl,
       github_url: formData.githubUrl,
       visible: formData.visible,
-      website: activeWebsite?.id || 1
+      website: currentSiteSlug
     };
 
     if (editingId) {
@@ -356,7 +358,7 @@ data:
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
                 <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2">
-                  Project Title <span className="text-blue-400">*</span>
+                  Project Title <span className={activeWebsite?.accentText || "text-blue-400"}>*</span>
                 </label>
                 <input
                   type="text"
@@ -365,7 +367,7 @@ data:
                   value={formData.title}
                   onChange={e => setFormData({ ...formData, title: e.target.value })}
                   placeholder="e.g. Real-Time Distributed Collaboration Suite"
-                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 transition-colors font-accent font-bold"
+                  className="w-full px-4 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 transition-all font-accent font-bold"
                 />
               </div>
 
@@ -378,7 +380,7 @@ data:
                   value={formData.category}
                   onChange={e => setFormData({ ...formData, category: e.target.value })}
                   placeholder="e.g. Web Application, Cloud Architecture"
-                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 transition-colors"
+                  className="w-full px-4 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 transition-all"
                 />
               </div>
             </div>
@@ -392,7 +394,7 @@ data:
                 <select
                   value={formData.status}
                   onChange={e => setFormData({ ...formData, status: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
+                  className="w-full px-4 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-sm text-white focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 transition-all"
                 >
                   <option value="LIVE">LIVE (Public Online)</option>
                   <option value="OFFLINE">OFFLINE (In Development / Archival)</option>
@@ -400,14 +402,12 @@ data:
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2">
-                  Completion / Release Date
-                </label>
-                <input
-                  type="date"
+                <CustomDatePicker
+                  label="Completion / Release Date"
                   value={formData.completed}
-                  onChange={e => setFormData({ ...formData, completed: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
+                  onChange={val => setFormData({ ...formData, completed: val })}
+                  activeWebsite={activeWebsite}
+                  placeholder="Select release date"
                 />
               </div>
             </div>
@@ -423,7 +423,7 @@ data:
                   value={formData.demoUrl}
                   onChange={e => setFormData({ ...formData, demoUrl: e.target.value })}
                   placeholder="https://example.com"
-                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 transition-colors"
+                  className="w-full px-4 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 transition-all"
                 />
               </div>
 
@@ -436,7 +436,7 @@ data:
                   value={formData.githubUrl}
                   onChange={e => setFormData({ ...formData, githubUrl: e.target.value })}
                   placeholder="https://github.com/username/project-repo"
-                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 transition-colors"
+                  className="w-full px-4 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 transition-all"
                 />
               </div>
             </div>
@@ -451,7 +451,7 @@ data:
                 value={formData.image}
                 onChange={e => setFormData({ ...formData, image: e.target.value })}
                 placeholder="https://images.unsplash.com/photo-..."
-                className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 transition-colors font-mono text-xs"
+                className="w-full px-4 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 transition-all font-mono text-xs"
               />
             </div>
 

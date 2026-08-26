@@ -10,4 +10,4 @@ class ProjectViewSet(MultiTenantViewSetMixin, viewsets.ModelViewSet):
     """
     queryset = Project.objects.select_related('website').all()
     serializer_class = ProjectSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]

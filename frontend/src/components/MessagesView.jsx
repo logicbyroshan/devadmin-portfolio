@@ -85,7 +85,7 @@ export default function MessagesView({ onNavigate, activeWebsite }) {
     let isMounted = true;
     const fetchContacts = async () => {
       try {
-        const siteSlug = activeWebsite?.slug || 'dev-meet';
+        const siteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-meet';
         const data = await contactsApi.getAll({ website: siteSlug });
         const list = Array.isArray(data) ? data : (data.results || []);
         if (isMounted && list.length > 0) {
@@ -395,7 +395,7 @@ export default function MessagesView({ onNavigate, activeWebsite }) {
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="p-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/30">
+                    <div className={`p-1 rounded ${activeWebsite?.accentBg || 'bg-blue-500/10'} ${activeWebsite?.accentText || 'text-blue-400'} border ${activeWebsite?.accentBorder || 'border-blue-500/30'}`}>
                       <Mail className="w-3.5 h-3.5" />
                     </div>
                     <span className="text-xs font-bold text-white">
@@ -403,14 +403,13 @@ export default function MessagesView({ onNavigate, activeWebsite }) {
                     </span>
                   </div>
 
-                  <span className="text-xs text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-md border border-blue-500/20 font-semibold flex items-center gap-1.5">
-                    <ShieldCheck className="w-3.5 h-3.5 text-blue-400" /> Direct SMTP Relay Connected
+                  <span className={`text-xs ${activeWebsite?.accentText || 'text-blue-400'} ${activeWebsite?.accentBg || 'bg-blue-500/10'} px-2.5 py-1 rounded-md border ${activeWebsite?.accentBorder || 'border-blue-500/20'} font-semibold flex items-center gap-1.5`}>
+                    <ShieldCheck className={`w-3.5 h-3.5 ${activeWebsite?.accentText || 'text-blue-400'}`} /> Direct SMTP Relay Connected
                   </span>
                 </div>
 
-
                 {/* Subject Input */}
-                <div className="flex items-center gap-2 bg-black/80 border border-neutral-800 rounded-lg px-3 py-2 text-xs">
+                <div className="flex items-center gap-2 bg-[#050609] border border-neutral-800 rounded-lg px-3 py-2 text-xs">
                   <span className="text-neutral-400 font-bold text-[11px] uppercase tracking-wider">Subject:</span>
                   <input
                     type="text"
@@ -426,7 +425,7 @@ export default function MessagesView({ onNavigate, activeWebsite }) {
                   value={replyText}
                   onChange={e => setReplyText(e.target.value)}
                   placeholder={`Hi ${selectedMessage.sender},\n\nThank you for reaching out! I would be delighted to assist you with...`}
-                  className="w-full p-3 rounded-lg bg-black/80 border border-neutral-800 text-xs sm:text-sm text-neutral-100 placeholder-neutral-500 focus:outline-none focus:border-blue-500/80 transition-colors resize-none leading-relaxed font-normal"
+                  className="w-full p-3 rounded-lg bg-[#050609] border border-neutral-800 text-xs sm:text-sm text-neutral-100 placeholder-neutral-500 focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 transition-all resize-none leading-relaxed font-normal"
                 />
 
                 {/* Canned suggestions + Send Button */}
@@ -458,7 +457,7 @@ export default function MessagesView({ onNavigate, activeWebsite }) {
                   <button
                     type="button"
                     onClick={handleSendReply}
-                    className="px-5 py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:brightness-110 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 transition-all flex-shrink-0"
+                    className={`px-5 py-2.5 rounded-lg bg-gradient-to-r ${activeWebsite?.gradient || 'from-blue-600 to-indigo-600'} hover:brightness-110 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 transition-all flex-shrink-0`}
                   >
                     <Send className="w-4 h-4" />
                     <span>Send Email Reply</span>

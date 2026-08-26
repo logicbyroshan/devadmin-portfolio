@@ -10,10 +10,16 @@ class ContactInquiryViewSet(MultiTenantViewSetMixin, viewsets.ModelViewSet):
     """
     Contact Inquiries & Messaging API.
     Supports email inquiries, message starring, read toggles, and authenticated SMTP replies.
+    - Public visitors can submit contact inquiries (POST).
+    - Only authenticated administrators can read, star, delete, or reply to messages.
     """
     queryset = ContactInquiry.objects.select_related('website').all()
     serializer_class = ContactInquirySerializer
-    permission_classes = [permissions.AllowAny]
+
+    def get_permissions(self):
+        if self.action == 'create':
+            return [permissions.AllowAny()]
+        return [permissions.IsAuthenticated()]
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -31,7 +37,7 @@ class ContactInquiryViewSet(MultiTenantViewSetMixin, viewsets.ModelViewSet):
             
         return queryset
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def reply(self, request, pk=None):
         """Dispatches an email reply via NotificationService."""
         inquiry = self.get_object()
@@ -47,7 +53,7 @@ class ContactInquiryViewSet(MultiTenantViewSetMixin, viewsets.ModelViewSet):
         except Exception as ex:
             return Response({'error': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def toggle_star(self, request, pk=None):
         """Toggle starred status."""
         inquiry = self.get_object()
@@ -55,7 +61,7 @@ class ContactInquiryViewSet(MultiTenantViewSetMixin, viewsets.ModelViewSet):
         inquiry.save(update_fields=['starred'])
         return Response({'id': inquiry.id, 'starred': inquiry.starred}, status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def mark_read(self, request, pk=None):
         """Mark message as read."""
         inquiry = self.get_object()

@@ -4,6 +4,7 @@ Provides high-performance single-pass database aggregations, activity streams, a
 """
 
 from typing import Dict, Any, List
+from django.utils import timezone
 from django.db.models import Count, Q
 from apps.websites.models import Website
 from apps.projects.models import Project
@@ -20,7 +21,10 @@ class AnalyticsService:
         site_filter = {}
         if website_slug:
             try:
-                site = Website.objects.get(slug=website_slug)
+                if website_slug.isdigit():
+                    site = Website.objects.get(id=int(website_slug))
+                else:
+                    site = Website.objects.get(slug=website_slug)
                 site_filter = {'website': site}
             except Website.DoesNotExist:
                 site_filter = {}
@@ -60,10 +64,13 @@ class AnalyticsService:
         """Retrieve recent project deployments and blog publications."""
         site_filter = {}
         if website_slug:
-            site_filter = {'website__slug': website_slug}
+            if website_slug.isdigit():
+                site_filter = {'website_id': int(website_slug)}
+            else:
+                site_filter = {'website__slug': website_slug}
 
-        recent_blogs = BlogPost.objects.filter(**site_filter).order_by('-created_at')[:limit]
-        recent_projects = Project.objects.filter(**site_filter).order_by('-created_at')[:limit]
+        recent_blogs = BlogPost.objects.filter(**site_filter).select_related('website').order_by('-created_at')[:limit]
+        recent_projects = Project.objects.filter(**site_filter).select_related('website').order_by('-created_at')[:limit]
 
         return {
             'blogs': [{
@@ -83,8 +90,11 @@ class AnalyticsService:
         }
 
     @staticmethod
-    def generate_contribution_heatmap(year: int = 2025) -> Dict[str, Any]:
+    def generate_contribution_heatmap(year: int = None) -> Dict[str, Any]:
         """Generate full 12-month contribution activity matrix."""
+        if year is None:
+            year = timezone.now().year
+
         months = [
             'January', 'February', 'March', 'April', 'May', 'June',
             'July', 'August', 'September', 'October', 'November', 'December'
@@ -95,7 +105,7 @@ class AnalyticsService:
             days_count = 28 if m_idx == 1 else (31 if m_idx % 2 == 0 else 30)
             days = []
             for d in range(1, days_count + 1):
-                seed = (m_idx * 31 + d)
+                seed = (m_idx * 31 + d + (year % 10))
                 level = 0 if seed % 7 == 0 else (4 if seed % 5 == 0 else (3 if seed % 3 == 0 else (2 if seed % 2 == 0 else 1)))
                 days.append({
                     'day': d,

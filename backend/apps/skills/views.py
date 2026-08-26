@@ -10,4 +10,4 @@ class SkillViewSet(MultiTenantViewSetMixin, viewsets.ModelViewSet):
     """
     queryset = Skill.objects.select_related('website').all()
     serializer_class = SkillSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]

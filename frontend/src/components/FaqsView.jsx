@@ -82,7 +82,7 @@ export default function FaqsView({ onNavigate, activeWebsite }) {
     let isMounted = true;
     const fetchFaqs = async () => {
       try {
-        const siteSlug = activeWebsite?.slug || 'dev-meet';
+        const siteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-meet';
         const data = await faqsApi.getAll({ website: siteSlug });
         const list = Array.isArray(data) ? data : (data.results || []);
         if (isMounted && list.length > 0) {
@@ -138,12 +138,13 @@ export default function FaqsView({ onNavigate, activeWebsite }) {
       return;
     }
 
+    const currentSiteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-meet';
     const payload = {
       question: formData.question,
       answer: formData.answer,
       category: formData.category,
       visible: formData.visible,
-      website: activeWebsite?.id || 1
+      website: currentSiteSlug
     };
 
     if (editingId) {
@@ -244,7 +245,7 @@ export default function FaqsView({ onNavigate, activeWebsite }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
                 <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2">
-                  Question <span className="text-blue-400">*</span>
+                  Question <span className={activeWebsite?.accentText || "text-blue-400"}>*</span>
                 </label>
                 <input
                   type="text"
@@ -253,7 +254,7 @@ export default function FaqsView({ onNavigate, activeWebsite }) {
                   value={formData.question}
                   onChange={e => setFormData({ ...formData, question: e.target.value })}
                   placeholder="e.g. What is your typical turnaround time for full-stack builds?"
-                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 transition-colors font-accent"
+                  className="w-full px-4 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 transition-all font-accent"
                 />
               </div>
 
@@ -266,14 +267,14 @@ export default function FaqsView({ onNavigate, activeWebsite }) {
                   value={formData.category}
                   onChange={e => setFormData({ ...formData, category: e.target.value })}
                   placeholder="e.g. Services, Timeline, Technical"
-                  className="w-full px-4 py-3 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 transition-colors"
+                  className="w-full px-4 py-2.5 rounded-lg bg-[#050609] border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 transition-all"
                 />
               </div>
             </div>
 
             <div>
               <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2">
-                Detailed Answer <span className="text-blue-400">*</span>
+                Detailed Answer <span className={activeWebsite?.accentText || "text-blue-400"}>*</span>
               </label>
               <textarea
                 rows={5}
@@ -281,7 +282,7 @@ export default function FaqsView({ onNavigate, activeWebsite }) {
                 value={formData.answer}
                 onChange={e => setFormData({ ...formData, answer: e.target.value })}
                 placeholder="Provide a comprehensive and helpful response for your clients..."
-                className="w-full p-4 rounded-lg bg-black/80 border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 resize-none leading-relaxed transition-colors"
+                className="w-full p-4 rounded-lg bg-[#050609] border border-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500/80 focus:ring-1 focus:ring-blue-500/30 resize-none leading-relaxed transition-all"
               />
             </div>
 

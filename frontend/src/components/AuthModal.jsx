@@ -83,7 +83,7 @@ export default function AuthModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-70 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
       <div className="relative w-full max-w-md bg-[#07080d] border border-neutral-800 rounded-2xl shadow-2xl overflow-hidden">
         {/* Top Gradient Banner */}
         <div className="relative bg-gradient-to-r from-blue-950/80 via-indigo-950/60 to-purple-950/40 p-6 border-b border-neutral-800 text-center">

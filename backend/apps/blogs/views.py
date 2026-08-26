@@ -10,4 +10,4 @@ class BlogPostViewSet(MultiTenantViewSetMixin, viewsets.ModelViewSet):
     """
     queryset = BlogPost.objects.select_related('website').all()
     serializer_class = BlogPostSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]

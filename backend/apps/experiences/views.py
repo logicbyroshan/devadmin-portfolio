@@ -10,4 +10,4 @@ class ExperienceViewSet(MultiTenantViewSetMixin, viewsets.ModelViewSet):
     """
     queryset = Experience.objects.select_related('website').all()
     serializer_class = ExperienceSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]

@@ -51,16 +51,50 @@ export default function DashboardView({ onNavigate, activeWebsite }) {
   const [replySubject, setReplySubject] = useState('');
   const [replyText, setReplyText] = useState('');
   const [sentToast, setSentToast] = useState(false);
+  const [blogsActivities, setBlogsActivities] = useState([
+    { id: 1, title: 'Published article: "Optimizing Node.js APIs for High Scale"', time: 'Recently', icon: FileText, color: 'text-blue-400', bg: 'bg-blue-500/10' },
+    { id: 2, title: 'Scheduled draft "State Management in 2025"', time: 'Upcoming', icon: CalendarDays, color: 'text-indigo-400', bg: 'bg-indigo-500/10' },
+    { id: 3, title: 'Saved draft "Understanding React Server Components"', time: 'Draft', icon: FileEdit, color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
+  ]);
+  const [projectActivities, setProjectActivities] = useState([
+    { id: 1, title: 'Updated live preview production URL and API endpoints', time: 'Recently', icon: Globe, color: 'text-blue-400', bg: 'bg-blue-500/10' },
+    { id: 2, title: 'Deployed WebRTC selective forwarding unit relay service', time: 'Recently', icon: Sparkles, color: 'text-indigo-400', bg: 'bg-indigo-500/10' },
+    { id: 3, title: 'Completed benchmark test suite for REST & WebSocket gateways', time: 'Recently', icon: CheckCircle, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+  ]);
 
-  // Fetch live stats & messages from backend API
+  // Fetch live stats, activities & messages from backend API
   useEffect(() => {
     let isMounted = true;
     const fetchDashboardData = async () => {
       try {
-        const siteSlug = activeWebsite?.slug || 'dev-meet';
+        const siteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-meet';
         const liveStats = await dashboardApi.getStats(siteSlug);
         if (isMounted && liveStats) {
           setStats(liveStats);
+        }
+
+        const activitiesData = await dashboardApi.getActivities(siteSlug).catch(() => null);
+        if (isMounted && activitiesData) {
+          if (activitiesData.blogs && activitiesData.blogs.length > 0) {
+            setBlogsActivities(activitiesData.blogs.map(b => ({
+              id: b.id,
+              title: b.title,
+              time: b.time || 'Recently',
+              icon: b.status === 'PUBLISHED' ? FileText : (b.status === 'SCHEDULED' ? CalendarDays : FileEdit),
+              color: b.status === 'PUBLISHED' ? 'text-blue-400' : (b.status === 'SCHEDULED' ? 'text-indigo-400' : 'text-cyan-400'),
+              bg: b.status === 'PUBLISHED' ? 'bg-blue-500/10' : (b.status === 'SCHEDULED' ? 'bg-indigo-500/10' : 'bg-cyan-500/10')
+            })));
+          }
+          if (activitiesData.projects && activitiesData.projects.length > 0) {
+            setProjectActivities(activitiesData.projects.map(p => ({
+              id: p.id,
+              title: p.title,
+              time: p.time || 'Recently',
+              icon: p.status === 'LIVE' ? Globe : Sparkles,
+              color: p.status === 'LIVE' ? 'text-blue-400' : 'text-indigo-400',
+              bg: p.status === 'LIVE' ? 'bg-blue-500/10' : 'bg-indigo-500/10'
+            })));
+          }
         }
 
         const contactsData = await contactsApi.getAll({ website: siteSlug });
@@ -98,30 +132,14 @@ export default function DashboardView({ onNavigate, activeWebsite }) {
         await contactsApi.reply(currentMsg.id, replySubject || `Re: Inquiry`, replyText);
       }
     } catch {
-      // Fallback simulation
+      // Fallback
     }
     setTimeout(() => {
       setSentToast(false);
       setReplyText('');
       alert(`Email reply sent successfully via SMTP to ${currentMsg?.email || 'recipient'}!`);
-    }, 600);
+    }, 500);
   };
-
-  // Separate Blogs Activities (showing exactly 3 items)
-  const [blogsActivities] = useState([
-    { id: 1, title: 'Published article: "Optimizing Node.js APIs for High Scale"', time: '4h ago', icon: FileText, color: 'text-blue-400', bg: 'bg-blue-500/10' },
-    { id: 2, title: 'Scheduled draft "State Management in 2025" for June 25', time: '2d ago', icon: CalendarDays, color: 'text-indigo-400', bg: 'bg-indigo-500/10' },
-    { id: 3, title: 'Saved new draft "Understanding React Server Components"', time: '3d ago', icon: FileEdit, color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
-    { id: 4, title: 'Article reached 1,420 total reader views', time: '5d ago', icon: BookOpen, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-  ]);
-
-  // Separate Project Activities (showing exactly 3 items)
-  const [projectActivities] = useState([
-    { id: 1, title: 'Updated live preview production URL and API endpoints', time: '2h ago', icon: Globe, color: 'text-blue-400', bg: 'bg-blue-500/10' },
-    { id: 2, title: 'Completed milestone 3 of "Ecommerce Microservices"', time: '1d ago', icon: CheckCircle, color: 'text-amber-400', bg: 'bg-amber-500/10' },
-    { id: 3, title: 'Deployed v2.0 production build to Vercel edge', time: '2d ago', icon: FolderCheck, color: 'text-indigo-400', bg: 'bg-indigo-500/10' },
-    { id: 4, title: 'Added 5 screenshots to Mobile App portfolio card', time: '4d ago', icon: FolderKanban, color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
-  ]);
 
   const [resumeName, setResumeName] = useState('my-resume-v4.pdf');
 

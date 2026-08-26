@@ -13,9 +13,11 @@ from drf_spectacular.views import (
 )
 
 from apps.websites.views_auth import RegisterView, CurrentUserView, ChangePasswordView
-from apps.common.views_health import HealthCheckView
+from apps.common.views_health import HealthCheckView, ApiRootView
 
 urlpatterns = [
+    path('', ApiRootView.as_view(), name='root_index'),
+    path('api/', ApiRootView.as_view(), name='api_root_index'),
     path('admin/', admin.site.urls),
     
     # OpenAPI 3.0 & Interactive Swagger UI Documentation

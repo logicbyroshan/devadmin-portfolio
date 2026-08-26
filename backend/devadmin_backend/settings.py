@@ -13,7 +13,11 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-devadmin-multi-site-s
 
 DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = [h.strip() for h in os.environ.get('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',') if h.strip()]
+_env_hosts = os.environ.get('ALLOWED_HOSTS', '')
+if _env_hosts:
+    ALLOWED_HOSTS = [h.strip() for h in _env_hosts.split(',') if h.strip()]
+else:
+    ALLOWED_HOSTS = ['*'] if DEBUG else ['127.0.0.1', 'localhost', '.localhost']
 
 INSTALLED_APPS = [
     'django.contrib.admin',

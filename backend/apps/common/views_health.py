@@ -1,5 +1,5 @@
 """
-System & Database Health Check Endpoint
+System & Database Health Check Endpoint & API Root Overview
 """
 
 import time
@@ -46,3 +46,40 @@ class HealthCheckView(APIView):
 
         http_status = status.HTTP_200_OK if is_healthy else status.HTTP_503_SERVICE_UNAVAILABLE
         return Response(data, status=http_status)
+
+
+class ApiRootView(APIView):
+    """
+    Root API discovery index.
+    """
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        return Response({
+            "service": "DevAdmin Multi-Site Portfolio Management REST API",
+            "version": "1.0.0",
+            "documentation": {
+                "swagger_ui": "/api/docs/",
+                "redoc": "/api/redoc/",
+                "openapi_schema": "/api/schema/"
+            },
+            "health": "/api/health/",
+            "endpoints": {
+                "auth": {
+                    "token": "/api/auth/token/",
+                    "refresh": "/api/auth/token/refresh/",
+                    "register": "/api/auth/register/",
+                    "me": "/api/auth/me/",
+                    "change_password": "/api/auth/change-password/"
+                },
+                "websites": "/api/websites/",
+                "projects": "/api/projects/",
+                "blogs": "/api/blogs/",
+                "experiences": "/api/experiences/",
+                "skills": "/api/skills/",
+                "contacts": "/api/contacts/",
+                "faqs": "/api/faqs/",
+                "profiles": "/api/profiles/",
+                "dashboard": "/api/dashboard/stats/"
+            }
+        })

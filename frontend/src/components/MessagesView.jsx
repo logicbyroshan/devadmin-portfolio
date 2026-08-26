@@ -192,11 +192,11 @@ export default function MessagesView({ onNavigate, activeWebsite }) {
   };
 
   return (
-    <div className="space-y-5 w-full max-w-full overflow-x-hidden font-sans">
+    <div className="flex flex-col h-[calc(100vh-6.5rem)] space-y-4 w-full max-w-full overflow-hidden font-sans">
       {/* Header Banner */}
-      <div className="p-4 sm:p-5 rounded-xl bg-[#07080d] border border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl">
+      <div className="flex-shrink-0 p-4 sm:p-4.5 rounded-xl bg-[#07080d] border border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xl">
         <div className="flex items-center gap-3.5">
-          <div className="p-3 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/30">
+          <div className="p-2.5 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/30">
             <Mail className="w-5 h-5" />
           </div>
           <div>
@@ -214,11 +214,11 @@ export default function MessagesView({ onNavigate, activeWebsite }) {
       </div>
 
       {/* 2-Column Split: Message Inbox Feed (Left) & Full Conversation & Reply Console (Right) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch min-h-[640px]">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 min-h-0 overflow-hidden">
         {/* LEFT COLUMN: Messages Feed & Search */}
-        <div className="lg:col-span-5 rounded-xl bg-[#07080d] border border-neutral-800 shadow-xl overflow-hidden flex flex-col justify-between">
+        <div className="lg:col-span-5 rounded-xl bg-[#07080d] border border-neutral-800 shadow-xl overflow-hidden flex flex-col h-full min-h-0">
           {/* Top Filter & Search Bar */}
-          <div className="p-3.5 border-b border-neutral-800 space-y-2.5 bg-[#050609]">
+          <div className="flex-shrink-0 p-3.5 border-b border-neutral-800 space-y-2.5 bg-[#050609]">
             <div className="relative">
               <Search className="w-4 h-4 text-neutral-500 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
@@ -256,7 +256,7 @@ export default function MessagesView({ onNavigate, activeWebsite }) {
           </div>
 
           {/* Scrollable Message Items List */}
-          <div className="p-3 space-y-2 flex-1 overflow-y-auto max-h-[580px]">
+          <div className="p-3 space-y-2 flex-1 overflow-y-auto min-h-0">
             {filteredMessages.length === 0 ? (
               <div className="p-8 text-center text-neutral-500 text-xs">
                 No messages match the current filter.
@@ -332,11 +332,11 @@ export default function MessagesView({ onNavigate, activeWebsite }) {
         </div>
 
         {/* RIGHT COLUMN: Full Conversation Reader & Quick Email Reply Composer */}
-        <div className="lg:col-span-7 rounded-xl bg-[#07080d] border border-neutral-800 shadow-xl overflow-hidden flex flex-col justify-between">
+        <div className="lg:col-span-7 rounded-xl bg-[#07080d] border border-neutral-800 shadow-xl overflow-hidden flex flex-col h-full min-h-0">
           {selectedMessage ? (
-            <div className="flex-1 flex flex-col justify-between">
+            <div className="flex-1 flex flex-col h-full min-h-0">
               {/* Message Header */}
-              <div className="bg-gradient-to-r from-[#0c0f1d] via-[#090b14] to-[#05060a] p-4 border-b border-neutral-800 flex items-start justify-between gap-3">
+              <div className="flex-shrink-0 bg-gradient-to-r from-[#0c0f1d] via-[#090b14] to-[#05060a] p-4 border-b border-neutral-800 flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-black text-base flex items-center justify-center flex-shrink-0 shadow-md font-accent">
                     {selectedMessage.sender.charAt(0)}
@@ -373,7 +373,7 @@ export default function MessagesView({ onNavigate, activeWebsite }) {
               </div>
 
               {/* Message Content View Card */}
-              <div className="p-5 space-y-3.5 border-b border-neutral-800 bg-[#050609]/60">
+              <div className="flex-1 overflow-y-auto min-h-0 p-5 space-y-3.5 bg-[#050609]/60">
                 <div className="text-sm sm:text-base font-bold text-neutral-100">
                   {selectedMessage.subject}
                 </div>
@@ -384,7 +384,7 @@ export default function MessagesView({ onNavigate, activeWebsite }) {
               </div>
 
               {/* Direct Email Reply Composer */}
-              <div className="p-4 sm:p-5 space-y-3.5 bg-[#07080d]">
+              <div className="flex-shrink-0 p-4 sm:p-5 space-y-3 bg-[#07080d] border-t border-neutral-800">
                 {/* Sent Success Toast Banner */}
                 {isSentToast && (
                   <div className="flex items-center gap-2.5 p-3 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-bold animate-in fade-in duration-200">
@@ -421,7 +421,7 @@ export default function MessagesView({ onNavigate, activeWebsite }) {
 
                 {/* Textarea */}
                 <textarea
-                  rows={4}
+                  rows={3}
                   value={replyText}
                   onChange={e => setReplyText(e.target.value)}
                   placeholder={`Hi ${selectedMessage.sender},\n\nThank you for reaching out! I would be delighted to assist you with...`}
@@ -429,7 +429,7 @@ export default function MessagesView({ onNavigate, activeWebsite }) {
                 />
 
                 {/* Canned suggestions + Send Button */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
                   <div className="flex flex-wrap items-center gap-1.5">
                     <button
                       type="button"
@@ -457,7 +457,7 @@ export default function MessagesView({ onNavigate, activeWebsite }) {
                   <button
                     type="button"
                     onClick={handleSendReply}
-                    className={`px-5 py-2.5 rounded-lg bg-gradient-to-r ${activeWebsite?.gradient || 'from-blue-600 to-indigo-600'} hover:brightness-110 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 transition-all flex-shrink-0`}
+                    className={`px-5 py-2 rounded-lg bg-gradient-to-r ${activeWebsite?.gradient || 'from-blue-600 to-indigo-600'} hover:brightness-110 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 transition-all flex-shrink-0`}
                   >
                     <Send className="w-4 h-4" />
                     <span>Send Email Reply</span>
@@ -466,7 +466,7 @@ export default function MessagesView({ onNavigate, activeWebsite }) {
               </div>
             </div>
           ) : (
-            <div className="p-12 text-center text-neutral-500 text-sm flex flex-col items-center justify-center space-y-2">
+            <div className="p-12 text-center text-neutral-500 text-sm flex flex-col items-center justify-center space-y-2 h-full">
               <Inbox className="w-10 h-10 text-neutral-600" />
               <p>Select a message from the left to read and reply.</p>
             </div>

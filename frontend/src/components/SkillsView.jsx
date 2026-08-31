@@ -53,7 +53,7 @@ export default function SkillsView({ onNavigate, activeWebsite }) {
     let isMounted = true;
     const fetchSkills = async () => {
       try {
-        const siteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-meet';
+        const siteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-mate';
         const data = await skillsApi.getAll({ website: siteSlug });
         const list = Array.isArray(data) ? data : (data.results || []);
         if (isMounted && list.length > 0) {
@@ -113,7 +113,7 @@ export default function SkillsView({ onNavigate, activeWebsite }) {
       return;
     }
 
-    const currentSiteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-meet';
+    const currentSiteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-mate';
     const payload = {
       name: formData.name,
       category: formData.category,

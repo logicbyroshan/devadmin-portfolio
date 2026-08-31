@@ -40,10 +40,13 @@ INSTALLED_APPS = [
     'apps.projects',
     'apps.experiences',
     'apps.skills',
+    'apps.categories',
+    'apps.achievements',
     'apps.contacts',
     'apps.faqs',
     'apps.profiles',
     'apps.dashboard',
+    'apps.public_api',
 ]
 
 MIDDLEWARE = [

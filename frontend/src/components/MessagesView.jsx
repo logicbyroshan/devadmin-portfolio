@@ -85,7 +85,7 @@ export default function MessagesView({ onNavigate, activeWebsite }) {
     let isMounted = true;
     const fetchContacts = async () => {
       try {
-        const siteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-meet';
+        const siteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-mate';
         const data = await contactsApi.getAll({ website: siteSlug });
         const list = Array.isArray(data) ? data : (data.results || []);
         if (isMounted && list.length > 0) {

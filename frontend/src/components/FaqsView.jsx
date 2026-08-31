@@ -82,7 +82,7 @@ export default function FaqsView({ onNavigate, activeWebsite }) {
     let isMounted = true;
     const fetchFaqs = async () => {
       try {
-        const siteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-meet';
+        const siteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-mate';
         const data = await faqsApi.getAll({ website: siteSlug });
         const list = Array.isArray(data) ? data : (data.results || []);
         if (isMounted && list.length > 0) {
@@ -138,7 +138,7 @@ export default function FaqsView({ onNavigate, activeWebsite }) {
       return;
     }
 
-    const currentSiteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-meet';
+    const currentSiteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-mate';
     const payload = {
       question: formData.question,
       answer: formData.answer,

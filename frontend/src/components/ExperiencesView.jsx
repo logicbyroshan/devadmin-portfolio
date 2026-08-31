@@ -80,7 +80,7 @@ export default function ExperiencesView({ onNavigate, activeWebsite }) {
     let isMounted = true;
     const fetchExperiences = async () => {
       try {
-        const siteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-meet';
+        const siteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-mate';
         const data = await experiencesApi.getAll({ website: siteSlug });
         const list = Array.isArray(data) ? data : (data.results || []);
         if (isMounted && list.length > 0) {
@@ -144,7 +144,7 @@ export default function ExperiencesView({ onNavigate, activeWebsite }) {
       return;
     }
 
-    const currentSiteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-meet';
+    const currentSiteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-mate';
     const payload = {
       role: formData.role,
       company: formData.company,

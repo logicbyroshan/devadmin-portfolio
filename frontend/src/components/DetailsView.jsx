@@ -43,7 +43,7 @@ export default function DetailsView({ onNavigate, activeWebsite }) {
     let isMounted = true;
     const fetchProfile = async () => {
       try {
-        const siteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-meet';
+        const siteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-mate';
         const res = await profilesApi.getByWebsite(siteSlug);
         const list = Array.isArray(res) ? res : (res.results || []);
         if (isMounted && list.length > 0) {
@@ -88,7 +88,7 @@ export default function DetailsView({ onNavigate, activeWebsite }) {
     e?.preventDefault();
     setSaved(true);
 
-    const currentSiteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-meet';
+    const currentSiteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-mate';
     const payload = {
       name: details.name,
       title: details.title,

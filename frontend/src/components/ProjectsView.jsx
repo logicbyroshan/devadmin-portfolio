@@ -25,90 +25,52 @@ export default function ProjectsView({ onNavigate, activeWebsite }) {
   const [projects, setProjects] = useState([
     {
       id: 1,
-      title: 'Dev-Meet Video Conference Suite',
-      status: 'LIVE',
-      category: 'Web Application',
-      description: `## 🎥 High-Performance WebRTC Video Conferencing Suite
+      title: 'CardFlow Enterprise ID Automation Engine',
+      projectName: 'CardFlow',
+      status: 'active',
+      category: 'Enterprise SaaS',
+      technologies: 'Python, Django, Celery, Redis, React, PostgreSQL',
+      description: `## 🚀 CardFlow Enterprise ID Generation Pipeline
 
-Real-time WebRTC multi-peer conference room with low-latency media relays, selective forwarding units (SFU), and synchronized collaborative code editing.
+High-throughput asynchronous ID card generation platform processing 136K+ cards with Celery and Redis.
 
-### 🏛️ WebRTC Peer & SFU Media Topology
+### 🏛️ Distributed Print & Rendering Pipeline
 
 \`\`\`architecture:microservices
-title: WebRTC Mesh & Selective Forwarding Unit (SFU) Relay
+title: CardFlow Distributed Print & Rendering Pipeline
 nodes:
-  - [Client Browser A] -> [Signaling Gateway (WebSocket / SSL)]
-  - [Signaling Gateway] -> [Mediasoup SFU Media Server]
-  - [Mediasoup SFU Server] -> [Opus Audio & VP9 Video Router]
-  - [Mediasoup SFU Server] -> [Client Browser B & C]
+  - [Client Dashboard (React)] -> [Nginx Reverse Proxy]
+  - [Nginx Reverse Proxy] -> [Django REST Framework Gateway]
+  - [DRF Gateway] -> [Redis Celery Task Broker]
+  - [Redis Broker] -> [Celery Worker Cluster (SVG/PDF Renderer)]
+  - [Celery Workers] -> [PostgreSQL Transaction Ledger]
 \`\`\`
 
-### ⚡ Connection Latency & Audio Jitter Benchmarks
+### ⚡ Performance Benchmarks
 
 \`\`\`chart:barchart
-title: Global Media Relay Latency (ms - Lower is Better)
-unit: ms
+title: Card Generation Throughput (Cards/sec - Higher is Better)
+unit: cards/sec
 data:
-  - Direct P2P Relay: 18
-  - Mediasoup SFU Regional Node: 24
-  - Legacy TURN Relay Server: 62
+  - CardFlow Celery Cluster: 145
+  - Legacy Node Pipeline: 12
 \`\`\`
-
-### 📡 Real-time Room Signaling Endpoints
-
-| Method | Endpoint Path | Description | Protocol |
-| :--- | :--- | :--- | :--- |
-| \`POST\` | \`/api/v1/rooms/create\` | Initialize encrypted WebRTC room | HTTPS REST |
-| \`WSS\` | \`/ws/rooms/:id/connect\` | Media stream negotiation & SDP exchange | WebSockets |
 `,
-      completed: '2025-05-15',
-      image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80',
-      demoUrl: 'https://dev-meet.example.com',
-      githubUrl: 'https://github.com/roshan-dev/dev-meet',
-      visible: true
+      completed: '2025-06-15',
+      image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=80',
+      demoUrl: 'https://cardflow.logicbyroshan.in',
+      liveUrl: 'https://cardflow.logicbyroshan.in',
+      githubUrl: 'https://github.com/logicbyroshan/cardflow',
+      visible: true,
+      featured: true
     },
     {
       id: 2,
-      title: 'Mitra Peer Pairing Matcher',
-      status: 'LIVE',
-      category: 'Community Platform',
-      description: `## 🤝 Intelligent Developer Mentorship & Pairing Platform
-
-Smart developer mentor pairing algorithms connecting junior developers with senior engineers for sprint coaching, code review sessions, and career guidance.
-
-### 🏛️ Algorithmic Matching Pipeline
-
-\`\`\`architecture:microservices
-title: Graph-Based Matchmaking Engine Flow
-nodes:
-  - [Mentor Profile Vectors] -> [Vector Embedding Engine]
-  - [Mentee Learning Goals] -> [Cosine Similarity Matcher]
-  - [Cosine Matcher] -> [Redis Pairing Queue]
-  - [Redis Pairing Queue] -> [Automated Calendar Invitation Relay]
-\`\`\`
-
-### 📈 Match Precision & Satisfaction Score
-
-\`\`\`chart:linegraph
-title: Session Completion Rate vs Pairing Cohorts
-unit: %
-points:
-  - Cohort 1 (Manual): 64%
-  - Cohort 2 (Rule-Based): 76%
-  - Cohort 3 (Vector Match): 94%
-\`\`\`
-`,
-      completed: '2025-06-01',
-      image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&auto=format&fit=crop&q=80',
-      demoUrl: 'https://dev-mitra.example.com',
-      githubUrl: 'https://github.com/roshan-dev/dev-mitra',
-      visible: true
-    },
-    {
-      id: 3,
-      title: 'Dev-Mate Collaborative IDE Sandbox',
-      status: 'OFFLINE',
-      category: 'Developer Tools',
+      title: 'DevMate In-Browser Sandbox IDE',
+      projectName: 'DevMate IDE',
+      status: 'active',
+      category: 'AI & Developer Tools',
+      technologies: 'React, TypeScript, WebAssembly, Python, Docker',
       description: `## ⚡ In-Browser Cloud Compilation & Code Sandbox
 
 In-browser real-time cloud compilation sandbox supporting Node.js, Python, and Go micro-services with instantaneous live preview and container execution.
@@ -119,15 +81,17 @@ In-browser real-time cloud compilation sandbox supporting Node.js, Python, and G
 title: Isolated Cloud Code Execution Sandbox
 nodes:
   - [Monaco Code Editor] -> [WebSocket Language Server (LSP)]
-  - [LSP Server] -> [Firecracker MicroVM Manager]
-  - [Firecracker MicroVM] -> [Isolated Ephemeral Container]
+  - [LSP Server] -> [Pyodide / WebAssembly Engine]
+  - [Pyodide Engine] -> [Interactive Live Terminal]
 \`\`\`
 `,
-      completed: '2025-06-20',
-      image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&auto=format&fit=crop&q=80',
-      demoUrl: '#',
-      githubUrl: 'https://github.com/roshan-dev/dev-mate',
-      visible: false
+      completed: '2025-07-20',
+      image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=80',
+      demoUrl: 'https://devmate.logicbyroshan.in',
+      liveUrl: 'https://devmate.logicbyroshan.in',
+      githubUrl: 'https://github.com/logicbyroshan/devmate',
+      visible: true,
+      featured: true
     }
   ]);
 
@@ -151,26 +115,32 @@ nodes:
     return p.category === selectedCategory;
   });
 
-  // Fetch projects from Django REST Framework API with multi-tenant filtering
+  // Fetch projects from Django REST Framework API
   useEffect(() => {
     let isMounted = true;
     const fetchProjects = async () => {
       try {
-        const siteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-meet';
-        const data = await projectsApi.getAll({ website: siteSlug });
+        const data = await projectsApi.getAll({ website: 'dev-mate' });
         const list = Array.isArray(data) ? data : (data.results || []);
         if (isMounted && list.length > 0) {
           setProjects(list.map(p => ({
             id: p.id,
             title: p.title,
+            projectName: p.project_name || p.title,
             status: p.status,
             category: p.category || 'Web Application',
             description: p.description || '',
+            documentation: p.documentation || p.description || '',
+            technologies: p.technologies || '',
             completed: p.completed_date || p.completed || '',
-            image: p.image || 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80',
+            image: p.image || p.thumbnail || 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80',
             demoUrl: p.demo_url || p.demoUrl || '',
+            liveUrl: p.live_url || p.liveUrl || '',
             githubUrl: p.github_url || p.githubUrl || '',
-            visible: p.visible !== false
+            visible: p.visible !== false && p.is_active !== false,
+            featured: p.featured || p.is_featured || false,
+            views: p.views || 0,
+            likes: p.likes || 0
           })));
         }
       } catch {
@@ -186,9 +156,12 @@ nodes:
     setEditingId(null);
     setFormData({
       title: '',
-      status: 'LIVE',
+      projectName: '',
+      status: 'active',
       category: 'Web Application',
-      description: `## 🚀 Project Overview
+      technologies: 'Python, Django, React, PostgreSQL',
+      description: 'High-performance cloud architecture and developer tool suite.',
+      documentation: `## 🚀 Project Overview
 
 Describe the core problem this project solves and architectural decisions.
 
@@ -215,8 +188,10 @@ data:
       completed: new Date().toISOString().split('T')[0],
       image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80',
       demoUrl: '',
+      liveUrl: '',
       githubUrl: '',
-      visible: true
+      visible: true,
+      featured: false
     });
     setViewMode('EDITOR');
     window.scrollTo(0, 0);
@@ -225,7 +200,11 @@ data:
   // Open separate Editor Page for Editing
   const handleOpenEditPage = (proj) => {
     setEditingId(proj.id);
-    setFormData({ ...proj });
+    setFormData({
+      ...proj,
+      documentation: proj.documentation || proj.description,
+      description: proj.description || proj.documentation?.slice(0, 200) || '',
+    });
     setViewMode('EDITOR');
     window.scrollTo(0, 0);
   };
@@ -245,19 +224,25 @@ data:
       return;
     }
 
-    const currentSiteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-meet';
     const payload = {
       title: formData.title,
+      project_name: formData.projectName || formData.title,
       slug: formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || `project-${Date.now()}`,
       status: formData.status,
       category: formData.category,
-      description: formData.description,
+      description: formData.description || formData.documentation?.slice(0, 200) || '',
+      documentation: formData.documentation || formData.description || '',
+      technologies: formData.technologies || '',
       completed_date: formData.completed,
       image: formData.image,
       demo_url: formData.demoUrl,
+      live_url: formData.liveUrl || formData.demoUrl,
       github_url: formData.githubUrl,
       visible: formData.visible,
-      website: currentSiteSlug
+      is_active: formData.visible,
+      featured: formData.featured,
+      is_featured: formData.featured,
+      website: 'dev-mate'
     };
 
     if (editingId) {

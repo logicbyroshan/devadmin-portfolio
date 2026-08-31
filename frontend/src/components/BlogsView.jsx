@@ -178,27 +178,30 @@ points:
     return b.category === selectedCategory;
   });
 
-  // Fetch blogs from Django REST Framework API with multi-tenant filtering
+  // Fetch blogs from Django REST Framework API
   useEffect(() => {
     let isMounted = true;
     const fetchBlogs = async () => {
       try {
-        const siteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-meet';
-        const data = await blogsApi.getAll({ website: siteSlug });
+        const data = await blogsApi.getAll({ website: 'dev-mate' });
         const list = Array.isArray(data) ? data : (data.results || []);
         if (isMounted && list.length > 0) {
           setBlogs(list.map(b => ({
             id: b.id,
             title: b.title,
+            subtitle: b.subtitle || '',
             slug: b.slug || '',
-            category: b.category || 'Engineering',
+            category: b.category || 'Architecture & Distributed Systems',
             status: b.status,
             date: b.date || (b.created_at ? b.created_at.split('T')[0] : 'Recently'),
             readTime: b.read_time || b.readTime || '5 min read',
             views: b.views_count || b.views || 0,
-            summary: b.summary || '',
+            summary: b.summary || b.tldr || '',
+            tldr: b.tldr || b.summary || '',
             content: b.content || '',
-            visible: b.visible !== false
+            image: b.image || '',
+            tags: b.tags || [],
+            visible: b.visible !== false && b.is_active !== false
           })));
         }
       } catch {
@@ -214,13 +217,17 @@ points:
     setEditingId(null);
     setFormData({
       title: '',
+      subtitle: '',
       slug: '',
-      category: 'React & Frontend',
+      category: 'Architecture & Distributed Systems',
       status: 'PUBLISHED',
       date: new Date().toISOString().split('T')[0],
       readTime: '5 min read',
       views: 0,
       summary: '',
+      tldr: '',
+      image: '',
+      tags: [],
       content: `## 🚀 Introduction
 
 Write your comprehensive technical documentation here...
@@ -254,7 +261,12 @@ data:
   // Open separate Editor Page for Editing
   const handleOpenEditPage = (blog) => {
     setEditingId(blog.id);
-    setFormData({ ...blog });
+    setFormData({
+      ...blog,
+      subtitle: blog.subtitle || '',
+      summary: blog.summary || blog.tldr || '',
+      tldr: blog.tldr || blog.summary || '',
+    });
     setViewMode('EDITOR');
     window.scrollTo(0, 0);
   };
@@ -274,18 +286,22 @@ data:
       return;
     }
 
-    const currentSiteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-meet';
     const payload = {
       title: formData.title,
+      subtitle: formData.subtitle || '',
       slug: formData.slug || formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || `blog-${Date.now()}`,
       category: formData.category,
       status: formData.status,
       date: formData.date,
       read_time: formData.readTime,
-      summary: formData.summary,
+      summary: formData.summary || formData.tldr || '',
+      tldr: formData.tldr || formData.summary || '',
       content: formData.content,
+      image: formData.image || '',
+      tags: formData.tags || [],
       visible: formData.visible,
-      website: currentSiteSlug
+      is_active: formData.visible,
+      website: 'dev-mate'
     };
 
     if (editingId) {

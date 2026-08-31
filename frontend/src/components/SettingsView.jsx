@@ -1,15 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Settings, Shield, UserPlus, Save, Lock, Trash2, Edit2, CheckCircle2, AlertCircle, ToggleLeft, ToggleRight, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { websitesApi } from '../services/api';
 
 export default function SettingsView({ onNavigate, activeWebsite }) {
   const { changePassword } = useAuth();
-  const [siteTitle, setSiteTitle] = useState(`${activeWebsite?.name || 'Dev-Meet'} Admin Workspace`);
-  const [seoDescription, setSeoDescription] = useState(`Official administrative control center for ${activeWebsite?.name || 'Dev-Meet'} developer platform.`);
-  const [seoKeywords, setSeoKeywords] = useState(`developer, portfolio, admin, ${activeWebsite?.slug || activeWebsite?.id || 'dev-meet'}, react, fullstack`);
+  const [siteTitle, setSiteTitle] = useState(`${activeWebsite?.name || 'DevMate'} Admin Workspace`);
+  const [seoDescription, setSeoDescription] = useState(`Official administrative control center for ${activeWebsite?.name || 'DevMate'} developer platform.`);
+  const [seoKeywords, setSeoKeywords] = useState(`developer, portfolio, admin, ${activeWebsite?.slug || activeWebsite?.id || 'dev-mate'}, react, fullstack`);
+  const [primaryColor, setPrimaryColor] = useState(activeWebsite?.primaryColor || 'violet');
   const [maintenanceMode, setMaintenanceMode] = useState(false);
-  const [savedSettings, setSavedSettings] = useState(false);
+  const [registrationOpen, setRegistrationOpen] = useState(true);
+  const [smtpNotifications, setSmtpNotifications] = useState(true);
+  const [savedToast, setSavedToast] = useState(false);
+  const [activeTab, setActiveTab] = useState('general'); // 'general' | 'seo' | 'security' | 'database'
+
+  // Fetch website settings from backend
+  useEffect(() => {
+    let isMounted = true;
+    const fetchSettings = async () => {
+      try {
+        const siteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-mate';
+      } catch (err) {
+        console.error("Failed to fetch settings", err);
+      }
+    };
+    fetchSettings();
+    return () => { isMounted = false; };
+  }, [activeWebsite]);
 
   const [users, setUsers] = useState([
     { id: 1, name: 'Roshan Kumar (You)', email: 'roshan.dev@example.com', role: 'Super User', status: 'Active' },
@@ -28,9 +46,9 @@ export default function SettingsView({ onNavigate, activeWebsite }) {
     e.preventDefault();
     setSavedSettings(true);
     try {
-      const siteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-meet';
+      const siteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-mate';
       await websitesApi.patch(siteSlug, {
-        name: activeWebsite?.name || 'DevMeet',
+        name: activeWebsite?.name || 'DevMate',
         tag: seoDescription
       });
     } catch {

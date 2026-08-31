@@ -67,7 +67,7 @@ export default function DashboardView({ onNavigate, activeWebsite }) {
     let isMounted = true;
     const fetchDashboardData = async () => {
       try {
-        const siteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-meet';
+        const siteSlug = activeWebsite?.slug || activeWebsite?.id || 'dev-mate';
         const liveStats = await dashboardApi.getStats(siteSlug);
         if (isMounted && liveStats) {
           setStats(liveStats);

@@ -16,76 +16,34 @@ import SignupView from './components/SignupView';
 import { useAuth } from './context/AuthContext';
 import AuthModal from './components/AuthModal';
 
-export const WEBSITES = [
-  { 
-    id: 'dev-meet', 
-    slug: 'dev-meet',
-    name: 'DevMeet', 
-    badge: 'DevMeet', 
-    tag: 'Multi-Peer Video Collaboration & WebRTC Engine', 
-    primaryColor: 'blue',
-    accentText: 'text-blue-400',
-    accentBg: 'bg-blue-500/10',
-    accentBorder: 'border-blue-500/30',
-    badgeStyle: 'bg-blue-500/15 text-blue-400 border-blue-500/30',
-    gradient: 'from-blue-600 to-indigo-600',
-    glow: 'shadow-blue-500/20',
-    dotColor: 'bg-blue-400',
-    heatmapColors: {
-      4: 'bg-blue-400 shadow-sm shadow-blue-400/50',
-      3: 'bg-blue-500/80',
-      2: 'bg-blue-600/50',
-      1: 'bg-blue-950/60 border border-blue-500/20',
-    }
-  },
-  { 
-    id: 'dev-mitra', 
-    slug: 'dev-mitra',
-    name: 'DevMitra', 
-    badge: 'DevMitra', 
-    tag: 'AI Peer Pairing & Mentorship Engine', 
-    primaryColor: 'sky',
-    accentText: 'text-sky-400',
-    accentBg: 'bg-sky-500/10',
-    accentBorder: 'border-sky-500/30',
-    badgeStyle: 'bg-sky-500/15 text-sky-400 border-sky-500/30',
-    gradient: 'from-sky-600 to-blue-600',
-    glow: 'shadow-sky-500/20',
-    dotColor: 'bg-sky-400',
-    heatmapColors: {
-      4: 'bg-sky-400 shadow-sm shadow-sky-400/50',
-      3: 'bg-sky-500/80',
-      2: 'bg-sky-600/50',
-      1: 'bg-sky-950/60 border border-sky-500/20',
-    }
-  },
-  { 
-    id: 'dev-mate', 
-    slug: 'dev-mate',
-    name: 'DevMate', 
-    badge: 'DevMate', 
-    tag: 'In-Browser Cloud Sandbox & Code IDE', 
-    primaryColor: 'violet',
-    accentText: 'text-violet-400',
-    accentBg: 'bg-violet-500/10',
-    accentBorder: 'border-violet-500/30',
-    badgeStyle: 'bg-violet-500/15 text-violet-400 border-violet-500/30',
-    gradient: 'from-violet-600 to-indigo-600',
-    glow: 'shadow-violet-500/20',
-    dotColor: 'bg-violet-400',
-    heatmapColors: {
-      4: 'bg-violet-400 shadow-sm shadow-violet-400/50',
-      3: 'bg-violet-500/80',
-      2: 'bg-violet-600/50',
-      1: 'bg-violet-950/60 border border-violet-500/20',
-    }
-  },
-];
+export const DEVMATE_SITE = { 
+  id: 'dev-mate', 
+  slug: 'dev-mate',
+  name: 'DevMate', 
+  badge: 'DevMate', 
+  tag: 'In-Browser Cloud Sandbox & Code IDE', 
+  primaryColor: 'violet',
+  accentText: 'text-violet-400',
+  accentBg: 'bg-violet-500/15',
+  accentBorder: 'border-violet-500/30',
+  badgeStyle: 'bg-violet-500/20 text-violet-300 border-violet-500/40',
+  gradient: 'from-violet-600 to-indigo-600',
+  glow: 'shadow-violet-500/20',
+  dotColor: 'bg-violet-400',
+  heatmapColors: {
+    4: 'bg-violet-400 shadow-sm shadow-violet-400/50',
+    3: 'bg-violet-500/80',
+    2: 'bg-violet-600/50',
+    1: 'bg-violet-950/60 border border-violet-500/20',
+  }
+};
+
+export const WEBSITES = [DEVMATE_SITE];
 
 export default function App() {
   const { isAuthenticated, logout } = useAuth();
   const [currentPage, setCurrentPage] = useState('dashboard');
-  const [activeWebsite, setActiveWebsite] = useState('dev-meet');
+  const [activeWebsite, setActiveWebsite] = useState(DEVMATE_SITE);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [authView, setAuthView] = useState(null); // null | 'LOGIN' | 'SIGNUP'
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -129,10 +87,10 @@ export default function App() {
     );
   }
 
-  const selectedSite = WEBSITES.find(w => w.id === activeWebsite || w.slug === activeWebsite) || WEBSITES[0];
+  const selectedSite = DEVMATE_SITE;
 
   return (
-    <div className="min-h-screen bg-black text-slate-100 flex flex-col selection:bg-blue-500/30 selection:text-blue-200 overflow-x-hidden">
+    <div className="min-h-screen bg-black text-slate-100 flex flex-col selection:bg-violet-500/30 selection:text-violet-200 overflow-x-hidden">
       {/* Container wrapper locking layout above 1920px */}
       <div className="w-full max-w-[1920px] mx-auto min-h-screen flex flex-col relative">
         {/* Fixed Navbar (Full-Width Header) */}
@@ -140,7 +98,6 @@ export default function App() {
           onNavigate={handleNavigate} 
           currentPage={currentPage}
           activeWebsite={selectedSite}
-          onSelectWebsite={(site) => setActiveWebsite(typeof site === 'object' ? (site.slug || site.id) : site)}
           isMobileSidebarOpen={isMobileSidebarOpen}
           onToggleMobileSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
         />
